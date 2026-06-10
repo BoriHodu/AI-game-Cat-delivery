@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1624, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>고양이 택배정리 🐱</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap');
+
+:root{
+  --W:1624px; --H:750px;
+  --cream:#F5E6D3; --cream-dark:#ECD9B8; --paper:#FAF1E1; --paper-sh:#E8D5B5;
+  --brown:#8B5A2B; --bdk:#5C3A1A; --blt:#B8763E;
+  --orange:#E89B6C; --odk:#D27A48;
+  --green:#A8C988; --gdk:#7FAA66; --coral:#E08B7C;
+  --ink:#4A3520; --inks:#6B523A;
+  --sh:rgba(92,58,26,.18);
+  --font:"Jua","Gaegu","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-xs:11px; --f-sm:13px; --f-md:16px; --f-lg:20px; --f-xl:26px; --f-xxl:36px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;
+  -webkit-tap-highlight-color:transparent;user-select:none;}
+
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  margin:0;padding:0;
+  background-color:#2a1f15;
+  font-family:var(--font);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+}
+
+#gameRoot{
+  position:relative;
+  width:var(--W);height:var(--H);
+  background:var(--cream);overflow:hidden;
+  transform-origin:top left;
+}
+
+.paper-bg{
+  position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle at 20% 40%,rgba(255,255,255,.5) 0%,transparent 45%),
+    radial-gradient(circle at 80% 60%,rgba(232,155,108,.07) 0%,transparent 45%),
+    repeating-linear-gradient(45deg,transparent 0,transparent 3px,rgba(139,90,43,.012) 3px,rgba(139,90,43,.012) 6px);
+}
+
+.screen{position:absolute;inset:0;display:none;flex-direction:column;z-index:1;}
+.screen.active{display:flex;animation:fadeIn .28s ease-out;}
+#screen-game{padding-top:0;background:transparent;}
+#screen-game .paper-bg{display:none;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.btn{
+  font-family:var(--font);font-size:var(--f-lg);font-weight:700;
+  padding:10px 28px;border-radius:20px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;justify-content:center;
+  transition:transform .1s,box-shadow .1s;transform:rotate(-.4deg);
+}
+.btn>*{pointer-events:none;}
+.btn:active{transform:translateY(3px) rotate(-.4deg);}
+.btn-primary{background:var(--orange);color:#fff;
+  box-shadow:0 4px 0 var(--odk),0 6px 14px var(--sh);border:2px solid var(--brown);}
+.btn-primary:active{box-shadow:0 1px 0 var(--odk);}
+.btn-secondary{background:var(--paper);color:var(--bdk);
+  box-shadow:0 4px 0 var(--paper-sh),0 6px 14px var(--sh);border:2px solid var(--blt);}
+.btn-secondary:active{box-shadow:0 1px 0 var(--paper-sh);}
+.btn-lg{font-size:var(--f-xl);padding:14px 44px;border-radius:26px;}
+.btn-back{
+  background:var(--paper);border:2px solid var(--brown);
+  width:52px;height:52px;border-radius:50%;font-size:22px;
+  color:var(--bdk);cursor:pointer;flex-shrink:0;
+  box-shadow:0 3px 0 var(--paper-sh),0 4px 10px var(--sh);
+  display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:700;
+}
+.btn-back:active{transform:translateY(2px);}
+
+.scr-header{
+  position:relative;z-index:2;display:flex;align-items:center;
+  justify-content:space-between;padding:16px 24px;gap:16px;flex-shrink:0;
+}
+.scr-title{
+  font-size:var(--f-xl);color:var(--bdk);font-weight:700;
+  text-shadow:2px 2px 0 var(--cream-dark);
+}
+
+.screen-main{
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  isolation:isolate;
+  background-image:url('https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_bg.png');
+  background-size:cover;
+  background-position:center;
+}
+
+
+.screen-main .paper-bg{display:none;}
+
+@keyframes float{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-14px) rotate(5deg)}}
+
+.main-card{
+  position:static;
+  background:transparent;border:none;border-radius:0;
+  padding:0;display:flex;flex-direction:column;align-items:center;
+  gap:0;box-shadow:none;width:860px;
+  margin-top:auto;margin-bottom:56px;
+}
+/* 메인화면 타이틀 숨김 (배경이미지에 포함됨) */
+.screen-main .main-title-block{display:none;}
+/* 고양이 + 버튼 래퍼 */
+.main-cat-btn-wrap{
+  position:static;
+  display:flex;align-items:flex-end;justify-content:center;
+  width:100%;
+}
+/* 고양이: 버튼 뒤에서 얼굴만 빼꼼 — z-index 1 (버튼 뒤) */
+.main-char-box{
+  position:absolute;
+  bottom:15%;
+  left:calc(50% + 5px);transform:translateX(-50%);
+  z-index:1;
+  background:transparent !important;
+  border:none;box-shadow:none;
+  margin:0;overflow:visible;pointer-events:none;
+  line-height:0;font-size:0;
+}
+.main-char-box::before{display:none;}
+/* 버튼 래퍼: 고양이보다 앞 */
+.main-mode-cards{position:absolute;left:813px;top:463px;transform:translate(-50%,-50%);z-index:2;display:flex;}
+
+.main-title-block{text-align:center;margin-bottom:4px;}
+.subtitle{
+  font-size:var(--f-sm);color:var(--blt);letter-spacing:.07em;
+  margin-bottom:4px;display:block;
+}
+.game-title{
+  font-size:56px;color:var(--bdk);font-weight:700;
+  line-height:1.05;margin:0 0 4px;
+  text-shadow:3px 3px 0 var(--cream-dark),6px 6px 0 rgba(139,90,43,.15);
+  letter-spacing:-.5px;
+}
+.title-tag{font-size:var(--f-sm);color:var(--inks);}
+
+
+.main-cat-big{
+  font-size:120px;line-height:1;
+  filter:drop-shadow(0 8px 20px rgba(0,0,0,.18));
+  animation:none;
+}
+@keyframes catBounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+.main-buttons{
+  display:flex;flex-direction:column;
+  align-items:center;gap:14px;width:100%;
+}
+.btn-row2{display:flex;gap:12px;width:100%;}
+.btn-row2 .btn{flex:1;justify-content:center;}
+.btn-start-wide{width:100%;font-size:22px;padding:16px 0;border-radius:24px;}
+
+.char-screen-body{
+  flex:1;display:flex;flex-direction:row;min-height:0;
+}
+
+.char-info-panel{
+  width:280px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  padding:16px 20px 20px;gap:14px;z-index:2;
+}
+.char-badge{
+  display:inline-block;background:var(--orange);color:#fff;
+  font-size:var(--f-sm);font-weight:700;padding:5px 14px;border-radius:20px;
+  border:2px solid var(--brown);box-shadow:0 3px 0 var(--odk);
+  align-self:flex-start;
+}
+.char-info-card{
+  background:var(--paper);border:2.5px solid var(--blt);border-radius:20px;
+  padding:18px 20px;flex:1;
+  box-shadow:0 5px 0 var(--paper-sh),0 8px 20px var(--sh);
+}
+.char-info-name{
+  font-size:36px;font-weight:700;color:var(--bdk);
+  display:flex;align-items:center;gap:8px;margin-bottom:6px;
+}
+.char-info-name-paw{font-size:22px;}
+.char-info-desc{font-size:var(--f-sm);color:var(--inks);line-height:1.6;margin-bottom:16px;}
+.char-ability-card{
+  background:linear-gradient(135deg,#f0f9e8,#e2f5d0);
+  border:2px solid var(--gdk);border-radius:14px;
+  padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+}
+.char-ability-icon{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--green);border:2px solid var(--gdk);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  box-shadow:0 2px 0 var(--gdk);
+}
+.char-ability-text{}
+.char-ability-title{font-size:var(--f-md);font-weight:700;color:var(--gdk);}
+.char-ability-desc{font-size:var(--f-xs);color:var(--inks);margin-top:2px;line-height:1.5;}
+
+.char-spotlight{
+  flex:1;position:relative;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  overflow:hidden;z-index:2;gap:0;
+}
+.char-spotlight::before{
+  content:"";position:absolute;
+  top:-40px;left:50%;transform:translateX(-50%);
+  width:340px;height:420px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,220,120,.55) 0%,rgba(255,200,80,.15) 45%,transparent 75%);
+  pointer-events:none;
+}
+.char-spotlight::after{
+  content:"";position:absolute;
+  bottom:110px;left:50%;transform:translateX(-50%);
+  width:240px;height:60px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(210,175,120,.45) 0%,transparent 70%);
+  pointer-events:none;
+}
+.char-big-emoji{
+  font-size:150px;line-height:1;
+  filter:drop-shadow(0 10px 30px rgba(180,120,30,.35));
+  animation:charFloat 2.5s ease-in-out infinite;
+  position:relative;z-index:3;
+  margin-bottom:8px;
+}
+@keyframes charFloat{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-16px) scale(1.03)}
+}
+.char-sparkle{
+  position:absolute;pointer-events:none;z-index:4;
+  font-size:20px;animation:sparkle 2s ease-in-out infinite;
+}
+.char-sparkle:nth-child(1){top:calc(50% - 80px);left:calc(50% - 100px);animation-delay:0s;}
+.char-sparkle:nth-child(2){top:calc(50% - 60px);right:calc(50% - 110px);animation-delay:.5s;}
+.char-sparkle:nth-child(3){top:calc(50% + 20px);left:calc(50% + 50px);animation-delay:1s;}
+@keyframes sparkle{
+  0%,100%{opacity:.3;transform:scale(.7) rotate(-10deg)}
+  50%{opacity:1;transform:scale(1.2) rotate(10deg)}
+}
+.char-nav{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.85);border:2px solid var(--blt);
+  cursor:pointer;font-size:18px;color:var(--bdk);font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px var(--sh);z-index:5;
+  transition:transform .1s;
+}
+.char-nav:active{transform:translateY(-50%) scale(.9);}
+.char-nav-prev{left:12px;}
+.char-nav-next{right:12px;}
+.char-dots{
+  display:flex;gap:8px;position:relative;z-index:3;margin-bottom:10px;
+}
+.char-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--paper-sh);border:1.5px solid var(--blt);
+  transition:all .2s;cursor:pointer;
+}
+.char-dot.active{background:var(--orange);border-color:var(--odk);transform:scale(1.25);}
+.char-confirm-btn{
+  width:340px;
+  font-size:22px;padding:15px 0;border-radius:28px;
+  font-weight:700;position:relative;z-index:3;
+  letter-spacing:.02em;
+}
+
+.char-list-panel{
+  width:360px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  padding:12px 20px 12px 12px;gap:8px;z-index:2;
+}
+.char-list-title{
+  font-size:var(--f-sm);font-weight:700;color:var(--blt);
+  text-align:center;padding:6px 0;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.char-list-title::before,.char-list-title::after{
+  content:"";flex:1;height:1.5px;background:var(--blt);opacity:.35;border-radius:2px;
+}
+.char-list-scroll{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  padding-right:4px;
+}
+.char-list-scroll::-webkit-scrollbar{width:4px;}
+.char-list-scroll::-webkit-scrollbar-thumb{background:var(--blt);border-radius:2px;}
+
+.char-list-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--paper);border:2px solid var(--paper-sh);border-radius:18px;
+  padding:10px 14px;cursor:pointer;
+  transition:all .15s;box-shadow:0 3px 0 var(--paper-sh);
+  position:relative;flex-shrink:0;
+}
+.char-list-item:hover:not(.locked){
+  border-color:var(--orange);box-shadow:0 4px 12px var(--sh);
+  transform:translateX(-2px);
+}
+.char-list-item.selected{
+  border:2.5px solid var(--orange);
+  background:linear-gradient(135deg,var(--paper),#FFF8E8);
+  box-shadow:0 4px 0 var(--odk),0 6px 16px rgba(232,155,108,.2);
+}
+.char-list-item.locked{
+  opacity:.6;cursor:not-allowed;
+  background:var(--cream-dark);border-color:var(--paper-sh);
+}
+.char-list-thumb{
+  width:60px;height:60px;border-radius:14px;
+  background:var(--cream);border:2px solid var(--blt);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;flex-shrink:0;
+  box-shadow:0 2px 6px var(--sh);
+}
+.char-list-item.selected .char-list-thumb{
+  background:linear-gradient(135deg,#FFF3E0,#FFE0B2);
+  border-color:var(--orange);
+}
+.char-list-info{flex:1;min-width:0;}
+.char-list-name{font-size:var(--f-lg);font-weight:700;color:var(--bdk);}
+.char-list-sub{font-size:var(--f-xs);color:var(--inks);margin-top:3px;display:flex;align-items:center;gap:5px;}
+.char-list-sub .lock-icon{font-size:11px;}
+.char-list-selected-badge{
+  background:var(--orange);color:#fff;
+  font-size:var(--f-xs);font-weight:700;padding:3px 10px;border-radius:10px;
+  border:1.5px solid var(--odk);display:flex;align-items:center;gap:4px;
+  white-space:nowrap;
+}
+.char-list-lock{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--cream-dark);border:1.5px solid var(--paper-sh);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;
+}
+.char-list-footer{
+  font-size:var(--f-xs);color:var(--inks);text-align:center;padding:6px 0;
+  opacity:.7;display:flex;align-items:center;justify-content:center;gap:5px;
+}
+
+.game-hud{
+  position:absolute;top:0;left:0;right:0;
+  z-index:20;
+  display:flex;align-items:flex-start;
+  padding:12px 16px;height:120px;
+  background:transparent;
+  border-bottom:none;
+  pointer-events:none;
+}
+.game-hud>*{pointer-events:auto;}
+/* 콤보 */
+.hud-combo-wrap{
+  position:relative;flex-shrink:0;
+  width:138px;height:111px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hud-combo-bg{position:absolute;width:138px;height:111px;object-fit:contain;display:block;}
+.hud-combo-val{
+  position:absolute;
+  bottom:18px;
+  font-size:46px;font-weight:700;color:#8e6eac;
+  line-height:1;
+}
+.hud-combo-wrap.hot .hud-combo-val{animation:comboPop .4s ease-out;color:#E05A1E;}
+@keyframes comboPop{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
+/* 좌측 그룹 */
+.hud-left{
+  display:flex;align-items:flex-start;gap:8px;flex-shrink:0;
+}
+/* 중앙 */
+.hud-center{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-start;gap:6px;
+  padding-top:8px;
+}
+.hud-score-val{
+  font-size:72px;font-weight:700;color:var(--bdk);line-height:1;
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:12px;white-space:nowrap;
+}
+/* 하트 */
+.hud-hearts-wrap{
+  position:relative;flex-shrink:0;
+  width:230px;height:84px;
+  display:flex;align-items:center;justify-content:center;
+}
+.hud-heart-bg{
+  position:absolute;width:230px;height:84px;object-fit:contain;
+}
+.hud-hearts-icons{
+  position:absolute;
+  top:0;left:0;
+  width:230px;height:84px;
+}
+.hud-heart{
+  position:absolute;
+  width:52px;height:43px;object-fit:contain;
+  transform:translate(-50%,-50%);
+}
+.hud-heart:nth-child(1){left:55px;top:43px;}
+.hud-heart:nth-child(2){left:117px;top:43px;}
+.hud-heart:nth-child(3){left:178px;top:43px;}
+.hud-heart.lost{opacity:0;}
+/* 일시정지 */
+.hud-pause-btn{
+  flex-shrink:0;background:none;border:none;padding:0;cursor:pointer;
+  width:95px;height:95px;
+}
+.hud-pause-btn img{width:100%;height:100%;object-fit:contain;display:block;}
+.hud-pause-btn:active{transform:translateY(2px);}
+
+.game-field{
+  position:absolute;inset:0;top:80px;overflow:hidden;
+}
+.game-field::before{
+  content:"";position:absolute;inset:0 0 40% 0;
+  background-image:
+    linear-gradient(rgba(139,90,43,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(139,90,43,.08) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;z-index:0;
+}
+.game-field::after{
+  content:"";position:absolute;bottom:0;left:0;right:0;height:45%;
+  background:linear-gradient(180deg,transparent 0%,rgba(92,58,26,.12) 100%);
+  pointer-events:none;z-index:0;
+}
+
+.game-character-layer{
+  position:absolute;
+  bottom:calc(34% - 5px);
+  left:0;right:0;
+  height:280px;
+  z-index:1;
+  pointer-events:none;
+}
+.game-character{
+  position:absolute;
+  bottom:0;
+  line-height:1;
+  filter:drop-shadow(0 8px 16px rgba(0,0,0,.25));
+  transition:left .25s cubic-bezier(.34,1.3,.64,1);
+  transform-origin:bottom center;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.game-character img{
+  width:auto;height:auto;
+  object-fit:contain;
+  pointer-events:none;
+  display:block;
+}
+.game-character.idle{/* 상하 모션 제거 */}
+.game-character.grab{animation:gcGrab .25s ease-out;}
+.game-character.wrong-react{animation:gcWrong .35s ease-in-out;}
+@keyframes gcGrab{
+  0%{transform:translateY(0)}
+  35%{transform:translateY(-18px)}
+  65%{transform:translateY(-10px)}
+  100%{transform:translateY(0)}
+}
+@keyframes gcWrong{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-10px)}
+  30%{transform:translateX(10px)}
+  45%{transform:translateX(-10px)}
+  60%{transform:translateX(10px)}
+  75%{transform:translateX(-6px)}
+  90%{transform:translateX(6px)}
+}
+
+.game-bubble{
+  position:absolute;
+  bottom:88px;
+  background:#fff;
+  border:2.5px solid var(--brown);
+  border-radius:18px 18px 18px 4px;
+  padding:8px 14px;
+  min-width:120px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);
+  opacity:0;transform:scale(.7) translateY(10px);
+  transition:opacity .25s,transform .25s;
+  pointer-events:none;z-index:6;
+  white-space:nowrap;
+}
+.game-bubble.show{opacity:1;transform:scale(1) translateY(0);}
+.bubble-label{font-size:10px;color:var(--blt);font-weight:700;display:block;margin-bottom:2px;}
+.bubble-content{display:flex;align-items:center;gap:6px;}
+.bubble-emoji{font-size:28px;}
+.bubble-name{font-size:16px;font-weight:700;color:var(--bdk);}
+
+.game-belt{
+  position:absolute;
+  left:0;right:0;
+  top:370px;
+  height:38%;
+  z-index:4;
+}
+.belt-body{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,#4A3520 0%,#3A2810 30%,#2E2010 70%,#3A2810 100%);
+  border-top:4px solid #5C3A1A;
+}
+.belt-stripes{
+  position:absolute;top:4px;left:0;right:0;bottom:0;
+  background-image:repeating-linear-gradient(
+    90deg,
+    rgba(255,255,255,.06) 0,rgba(255,255,255,.06) 6px,
+    transparent 6px,transparent 52px
+  );
+  animation:beltMove 1s linear infinite;
+}
+@keyframes beltMove{from{background-position:0 0}to{background-position:-52px 0}}
+.belt-roller-top,.belt-roller-bot{
+  position:absolute;left:0;right:0;height:10px;
+  background:repeating-linear-gradient(
+    90deg,#7A5A3A 0,#7A5A3A 18px,#5C3A1A 18px,#5C3A1A 36px
+  );
+}
+.belt-roller-top{top:0;}
+.belt-roller-bot{bottom:0;}
+
+.belt-items-layer{
+  position:absolute;inset:0;
+  z-index:5;pointer-events:none;
+}
+.belt-item{
+  position:absolute;
+  top:-35px;transform:translateY(-50%);
+  background:none;border:none;border-radius:0;box-shadow:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;pointer-events:all;
+  transition:transform .12s;
+}
+.belt-item img{width:192px;height:192px;object-fit:contain;pointer-events:none;}
+.belt-item.target-item img{
+  filter:drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 20px rgba(255,200,0,.6));
+}
+.belt-item:hover{transform:translateY(-58%) scale(1.06);}
+.belt-item:active{transform:translateY(-46%) scale(.95);}
+.belt-item::after{display:none;}
+.belt-item.correct{
+  pointer-events:none;
+  animation:itemCorrect .5s ease-out forwards;
+}
+@keyframes itemCorrect{
+  0%{transform:translateY(-50%) scale(1);opacity:1}
+  30%{transform:translateY(-90%) scale(1.25) rotate(10deg);opacity:1}
+  100%{transform:translateY(-200%) scale(.1) rotate(360deg);opacity:0}
+}
+.belt-item.wrong{
+  animation:itemWrong .45s ease-in-out;
+}
+@keyframes itemWrong{
+  0%,100%{transform:translateY(-50%)}
+  20%{transform:translateY(-50%) translateX(-14px) rotate(-5deg)}
+  60%{transform:translateY(-50%) translateX(14px) rotate(5deg)}
+}
+.item-sparkle{display:none;}
+
+.sort-buttons{
+  position:absolute;
+  left:0;bottom:0;
+  width:100%;height:246px;
+  display:flex;flex-direction:row;align-items:flex-end;
+  z-index:10;background:none;border:none;padding:0;
+  pointer-events:auto;
+}
+.sort-btn{
+  position:absolute;
+  bottom:0;
+  border:none;background:none;box-shadow:none;
+  cursor:pointer;display:flex;
+  align-items:flex-end;justify-content:center;
+  padding:0;margin:0;
+  transform:translateX(-50%);
+  transition:transform .1s;
+  overflow:visible;
+}
+.sort-btn>*{pointer-events:none;}
+
+.sort-btn.ok {animation:btnOk .4s ease-out;}
+.sort-btn.bad{animation:btnBad .5s ease-in-out;}
+@keyframes btnOk{
+  0%{transform:translateX(-50%) translateY(0)}
+  40%{transform:translateX(-50%) translateY(5px);filter:brightness(1.4)}
+  100%{transform:translateX(-50%) translateY(0);filter:brightness(1)}
+}
+@keyframes btnBad{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  20%{transform:translateX(-50%) translateX(-6px)}
+  25%{transform:translateX(-50%) translateY(5px)}
+  60%{transform:translateX(-50%) translateX(6px)}
+  75%{transform:translateX(-50%) translateY(3px)}
+}
+.sort-emoji{font-size:36px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.25));}
+.sort-label{font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
+
+.feedback-layer{position:absolute;inset:0;pointer-events:none;z-index:20;}
+.fb-pop{
+  position:absolute;font-size:30px;font-weight:700;pointer-events:none;
+  animation:fbRise .85s ease-out forwards;
+  text-shadow:2px 2px 0 rgba(255,255,255,.8);
+}
+.fb-pop.ok {color:var(--gdk);}
+.fb-pop.bad{color:var(--coral);}
+@keyframes fbRise{
+  0%{opacity:0;transform:translateY(0) scale(.5)}
+  25%{opacity:1;transform:translateY(-14px) scale(1.3)}
+  100%{opacity:0;transform:translateY(-80px) scale(1)}
+}
+
+.modal-overlay{
+  position:absolute;inset:0;background:rgba(74,53,32,.52);
+  z-index:100;display:none;align-items:center;justify-content:center;
+  padding:24px;backdrop-filter:blur(3px);
+}
+.modal-overlay.active{display:flex;animation:fadeIn .28s ease-out;}
+.modal-card{
+  background:var(--paper);border:3px solid var(--brown);
+  border-radius:26px;padding:28px 36px;max-width:520px;width:100%;
+  text-align:center;position:relative;
+  box-shadow:0 10px 0 var(--paper-sh),0 24px 48px rgba(0,0,0,.28);
+  transform:rotate(-.4deg);animation:modalPop .38s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes modalPop{from{transform:rotate(-.4deg) scale(.65);opacity:0}to{transform:rotate(-.4deg) scale(1);opacity:1}}
+.tape{position:absolute;top:-12px;width:80px;height:28px;
+  background:rgba(232,155,108,.52);border:1px dashed rgba(139,90,43,.38);}
+.tape-l{left:14%;transform:rotate(-8deg);}
+.tape-r{right:14%;transform:rotate(6deg);}
+.m-region{font-size:var(--f-sm);font-weight:700;color:var(--odk);letter-spacing:.06em;}
+.m-title {font-size:var(--f-xxl);color:var(--bdk);font-weight:700;margin:6px 0 10px;}
+.m-desc  {font-size:var(--f-md);color:var(--inks);line-height:1.55;margin-bottom:12px;}
+.m-targets{display:flex;gap:12px;justify-content:center;margin:12px 0;}
+.tgt{background:#fff;border:2px solid var(--blt);border-radius:14px;
+  padding:10px 16px;display:flex;flex-direction:column;align-items:center;flex:1;max-width:160px;}
+.tgt-e{font-size:22px;}
+.tgt-l{font-size:var(--f-xs);color:var(--blt);margin:3px 0;}
+.tgt-v{font-size:var(--f-xl);font-weight:700;color:var(--bdk);}
+.m-hint{font-size:var(--f-sm);color:var(--gdk);margin:6px 0 14px;font-style:italic;}
+.m-btns{display:flex;gap:10px;justify-content:center;margin-top:10px;}
+.m-btns-v{flex-direction:column;align-items:stretch;max-width:290px;margin:10px auto 0;}
+
+
+/* 아이템 수집/오답 애니메이션 - 피드백 레이어 */
+@keyframes itemCollect{
+  0%{transform:scale(1) rotate(0)}
+  50%{transform:scale(1.35) rotate(18deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+@keyframes itemShake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:rotate(-14deg)}
+  75%{transform:rotate(14deg)}
+}
+
+.toast{
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--bdk);color:#fff;padding:10px 22px;border-radius:20px;
+  font-size:var(--f-md);z-index:200;opacity:0;transition:opacity .3s,transform .3s;
+  box-shadow:0 6px 22px rgba(0,0,0,.28);white-space:nowrap;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.main-mode-cards{
+  display:flex;gap:48px;justify-content:center;
+  margin-top:4px;width:100%;
+}
+.mode-card{
+  flex:1;max-width:300px;
+  background:var(--paper);border:2.5px solid var(--paper-sh);
+  border-radius:28px;padding:22px 20px 16px;
+  cursor:pointer;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  box-shadow:0 6px 0 var(--paper-sh),0 10px 28px rgba(92,58,26,.12);
+  transition:transform .15s,box-shadow .15s;
+  position:relative;overflow:visible;
+}
+.mode-card:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 10px 0 var(--paper-sh),0 16px 36px rgba(92,58,26,.18);}
+.mode-card:active{transform:translateY(3px);box-shadow:0 3px 0 var(--paper-sh);}
+.mode-card--stage{border-color:var(--orange);box-shadow:0 6px 0 var(--odk),0 10px 28px rgba(232,155,108,.2);}
+.mode-card--stage:hover{box-shadow:0 10px 0 var(--odk),0 16px 36px rgba(232,155,108,.3);}
+.mode-card--survival{border-color:#A478D0;box-shadow:0 6px 0 #7040A8,0 10px 28px rgba(164,120,208,.2);}
+.mode-card--survival:hover{box-shadow:0 10px 0 #7040A8,0 16px 36px rgba(164,120,208,.3);}
+.mode-card-badge{
+  position:absolute;top:-14px;left:18px;
+  background:var(--orange);color:#fff;
+  font-size:13px;font-weight:700;padding:4px 12px;
+  border-radius:20px;border:2px solid var(--odk);
+  box-shadow:0 3px 8px rgba(232,155,108,.4);
+}
+.mode-card-icon{font-size:50px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15));}
+.mode-card-title{font-size:24px;font-weight:700;color:var(--bdk);}
+.mode-card-desc{font-size:12px;color:var(--inks);line-height:1.5;}
+.mode-card-paw{font-size:16px;opacity:.5;margin-top:2px;}
+
+
+.main-char-btn{font-size:16px;padding:11px 22px;}
+
+.danger-vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:9;
+  border-radius:inherit;
+  box-shadow:inset 0 0 0 0 rgba(200,40,40,0);
+  transition:box-shadow .3s;
+}
+.danger-vignette.active{
+  box-shadow:inset 0 0 80px 30px rgba(200,40,40,.35);
+  animation:dangerPulse 1s ease-in-out infinite;
+}
+@keyframes dangerPulse{
+  0%,100%{box-shadow:inset 0 0 80px 30px rgba(200,40,40,.25);}
+  50%{box-shadow:inset 0 0 100px 50px rgba(200,40,40,.5);}
+}
+
+.hud-survival-time{
+  background:#fff;border:2px solid var(--brown);border-radius:14px;
+  padding:4px 14px;display:flex;flex-direction:column;align-items:center;
+  box-shadow:0 3px 0 var(--paper-sh);min-width:90px;
+}
+.hud-survival-time .hud-lbl{font-size:10px;color:var(--blt);font-weight:700;}
+.hud-survival-time .hud-val{font-size:20px;color:var(--bdk);font-weight:700;}
+
+.modal-survival .survival-best-board{
+  background:rgba(255,255,255,.7);border:1.5px solid var(--blt);border-radius:14px;
+  padding:10px 16px;width:100%;margin:4px 0 8px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.survival-best-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;color:var(--inks);
+}
+.survival-best-row span:last-child{font-weight:700;color:var(--bdk);}
+
+
+/* 버튼 이미지: multiply로 버튼 테두리/배경 자연스럽게 */
+.mode-card--img img,.mode-card--survival-img img{
+  border-radius:22px;
+  display:block;
+}
+
+/* 중앙 타겟 하이라이트 */
+.belt-item.target-item{
+  transform:translateY(-62%) scale(1.18) rotate(0deg) !important;
+  animation:targetPulse 0.65s ease-in-out infinite !important;
+  z-index:10;
+}
+@keyframes targetPulse{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.08);}
+}
+
+
+.main-corner-btn{background:none;border:none;padding:0;cursor:pointer;}
+.main-corner-btns{position:static;}.main-corner-btn-rank{position:absolute;left:575px;top:618px;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;z-index:3;}.main-corner-btn-char{position:absolute;left:811px;top:618px;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;z-index:3;}.main-corner-btn-shop{position:absolute;left:1047px;top:618px;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;z-index:3;}
+.main-corner-btn-rank img,.main-corner-btn-char img,.main-corner-btn-shop img{display:block;}
+
+/* ── 인게임 배경/벨트/박스 이미지 ── */
+.ingame-bg{
+  position:absolute;
+  left:0;top:0;width:100%;height:100%;
+  object-fit:fill;z-index:0;pointer-events:none;
+}
+.ingame-belt{
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  top:293px;
+  width:2192px;height:224px;
+  z-index:3;pointer-events:none;
+}
+/* 박스: center anchor, position:absolute */
+.ingame-box{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  pointer-events:none;z-index:1;
+}
+.ingame-box-toy  { left:292px; top:634px; }
+.ingame-box-food  { left:558px; top:634px; }
+.ingame-box-cloth  { left:815px; top:634px; }
+.ingame-box-book  { left:1073px; top:634px; }
+.ingame-box-trash  { left:1334px; top:634px; }
+
+.sort-btn img{
+  display:block;
+  pointer-events:none;
+}
+.sort-btn:active{transform:translateX(-50%) translateY(6px);}
+.sort-btn[data-type=toy]{left:304px;}
+.sort-btn[data-type=snack]{left:558px;}
+.sort-btn[data-type=cloth]{left:812px;}
+.sort-btn[data-type=book]{left:1066px;}
+.sort-btn[data-type=trash]{left:1320px;}
+</style>
+</head>
+<body>
+<div id="gameRoot">
+
+<section id="screen-main" class="screen screen-main active">
+  <div class="paper-bg"></div>
+
+  <div class="main-card">
+    <div class="main-title-block">
+      <span class="subtitle">따뜻한 동물 택배 회사</span>
+      <h1 class="game-title">고양이 택배정리</h1>
+      <p class="title-tag">~ 오늘도 차근차근 분류해볼까냥? ~</p>
+    </div>
+    <!-- 고양이 + 버튼 래퍼 -->
+    <div class="main-cat-btn-wrap">
+    <div class="main-char-box">
+      
+      <div id="mainCatEmoji" style="display:none">🐱</div>
+    </div>
+    <div class="main-mode-cards">
+      <button class="mode-card mode-card--survival-img" data-action="start-survival" style="background:none;border:none;box-shadow:none;padding:0;overflow:visible;">
+        <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_start_btn.png" style="display:block;" alt="게임 시작">
+      </button>
+    </div><!-- /main-mode-cards -->
+    </div><!-- /main-cat-btn-wrap -->
+  </div><!-- /main-card -->
+
+  <div class="main-corner-btns">
+    <button class="main-corner-btn-rank" data-action="goto-ranking">
+      <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_rank_btn.png" alt="순위">
+    </button>
+    <button class="main-corner-btn-char" data-action="goto-character">
+      <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_cha_btn.png" alt="캐릭터">
+    </button>
+    <button class="main-corner-btn-shop" data-action="goto-shop">
+      <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_shop_btn.png" alt="상점">
+    </button>
+  </div>
+</section>
+
+
+<section id="screen-character" class="screen">
+  <div class="paper-bg"></div>
+  <header class="scr-header" style="padding:12px 20px;flex-shrink:0;">
+    <button class="btn-back" data-action="goto-main">←</button>
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <h2 class="scr-title">🐾 캐릭터 선택 🐾</h2>
+      <p style="font-size:var(--f-sm);color:var(--inks);margin-top:2px;">함께할 택배 기사를 선택해 주세요!</p>
+    </div>
+    <div style="width:52px"></div>
+  </header>
+
+  <div class="char-screen-body">
+    <div class="char-info-panel">
+      <div class="char-badge" id="charBadge">신입 택배기사</div>
+      <div class="char-info-card">
+        <div class="char-info-name">
+          <span id="charInfoName">냐옹이</span>
+          <span class="char-info-name-paw">🐾</span>
+        </div>
+        <p class="char-info-desc" id="charInfoDesc">꼼꼼하고 차분한 신입. 실수 없는 완벽주의자!</p>
+        <div class="char-ability-card">
+          <div class="char-ability-icon">⭐</div>
+          <div class="char-ability-text">
+            <div class="char-ability-title" id="charAbilityTitle">정답 점수 +10%</div>
+            <div class="char-ability-desc" id="charAbilityDesc">정리 미션에서 획득하는 정답 점수가 10% 증가해요.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="char-spotlight">
+      <span class="char-sparkle">✨</span>
+      <span class="char-sparkle">✨</span>
+      <span class="char-sparkle">✨</span>
+      <button class="char-nav char-nav-prev" id="charNavPrev">‹</button>
+      <div class="char-big-emoji" id="charBigEmoji">🐱</div>
+      <button class="char-nav char-nav-next" id="charNavNext">›</button>
+      <div class="char-dots" id="charDots"></div>
+      <button class="btn btn-primary char-confirm-btn" data-action="confirm-character">🐾 이 캐릭터로 시작!</button>
+    </div>
+
+    <div class="char-list-panel">
+      <div class="char-list-title">캐릭터를 선택하세요</div>
+      <div class="char-list-scroll" id="charListScroll"></div>
+      <div class="char-list-footer">🐾 더 많은 캐릭터는 게임을 플레이하며 만나보세요!</div>
+    </div>
+  </div>
+</section>
+
+<section id="screen-game" class="screen">
+  <div class="danger-vignette" id="dangerVignette"></div>
+  <img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_bg.png" alt="">
+  <header class="game-hud">
+    <!-- 좌측: 콤보 + 하트 -->
+    <div class="hud-left">
+      <div class="hud-combo-wrap" id="hudComboBlock">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ui_combo_bg.png" class="hud-combo-bg" alt="">
+        <span class="hud-combo-val" id="hudCombo">×1</span>
+      </div>
+      <div class="hud-hearts-wrap">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ui_heart_bg.png" class="hud-heart-bg" alt="">
+        <div class="hud-hearts-icons" id="hudHeartsBlock"></div>
+      </div>
+    </div>
+    <!-- 중앙: 점수 -->
+    <div class="hud-center">
+      <div class="hud-score-val" id="hudScore">0</div>
+    </div>
+    <!-- 우측: 일시정지 -->
+    <button class="hud-pause-btn" data-action="pause-game">
+      <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/btn_pause.png" alt="일시정지">
+    </button>
+  </header>
+
+  <div class="game-field" id="gameField">
+    <!-- 컨베이어 벨트 -->
+    <img class="ingame-belt" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_conveyor_belt.png" alt="">
+    <!-- 분류 박스는 sort-btn 이미지로 표시 -->
+
+    <div class="game-character-layer" id="charLayer">
+      <div class="game-character idle" id="gameCharacter"><img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png" alt="고양이"></div>
+      <div class="game-bubble" id="gameBubble">
+        <span class="bubble-label">지금 이건!</span>
+        <div class="bubble-content">
+          <span class="bubble-emoji" id="bubbleEmoji">📦</span>
+          <span class="bubble-name" id="bubbleName">택배</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-belt">
+      <div class="belt-items-layer" id="beltItems"></div>
+    </div>
+
+    <div class="feedback-layer" id="feedbackLayer"></div>
+
+    <div class="sort-buttons">
+      <button class="sort-btn" data-type="toy">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_toy.png" alt="장난감">
+      </button>
+      <button class="sort-btn" data-type="snack">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_food.png" alt="간식">
+      </button>
+      <button class="sort-btn" data-type="cloth">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_cloth.png" alt="옷">
+      </button>
+      <button class="sort-btn" data-type="book">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_book.png" alt="책">
+      </button>
+      <button class="sort-btn" data-type="trash">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_trash.png" alt="쓰레기">
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- 모달: 일시정지 -->
+<div id="modal-pause" class="modal-overlay">
+  <div class="modal-card">
+    <h3 class="m-title">잠깐 쉬어가요 ☕</h3>
+    <div class="m-btns m-btns-v">
+      <button class="btn btn-primary"   data-action="resume-game">▶ 계속하기</button>
+      <button class="btn btn-secondary" data-action="restart-game">↻ 다시 시작</button>
+      <button class="btn btn-secondary" data-action="quit-game" id="pauseQuitBtn">← 홈으로</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 서바이벌 종료 -->
+<div id="modal-survival-end" class="modal-overlay">
+  <div class="modal-card modal-survival">
+    <div class="fail-emoji" id="survivalEndEmoji">😿</div>
+    <p class="m-region">서바이벌 종료!</p>
+    <h3 class="m-title">수고했어요!</h3>
+    <div class="m-targets" style="flex-wrap:wrap;gap:8px;">
+      <div class="tgt"><span class="tgt-e">💯</span><span class="tgt-l">최종 점수</span><span class="tgt-v" id="sEndScore">0</span></div>
+      <div class="tgt"><span class="tgt-e">⏱</span><span class="tgt-l">생존 시간</span><span class="tgt-v" id="sEndTime">0초</span></div>
+      <div class="tgt"><span class="tgt-e">🔥</span><span class="tgt-l">최대 콤보</span><span class="tgt-v" id="sEndCombo">0</span></div>
+    </div>
+    <p class="m-hint" id="sEndRecord" style="color:var(--odk);font-weight:700;font-size:16px;"></p>
+    <div class="survival-best-board" id="survivalBestBoard"></div>
+    <div class="m-btns">
+      <button class="btn btn-secondary" data-action="quit-survival">← 홈으로</button>
+      <button class="btn btn-primary"   data-action="restart-survival">↻ 다시 도전</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+(function scaleGame(){
+  const BASE_W=1624,BASE_H=750;
+  function resize(){
+    const vw=window.innerWidth,vh=window.innerHeight;
+    const scale=Math.min(vw/BASE_W,vh/BASE_H);
+    const root=document.getElementById("gameRoot");
+    root.style.width=BASE_W+"px";
+    root.style.height=BASE_H+"px";
+    root.style.transform="scale("+scale+")";
+    root.style.left=Math.round((vw-BASE_W*scale)/2)+"px";
+    root.style.top=Math.round((vh-BASE_H*scale)/2)+"px";
+    root.style.position="absolute";
+  }
+  resize();
+  window.addEventListener("resize",resize);
+  screen.orientation&&screen.orientation.addEventListener("change",()=>setTimeout(resize,200));
+})();
+
+const CATEGORIES={
+  toy:  {label:"장난감",emoji:"🧸",color:"#E89B6C",bg:"#FEF0E0"},
+  snack:{label:"간식",  emoji:"🍪",color:"#E8B84B",bg:"#FEF8E0"},
+  cloth:{label:"옷",    emoji:"👕",color:"#7FB5D9",bg:"#E6F2F9"},
+  book: {label:"책",    emoji:"📚",color:"#A478D0",bg:"#F2EBFA"},
+  trash:{label:"쓰레기",emoji:"🗑️",color:"#8FA67E",bg:"#E5EDDD"},
+};
+
+const ALL_ITEMS=[
+  {id:"bear",       emoji:"🧸",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_01.png",label:"곰인형",         type:"toy",  tricky:false,confuses:null},
+  {id:"ball",       emoji:"⚽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_02.png",label:"고무공",          type:"toy",  tricky:false,confuses:null},
+  {id:"car",        emoji:"🚗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_03.png",label:"장난감 자동차",   type:"toy",  tricky:false,confuses:null},
+  {id:"doll_dress", emoji:"👗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_04.png",label:"종이인형 옷세트", type:"toy",  tricky:true, confuses:"옷처럼 보이지만 장난감!"},
+  {id:"donut_toy",  emoji:"🍩",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_05.png",label:"도넛 튜브 장난감",type:"toy",  tricky:true, confuses:"간식처럼 보이지만 장난감!"},
+  {id:"cookie",     emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_01.png",label:"쿠키",              type:"snack",tricky:false,confuses:null},
+  {id:"churro",     emoji:"🥐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_02.png",label:"츄르",              type:"snack",tricky:false,confuses:null},
+  {id:"candy",      emoji:"🍬",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_03.png",label:"사탕",              type:"snack",tricky:false,confuses:null},
+  {id:"empty_bag",  emoji:"🛍️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_04.png",label:"먹다 남은 과자봉지",type:"snack",tricky:true, confuses:"쓰레기처럼 보이지만 간식!"},
+  {id:"bear_jelly", emoji:"🐻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_05.png",label:"곰돌이 젤리",       type:"snack",tricky:true, confuses:"장난감처럼 보이지만 간식!"},
+  {id:"tshirt",     emoji:"👕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_01.png",label:"일반 티셔츠", type:"cloth",tricky:false,confuses:null},
+  {id:"socks",      emoji:"🧦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_02.png",label:"양말",       type:"cloth",tricky:false,confuses:null},
+  {id:"hat",        emoji:"🧢",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_03.png",label:"모자",       type:"cloth",tricky:false,confuses:null},
+  {id:"bear_hood",  emoji:"🐻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_04.png",label:"곰돌이 후드", type:"cloth",tricky:true, confuses:"장난감처럼 보이지만 옷!"},
+  {id:"dirty_socks",emoji:"🧦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_05.png",label:"더러운 양말", type:"cloth",tricky:true, confuses:"쓰레기처럼 보이지만 옷!"},
+  {id:"comic",       emoji:"💬",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_01.png",label:"만화책",       type:"book", tricky:false,confuses:null},
+  {id:"old_magazine",emoji:"🗞️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_02.png",label:"오래된 잡지",   type:"book", tricky:true, confuses:"쓰레기처럼 보이지만 책!"},
+  {id:"diary",       emoji:"🔐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_03.png",label:"자물쇠 일기장", type:"book", tricky:false,confuses:null},
+  {id:"sticker_book",emoji:"⭐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_04.png",label:"스티커북",      type:"book", tricky:true, confuses:"별스티커처럼 보이지만 책!"},
+  {id:"webtoon_book",emoji:"📱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_05.png",label:"웹툰 단행본",   type:"book", tricky:true, confuses:"기계처럼 보이지만 책!"},
+  {id:"tissue",     emoji:"🧻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_01.png",label:"휴지뭉치",    type:"trash",tricky:false,confuses:null},
+  {id:"can",        emoji:"🥫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_02.png",label:"빈 캔",       type:"trash",tricky:false,confuses:null},
+  {id:"cup",        emoji:"☕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_03.png",label:"종이컵",      type:"trash",tricky:false,confuses:null},
+  {id:"torn_book",  emoji:"📄",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_04.png",label:"찢어진 책장", type:"trash",tricky:true, confuses:"책처럼 보이지만 쓰레기!"},
+  {id:"old_doll",   emoji:"🪆",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_05.png",label:"낡은 인형",   type:"trash",tricky:true, confuses:"장난감처럼 보이지만 쓰레기!"},
+];
+
+const CHARS=[
+  {id:"cat",      emoji:"🐱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png",  name:"냐옹이",title:"신입 택배기사",   desc:"꼼꼼하고 차분한 신입. 정답 점수 +10%",  ability:"정답 점수 +10%", abilityDesc:"정리 미션에서 획득하는 정답 점수가 10% 증가해요.",  key:"scoreBoost",val:1.1, unlock:0},
+  {id:"dog",      emoji:"🐶",img:null,name:"멍멍이",title:"활기찬 베테랑",   desc:"콤보가 잘 안 끊기는 베테랑.",            ability:"콤보 유지 +15%", abilityDesc:"콤보가 끊기지 않아 더 오래 유지돼요.",              key:"comboBoost",val:1.15,unlock:5},
+  {id:"otter",    emoji:"🦦",img:null,name:"해달이",title:"느긋한 손재주꾼", desc:"느긋하지만 시작 시간이 5초 더 있어요.",  ability:"시작 시간 +5초", abilityDesc:"게임 시작 시 제한 시간이 5초 더 길어요.",            key:"extraTime", val:5,   unlock:10},
+  {id:"sea_otter",emoji:"🦫",img:null,name:"수달이",title:"재빠른 장난꾸러기",desc:"콤보 점수 보너스가 큰 장난꾸러기.",     ability:"콤보 점수 1.5배",abilityDesc:"콤보 연속 시 획득 점수가 1.5배로 늘어요.",          key:"comboScore",val:1.5, unlock:15},
+  {id:"panda",    emoji:"🐼",img:null,name:"판다씨",title:"베테랑 매니저",   desc:"시작 하트가 1개 더 있는 든든한 선배.",   ability:"시작 하트 +1",  abilityDesc:"게임 시작 시 하트가 1개 더 주어져요.",              key:"extraHeart",val:1,   unlock:20},
+];
+
+const COMBO_TIERS=[{min:0,mult:1,lbl:"×1"},{min:3,mult:1.2,lbl:"×1.2"},{min:6,mult:1.5,lbl:"×1.5"},{min:10,mult:2,lbl:"×2.0"}];
+
+/* ── SV_PHASES: 즉각적인 긴장감 ── */
+const SV_PHASES=[
+  {until:20,  spawnBase:1600,trickyRatio:0.20,travelMs:5500},
+  {until:40,  spawnBase:1300,trickyRatio:0.28,travelMs:5000},
+  {until:70,  spawnBase:1100,trickyRatio:0.34,travelMs:4500},
+  {until:100, spawnBase:900, trickyRatio:0.40,travelMs:4000},
+  {until:150, spawnBase:750, trickyRatio:0.46,travelMs:3500},
+  {until:Infinity,spawnBase:600,trickyRatio:0.52,travelMs:3000},
+];
+
+const SAVE_KEY="catDelivery.v3";
+let save={cleared:{},unlocked:["cat"],selected:"cat"};
+function loadSave(){
+  try{const r=localStorage.getItem(SAVE_KEY);if(r)Object.assign(save,JSON.parse(r));}catch(e){}
+  if(!Array.isArray(save.unlocked)||!save.unlocked.length)save.unlocked=["cat"];
+  if(!save.selected)save.selected="cat";
+  if(!save.cleared)save.cleared={};
+}
+function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+function getChar(){return CHARS.find(c=>c.id===save.selected)||CHARS[0];}
+
+let curScreen="main";
+function showScreen(name){
+  curScreen=name;
+  document.querySelectorAll(".screen").forEach(el=>el.classList.toggle("active",el.id==="screen-"+name));
+  if(name==="character") renderCharacter();
+  if(name==="main")      document.getElementById("mainCatEmoji").textContent=getChar().emoji;
+}
+
+let previewCharIdx=0;
+function renderCharacter(){
+  previewCharIdx=CHARS.findIndex(c=>c.id===save.selected);
+  if(previewCharIdx<0)previewCharIdx=0;
+  const dots=document.getElementById("charDots");
+  dots.innerHTML="";
+  CHARS.forEach((_,i)=>{
+    const d=document.createElement("div");
+    d.className="char-dot"+(i===previewCharIdx?" active":"");
+    d.addEventListener("click",()=>setCharPreview(i));
+    dots.appendChild(d);
+  });
+  const scroll=document.getElementById("charListScroll");
+  scroll.innerHTML="";
+  CHARS.forEach((ch,i)=>{
+    const unlocked=save.unlocked.includes(ch.id);
+    const isSelected=ch.id===save.selected;
+    const item=document.createElement("div");
+    item.className="char-list-item"+(isSelected?" selected":"")+((!unlocked)?" locked":"");
+    item.dataset.idx=i;
+    const thumb=document.createElement("div");thumb.className="char-list-thumb";thumb.textContent=ch.emoji;
+    const info=document.createElement("div");info.className="char-list-info";
+    const nameEl=document.createElement("div");nameEl.className="char-list-name";nameEl.textContent=ch.name;
+    const subEl=document.createElement("div");subEl.className="char-list-sub";
+    if(isSelected){
+      const badge=document.createElement("div");badge.className="char-list-selected-badge";
+      badge.innerHTML="✓ 선택됨";subEl.appendChild(badge);
+    }else if(!unlocked){
+      subEl.innerHTML='<span class="lock-icon">🔒</span> 스테이지 '+ch.unlock+' 클리어';
+    }else{
+      subEl.textContent=ch.ability;
+    }
+    info.append(nameEl,subEl);
+    const right=document.createElement("div");
+    if(!unlocked){right.className="char-list-lock";right.textContent="🔒";}
+    item.append(thumb,info,right);
+    item.addEventListener("click",()=>{
+      if(!unlocked){showToast("스테이지 "+ch.unlock+" 클리어 시 해금!");return;}
+      setCharPreview(i);
+    });
+    scroll.appendChild(item);
+  });
+  updateCharPreview();
+}
+
+function setCharPreview(idx){
+  previewCharIdx=Math.max(0,Math.min(CHARS.length-1,idx));
+  updateCharPreview();
+}
+
+function updateCharPreview(){
+  const ch=CHARS[previewCharIdx];
+  const unlocked=save.unlocked.includes(ch.id);
+  document.getElementById("charBigEmoji").textContent=ch.emoji;
+  const badge=document.getElementById("charBadge");if(badge)badge.textContent=ch.title;
+  const nameEl=document.getElementById("charInfoName");if(nameEl)nameEl.textContent=ch.name;
+  const descEl=document.getElementById("charInfoDesc");if(descEl)descEl.textContent=ch.desc;
+  const abilityTitle=document.getElementById("charAbilityTitle");if(abilityTitle)abilityTitle.textContent=ch.ability;
+  const abilityDesc=document.getElementById("charAbilityDesc");
+  if(abilityDesc) abilityDesc.textContent = ch.abilityDesc || ch.ability;
+  document.querySelectorAll(".char-dot").forEach((d,i)=>d.classList.toggle("active",i===previewCharIdx));
+  document.querySelectorAll(".char-list-item").forEach((el,i)=>{
+    el.classList.toggle("selected",i===previewCharIdx&&save.unlocked.includes(CHARS[i].id));
+    const sub=el.querySelector(".char-list-sub");
+    if(sub&&save.unlocked.includes(CHARS[i].id)){
+      if(i===previewCharIdx){sub.innerHTML='<div class="char-list-selected-badge">✓ 선택됨</div>';}
+      else{sub.textContent=CHARS[i].ability;}
+    }
+  });
+  const confirmBtn=document.querySelector(".char-confirm-btn");
+  if(confirmBtn){confirmBtn.disabled=!unlocked;confirmBtn.style.opacity=unlocked?1:.5;}
+}
+
+function showModal(id){const el=document.getElementById("modal-"+id);if(el)el.classList.add("active");}
+function hideModal(id){const el=document.getElementById("modal-"+id);if(el)el.classList.remove("active");}
+function hideAllModals(){document.querySelectorAll(".modal-overlay").forEach(m=>m.classList.remove("active"));}
+
+let G = null;
+
+/* ── DOM 캐시: 매 프레임 querySelector 방지 ── */
+const DOM = {};
+function getEl(id){ return DOM[id] || (DOM[id] = document.getElementById(id)); }
+
+/* ── 하트 DOM 미리 생성, 클래스만 토글 ── */
+let _heartEls = [];
+function initHearts(maxH){
+  const hb = getEl("hudHeartsBlock");
+  hb.innerHTML = "";
+  _heartEls = [];
+  for(let i = 0; i < maxH; i++){
+    const h = document.createElement("img");
+    h.src = "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ui_heart_icon.png";
+    h.className = "hud-heart";
+    h.alt = "❤";
+    hb.appendChild(h);
+    _heartEls.push(h);
+  }
+}
+function updateHearts(current){
+  _heartEls.forEach((h, i) => h.classList.toggle("lost", i >= current));
+}
+
+function moveCharTo(xPercent){
+  const charEl=document.getElementById("gameCharacter");if(!charEl)return;
+  const field=document.getElementById("gameField");if(!field)return;
+  const W=field.clientWidth;
+  const px=W*xPercent/100;
+  charEl.style.left=Math.max(40,Math.min(W-100,px-48-10))+"px";
+}
+
+
+let bubbleTimer=null;
+const CAT_IMG={
+  normal:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png",
+  happy :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_happy.png",
+  fail  :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_fail.png",
+  blink :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_blink.png",
+};
+let _blinkTimer=null;
+function startBlinking(){
+  if(_blinkTimer)clearTimeout(_blinkTimer);
+  function doBlink(){
+    const charEl=document.getElementById("gameCharacter");
+    if(!charEl||!charEl.classList.contains("idle")){
+      _blinkTimer=setTimeout(doBlink,Math.random()*3000+2000);return;
+    }
+    const img=charEl.querySelector("img");
+    if(img){
+      img.src=CAT_IMG.blink;
+      setTimeout(()=>{
+        if(img&&charEl.classList.contains("idle")) img.src=CAT_IMG.normal;
+      },120);
+    }
+    _blinkTimer=setTimeout(doBlink,Math.random()*1500+1000);
+  }
+  _blinkTimer=setTimeout(doBlink,Math.random()*1500+1000);
+}
+function stopBlinking(){
+  if(_blinkTimer){clearTimeout(_blinkTimer);_blinkTimer=null;}
+}
+function charReact(type){
+  const charEl=document.getElementById("gameCharacter");if(!charEl)return;
+  const img=charEl.querySelector("img");
+  charEl.className="game-character "+type;
+  if(img&&type==="grab")        img.src=CAT_IMG.happy;
+  if(img&&type==="wrong-react") img.src=CAT_IMG.fail;
+  const dur=type==="grab"?280:450;
+  setTimeout(()=>{
+    charEl.classList.remove(type);charEl.classList.add("idle");
+    if(img) img.src=CAT_IMG.normal;
+  },dur);
+}
+
+function updateCharPosition(){
+  moveCharTo(43);
+  const items = (SV && !SV.ended) ? SV.items : (G ? G.items : []);
+  const alive = items.filter(it => it.alive);
+  let closest = null, minDist = Infinity;
+  for(const it of alive){
+    const dist = Math.abs(it.prog - 0.5);
+    if(dist < minDist){ minDist = dist; closest = it; }
+  }
+  for(const it of alive) it.node.classList.toggle("target-item", it === closest);
+  const bubble = getEl("gameBubble");
+  if(bubble && closest && !bubble.classList.contains("show")) showBubble(closest);
+}
+
+
+function showBubble(item){
+  const bubble = getEl("gameBubble");
+  const charEl = document.getElementById("gameCharacter");
+  if(!bubble || !charEl || !item.itemDef) return;
+  getEl("bubbleEmoji").textContent = item.itemDef.emoji;
+  getEl("bubbleName").textContent  = item.itemDef.label;
+  bubble.style.left = (parseFloat(charEl.style.left || "100") + 90) + "px";
+  bubble.classList.add("show");
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => bubble.classList.remove("show"), 2000);
+}
+
+
+function moveItems(dt){
+  const wrap = getEl("beltItems"); if(!wrap) return;
+  const W = wrap.clientWidth;
+  const items = SV ? SV.items : (G ? G.items : []);
+  for(let i = items.length - 1; i >= 0; i--){
+    const it = items[i]; if(!it.alive) continue;
+    it.prog += dt / it.travelMs;
+    it.node.style.left = (-192 + (W + 384) * it.prog) + "px";
+    if(it.prog >= 1) missItem(it);
+  }
+}
+
+
+function missItem(it){ svMissItem(it); }
+
+function onSort(type){
+  if(SV && !SV.ended) onSortSurvival(type);
+}
+
+function popFeedback(text,kind,node){
+  const layer=document.getElementById("feedbackLayer");if(!layer)return;
+  const el=document.createElement("div");el.className="fb-pop "+kind;el.textContent=text;
+  let lp=50,tp=70;
+  if(node&&node.isConnected){
+    const r=node.getBoundingClientRect(),pr=layer.getBoundingClientRect();
+    lp=((r.left+r.width/2-pr.left)/pr.width)*100;
+    tp=((r.top-pr.top)/pr.height)*100;
+  }
+  el.style.left=lp+"%";el.style.top=tp+"%";
+  layer.appendChild(el);setTimeout(()=>el.remove(),850);
+}
+
+
+function pauseGame(){
+  if(G && !G.ended){
+    G.paused = true;
+    showModal("pause");
+  }
+}
+function resumeGame(){
+  if(G){ G.paused=false; G.lastTick=performance.now(); hideModal("pause"); requestAnimationFrame(svLoop); }
+}
+/* ══ 서바이벌 모드 ══ */
+let SV=null;
+
+function getSvPhase(s){return SV_PHASES.find(p=>s<p.until)||SV_PHASES[SV_PHASES.length-1];}
+
+function buildSvPool(phase){
+  const allCats=["toy","snack","cloth","book","trash"];
+  const basic=ALL_ITEMS.filter(it=>allCats.includes(it.type)&&!it.tricky);
+  const tricky=ALL_ITEMS.filter(it=>allCats.includes(it.type)&&it.tricky);
+  const pool=[...basic];
+  if(tricky.length>0&&phase.trickyRatio>0){
+    const cnt=Math.max(1,Math.round(basic.length*(phase.trickyRatio/(1-phase.trickyRatio))));
+    for(let i=0;i<cnt;i++)pool.push(tricky[i%tricky.length]);
+  }
+  return pool;
+}
+
+/* ── 수정: 서바이벌 버튼 항상 5개 표시 ── */
+function updateSvButtons(){
+  document.querySelectorAll(".sort-btn").forEach(btn=>btn.style.display="");
+  }
+
+function startSurvival(){
+  const ch=getChar();
+  const extraH=ch.key==="extraHeart"?ch.val:0;
+  const maxH=3+extraH;
+  SV={ch,score:0,combo:0,maxCombo:0,hearts:maxH,maxH,
+      elapsed:0,elapsedMs:0,
+      paused:false,ended:false,
+      items:[],itemId:0,lastSpawn:0,lastTick:performance.now(),
+      lastPhase:null,_pool:null,
+      nextSpawnMs:1800,   /* ── 수정: 첫 스폰 간격 초기값 ── */
+      sB:ch.key==="scoreBoost"?ch.val:1,
+      cB:ch.key==="comboScore"?ch.val:1};
+  document.getElementById("beltItems").innerHTML="";
+  document.getElementById("gameBubble").classList.remove("show");
+  clearDangerEffect();
+  updateSvButtons();
+  initHearts(maxH);
+  const charEl=document.getElementById("gameCharacter");
+  if(charEl){
+    charEl.innerHTML=ch.img?'<img src="'+ch.img+'" alt="'+ch.name+'">':ch.emoji;
+    charEl.style.left="100px";charEl.className="game-character idle";
+  }
+  G=SV;updateSvHUD();showScreen("game");requestAnimationFrame(svLoop);startBlinking();
+}
+
+/* ── 수정: svLoop — jitter 적용, nextSpawnMs 갱신 ── */
+function svLoop(now){
+  if(!SV||SV.ended||SV.paused)return;
+  const dt=Math.min(100,now-SV.lastTick);
+  SV.lastTick=now;SV.elapsedMs+=dt;SV.elapsed=SV.elapsedMs/1000;
+  const phase=getSvPhase(SV.elapsed);
+  if(phase!==SV.lastPhase){
+    SV.lastPhase=phase;
+    SV._pool=buildSvPool(phase);
+    updateSvButtons();
+  }
+  if(SV.elapsedMs-SV.lastSpawn>=SV.nextSpawnMs){
+    svSpawnItem(phase);
+    SV.lastSpawn=SV.elapsedMs;
+    /* jitter ±20%, 최소 500ms */
+    const jitter=phase.spawnBase*0.2;
+    SV.nextSpawnMs=Math.max(500,phase.spawnBase+(Math.random()*2-1)*jitter);
+  }
+  moveItems(dt);updateCharPosition();updateSvHUD();checkComboBonus();
+  requestAnimationFrame(svLoop);
+}
+
+function svSpawnItem(phase){
+  if(!SV._pool||SV._pool.length===0)SV._pool=buildSvPool(phase);
+  const itemDef=SV._pool[Math.floor(Math.random()*SV._pool.length)];
+  if(!itemDef)return;
+  const cat=CATEGORIES[itemDef.type];
+  const id=++SV.itemId;
+  const node=document.createElement("div");
+  node.className="belt-item";node.dataset.id=id;node.dataset.type=itemDef.type;node.dataset.label=itemDef.label;
+  node.innerHTML=itemDef.img
+    ?`<img src="${itemDef.img}">`
+    :itemDef.emoji;
+  if(!itemDef.img){node.style.background=cat.bg;node.style.borderColor=cat.color;}
+  if(itemDef.tricky&&!itemDef.img)node.style.boxShadow="0 6px 0 "+cat.color+", 0 0 0 3px rgba(255,200,50,.5), 0 8px 20px rgba(0,0,0,.2)";
+  const sp=document.createElement("div");sp.className="item-sparkle";node.appendChild(sp);
+  document.getElementById("beltItems").appendChild(node);
+  SV.items.push({id,itemDef,type:itemDef.type,node,prog:0,travelMs:phase.travelMs||5500,alive:true});
+}
+
+function svMissItem(it){
+  if(!it.alive)return;it.alive=false;
+  if(it.type!=="trash"){
+    SV.combo=0;SV.hearts--;
+    charReact("wrong-react");popFeedback("놓쳤어요!","bad",null);
+    updateDangerEffect();
+    if(SV.hearts<=0){if(it.node.parentNode)it.node.parentNode.removeChild(it.node);endSurvival();return;}
+  }
+  it.node.style.transition="opacity .3s,transform .3s";
+  it.node.style.opacity="0";it.node.style.transform="translateY(-50%) translateX(22px)";
+  setTimeout(()=>{if(it.node.parentNode)it.node.parentNode.removeChild(it.node);},320);
+}
+
+function onSortSurvival(type){
+  if(!SV||SV.paused||SV.ended)return;
+  // 중앙에 가장 가까운 아이템이 타겟
+  let target=null,minDist=Infinity;
+  for(const it of SV.items){
+    if(it.alive){const dist=Math.abs(it.prog-0.5);if(dist<minDist){minDist=dist;target=it;}}
+  }
+  if(!target)return;
+  const btn=document.querySelector('.sort-btn[data-type="'+type+'"]');
+  if(target.type===type){
+    target.alive=false;SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);
+    const base=target.itemDef?.tricky?20:10;
+    const gain=Math.floor(base*SV.sB*(SV.combo>=3?SV.cB:1));
+    SV.score+=gain;charReact("grab");target.node.classList.add("correct");
+    if(btn){btn.classList.add("ok");setTimeout(()=>btn.classList.remove("ok"),400);}
+    setTimeout(()=>{if(target.node.parentNode)target.node.parentNode.removeChild(target.node);},500);
+    popFeedback(target.itemDef?.tricky?"+"+gain+" 🎉":"+"+gain,"ok",target.node);
+    document.getElementById("gameBubble").classList.remove("show");
+  }else{
+    SV.combo=0;SV.hearts--;
+    charReact("wrong-react");target.node.classList.add("wrong");
+    if(btn){btn.classList.add("bad");setTimeout(()=>{target.node.classList.remove("wrong");btn.classList.remove("bad");},500);}
+    popFeedback(target.itemDef?.tricky?(target.itemDef.confuses||"-오답!"):"-오답!","bad",target.node);
+    updateDangerEffect();
+    if(SV.hearts<=0)endSurvival();
+  }
+  updateSvHUD();
+}
+
+let _lastComboBonusAt=0;
+const SV_COMBO_BONUSES=[{at:5,pts:20},{at:10,pts:50},{at:20,pts:100}];
+function checkComboBonus(){
+  if(!SV)return;
+  const bonus=SV_COMBO_BONUSES.find(b=>SV.combo===b.at&&SV.combo!==_lastComboBonusAt);
+  if(bonus){_lastComboBonusAt=SV.combo;SV.score+=bonus.pts;popFeedback("🎊 "+SV.combo+"콤보! +"+bonus.pts,"ok",null);}
+  if(SV.combo===0)_lastComboBonusAt=0;
+}
+
+function updateDangerEffect(){
+  const v = getEl("dangerVignette"); if(!v) return;
+  const hearts = (SV || G)?.hearts || 3;
+  v.classList.toggle("active", hearts <= 1);
+  const charEl = document.getElementById("gameCharacter");
+  if(charEl) charEl.style.filter = hearts <= 1 ? "drop-shadow(0 0 12px rgba(200,40,40,.6))" : "";
+}
+function clearDangerEffect(){
+  const v = getEl("dangerVignette"); if(v) v.classList.remove("active");
+  const charEl = document.getElementById("gameCharacter"); if(charEl) charEl.style.filter = "";
+}
+
+function updateSvHUD(){
+  if(!SV)return;
+  getEl("hudScore").textContent = Math.floor(SV.score).toLocaleString();
+  getEl("hudCombo").textContent = "×" + SV.combo;
+  getEl("hudComboBlock").classList.toggle("hot", SV.combo >= 3);
+  updateHearts(SV.hearts);
+}
+
+function endSurvival(){
+  if(!SV||SV.ended)return;SV.ended=true;SV.paused=true;
+  clearDangerEffect();
+  document.getElementById("gameBubble").classList.remove("show");
+  const prev=save.survivalBest||{score:0,time:0,combo:0};
+  const nr={
+    score:Math.max(prev.score,Math.floor(SV.score)),
+    time:Math.max(prev.time,Math.floor(SV.elapsed)),
+    combo:Math.max(prev.combo,SV.maxCombo)
+  };
+  const isNew=Math.floor(SV.score)>prev.score||Math.floor(SV.elapsed)>prev.time||SV.maxCombo>prev.combo;
+  save.survivalBest=nr;persist();
+  const t=Math.floor(SV.elapsed),mm=Math.floor(t/60),ss=t%60;
+  document.getElementById("sEndScore").textContent=Math.floor(SV.score).toLocaleString();
+  document.getElementById("sEndTime").textContent=mm>0?mm+"분 "+ss+"초":ss+"초";
+  document.getElementById("sEndCombo").textContent="×"+SV.maxCombo;
+  document.getElementById("sEndRecord").textContent=isNew?"🏆 새 최고 기록!":"";
+  document.getElementById("survivalEndEmoji").textContent=SV.elapsed>=60?"😸":"😿";
+  const board=document.getElementById("survivalBestBoard");
+  if(board){
+    board.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--blt);margin-bottom:4px;">📋 최고 기록</div>';
+    [["최고 점수",nr.score.toLocaleString()+"점"],
+     ["최장 생존",(()=>{const m2=Math.floor(nr.time/60),s2=nr.time%60;return m2>0?m2+"분 "+s2+"초":s2+"초";})()],
+     ["최대 콤보","×"+nr.combo]
+    ].forEach(([l,v])=>{
+      const row=document.createElement("div");row.className="survival-best-row";
+      row.innerHTML="<span>"+l+"</span><span>"+v+"</span>";board.appendChild(row);
+    });
+  }
+  showModal("survival-end");
+}
+
+function quitSurvival(){
+  SV=null;G=null;
+  stopBlinking();
+  document.getElementById("beltItems").innerHTML="";
+  clearDangerEffect();hideAllModals();showScreen("main");
+}
+function restartSurvival(){
+  SV=null;G=null;
+  document.getElementById("beltItems").innerHTML="";
+  hideAllModals();startSurvival();
+}
+
+let toastT=null;
+function showToast(msg){
+  const el=document.getElementById("toast");
+  el.textContent=msg;el.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("show"),2300);
+}
+
+function handleAction(a){
+  switch(a){
+    case"goto-character":showScreen("character");break;
+    case"goto-main":
+      if(G&&!G.ended){SV=null;G=null;document.getElementById("beltItems").innerHTML="";hideAllModals();clearDangerEffect();}
+      showScreen("main");break;
+    case"confirm-character":{
+      const selCh=CHARS[previewCharIdx];
+      if(!selCh||!save.unlocked.includes(selCh.id)){showToast("먼저 해금이 필요해요!");break;}
+      save.selected=selCh.id;persist();showToast(selCh.name+" 선택 완료!");showScreen("main");break;
+    }
+    case"start-survival":startSurvival();break;
+    case"pause-game":    pauseGame();break;
+    case"resume-game":   resumeGame();break;
+    case"restart-game":
+    case"restart-survival":restartSurvival();break;
+    case"quit-game":
+    case"quit-survival": quitSurvival();break;
+  }
+}
+
+document.getElementById("gameRoot").addEventListener("click",e=>{
+  const el=e.target.closest("[data-action]");if(!el)return;
+  e.preventDefault();handleAction(el.dataset.action);
+});
+document.querySelectorAll(".sort-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    if(SV&&!SV.ended)onSortSurvival(btn.dataset.type);
+    else onSort(btn.dataset.type);
+  });
+});
+document.getElementById("charNavPrev").addEventListener("click",()=>setCharPreview(previewCharIdx-1));
+document.getElementById("charNavNext").addEventListener("click",()=>setCharPreview(previewCharIdx+1));
+window.addEventListener("keydown",e=>{
+  if(curScreen!=="game")return;
+  if(e.key==="Escape"){pauseGame();return;}
+  if(e.key===" "&&(G?.paused||SV?.paused)){resumeGame();return;}
+  const m={"1":"toy","2":"snack","3":"cloth","4":"book","5":"trash"};
+  if(m[e.key]){if(SV&&!SV.ended)onSortSurvival(m[e.key]);else onSort(m[e.key]);}
+});
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&!G?.ended)pauseGame();});
+
+loadSave();
+showScreen("main");
+
+
+</script>

@@ -29,7 +29,7 @@
 html,body{
   width:100%;height:100%;overflow:hidden;
   margin:0;padding:0;
-  background-color:#2a1f15;
+  background-color:#F5E6D3;
   font-family:var(--font);color:var(--ink);
   display:flex;align-items:center;justify-content:center;
 }
@@ -997,22 +997,25 @@ html,body{
 (function scaleGame(){
   const BASE_W=1624,BASE_H=750;
   function resize(){
-    const vw=window.innerWidth,vh=window.innerHeight;
-    const scale=Math.min(vw/BASE_W,vh/BASE_H);
-    const root=document.getElementById("gameRoot");
-    root.style.width=BASE_W+"px";
-    root.style.height=BASE_H+"px";
-    root.style.transform="scale("+scale+")";
-    root.style.transformOrigin="top left";
-    root.style.position="fixed";
-    root.style.left=Math.round((vw-BASE_W*scale)/2)+"px";
-    root.style.top=Math.round((vh-BASE_H*scale)/2)+"px";
-    document.body.style.overflow="hidden";
-    document.documentElement.style.overflow="hidden";
+    /* visualViewport가 있으면 Safari 주소창 제외한 실제 뷰 크기 사용 */
+    const vw = (window.visualViewport ? window.visualViewport.width  : window.innerWidth);
+    const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+    const scale = Math.min(vw/BASE_W, vh/BASE_H);
+    const root = document.getElementById("gameRoot");
+    root.style.width  = BASE_W+"px";
+    root.style.height = BASE_H+"px";
+    root.style.transform = "scale("+scale+")";
+    root.style.transformOrigin = "top left";
+    root.style.position = "fixed";
+    root.style.left = Math.round((vw - BASE_W*scale)/2)+"px";
+    root.style.top  = Math.round((vh - BASE_H*scale)/2)+"px";
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
   }
   resize();
-  window.addEventListener("resize",resize);
-  screen.orientation&&screen.orientation.addEventListener("change",()=>setTimeout(resize,200));
+  window.addEventListener("resize", resize);
+  if(window.visualViewport) window.visualViewport.addEventListener("resize", resize);
+  screen.orientation && screen.orientation.addEventListener("change", ()=>setTimeout(resize,200));
 })();
 
 const CATEGORIES={

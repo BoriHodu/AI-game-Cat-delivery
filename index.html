@@ -1000,7 +1000,7 @@ html,body{
     /* visualViewport가 있으면 Safari 주소창 제외한 실제 뷰 크기 사용 */
     const vw = (window.visualViewport ? window.visualViewport.width  : window.innerWidth);
     const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
-    const scale = Math.min(vw/BASE_W, vh/BASE_H);
+    const scale = Math.max(vw/BASE_W, vh/BASE_H);
     const root = document.getElementById("gameRoot");
     root.style.width  = BASE_W+"px";
     root.style.height = BASE_H+"px";

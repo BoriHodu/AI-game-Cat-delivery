@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1624, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1003,9 +1003,12 @@ html,body{
     root.style.width=BASE_W+"px";
     root.style.height=BASE_H+"px";
     root.style.transform="scale("+scale+")";
+    root.style.transformOrigin="top left";
+    root.style.position="fixed";
     root.style.left=Math.round((vw-BASE_W*scale)/2)+"px";
     root.style.top=Math.round((vh-BASE_H*scale)/2)+"px";
-    root.style.position="absolute";
+    document.body.style.overflow="hidden";
+    document.documentElement.style.overflow="hidden";
   }
   resize();
   window.addEventListener("resize",resize);

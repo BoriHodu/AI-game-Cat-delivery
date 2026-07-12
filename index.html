@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1013,19 +1013,39 @@ html,body{
 <script>
 (function scaleGame(){
   const BASE_W=1624,BASE_H=750;
+  function getSafeAreaInsets(){
+    const el=document.createElement("div");
+    el.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;visibility:hidden;pointer-events:none;"
+      +"padding-top:env(safe-area-inset-top,0px);padding-right:env(safe-area-inset-right,0px);"
+      +"padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);";
+    document.body.appendChild(el);
+    const cs=getComputedStyle(el);
+    const insets={
+      top:parseFloat(cs.paddingTop)||0,
+      right:parseFloat(cs.paddingRight)||0,
+      bottom:parseFloat(cs.paddingBottom)||0,
+      left:parseFloat(cs.paddingLeft)||0
+    };
+    document.body.removeChild(el);
+    return insets;
+  }
   function resize(){
     const vw = (window.visualViewport ? window.visualViewport.width  : window.innerWidth);
     const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
-    /* Math.min: 항상 화면 안에 꽉 맞게 (잘림 없음) */
-    const scale = Math.min(vw/BASE_W, vh/BASE_H);
+    const insets = getSafeAreaInsets();
+    /* 노치/다이나믹 아일랜드/홈 인디케이터 영역을 뺀 실제 "보이는" 영역만 기준으로 계산 */
+    const availW = Math.max(0, vw - insets.left - insets.right);
+    const availH = Math.max(0, vh - insets.top - insets.bottom);
+    /* Math.min: 항상 화면 안(세이프 에어리어 내)에 꽉 맞게 (잘림 없음) */
+    const scale = Math.min(availW/BASE_W, availH/BASE_H);
     const root = document.getElementById("gameRoot");
     root.style.width  = BASE_W+"px";
     root.style.height = BASE_H+"px";
     root.style.transform = "scale("+scale+")";
     root.style.transformOrigin = "top left";
     root.style.position = "fixed";
-    root.style.left = Math.round((vw - BASE_W*scale)/2)+"px";
-    root.style.top  = Math.round((vh - BASE_H*scale)/2)+"px";
+    root.style.left = Math.round(insets.left + (availW - BASE_W*scale)/2)+"px";
+    root.style.top  = Math.round(insets.top  + (availH - BASE_H*scale)/2)+"px";
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
   }

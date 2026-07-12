@@ -589,6 +589,23 @@ html,body{
 }
 .sort-btn>*{pointer-events:none;}
 
+/* 상자로 날아가는 아이템 복사본 */
+.fly-item{
+  position:fixed;
+  pointer-events:none;
+  z-index:999;
+  transform-origin:center center;
+  will-change:transform,opacity;
+}
+/* 상자 흡수 시 상자 통통 튀기 */
+.sort-btn.box-absorb{animation:boxAbsorb .35s ease-out;}
+@keyframes boxAbsorb{
+  0%  {transform:translateX(-50%) scale(1)}
+  40% {transform:translateX(-50%) scale(1.12) translateY(-6px)}
+  70% {transform:translateX(-50%) scale(0.93) translateY(3px)}
+  100%{transform:translateX(-50%) scale(1)}
+}
+
 .sort-btn.ok {animation:btnOk .4s ease-out;}
 .sort-btn.bad{animation:btnBad .5s ease-in-out;}
 @keyframes btnOk{
@@ -997,10 +1014,10 @@ html,body{
 (function scaleGame(){
   const BASE_W=1624,BASE_H=750;
   function resize(){
-    /* visualViewport가 있으면 Safari 주소창 제외한 실제 뷰 크기 사용 */
     const vw = (window.visualViewport ? window.visualViewport.width  : window.innerWidth);
     const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
-    const scale = Math.max(vw/BASE_W, vh/BASE_H);
+    /* Math.min: 항상 화면 안에 꽉 맞게 (잘림 없음) */
+    const scale = Math.min(vw/BASE_W, vh/BASE_H);
     const root = document.getElementById("gameRoot");
     root.style.width  = BASE_W+"px";
     root.style.height = BASE_H+"px";
@@ -1277,20 +1294,101 @@ function showBubble(item){
 function moveItems(dt){
   const wrap = getEl("beltItems"); if(!wrap) return;
   const W = wrap.clientWidth;
+  if(W < 100) return;   /* W=0 또는 비정상값이면 이동 중단 (오판정 방지) */
   const items = SV ? SV.items : (G ? G.items : []);
   for(let i = items.length - 1; i >= 0; i--){
-    const it = items[i]; if(!it.alive) continue;
+    const it = items[i];
+    if(!it.alive || it._flying) continue;
     it.prog += dt / it.travelMs;
     it.node.style.left = (-192 + (W + 384) * it.prog) + "px";
-    if(it.prog >= 1) missItem(it);
+    if(it.prog >= 1) svMissItem(it);
   }
 }
 
 
-function missItem(it){ svMissItem(it); }
+/* ── 포물선 날아가기: scale 보정된 clone을 정확한 화면좌표에 ── */
+function flyToBox(itemNode, btnEl){
+  /* getBoundingClientRect = scale 적용 후 실제 화면 좌표/크기 */
+  const itemR = itemNode.getBoundingClientRect();
+  const btnR  = btnEl.getBoundingClientRect();
+
+  /* 시작점: 아이템 실제 화면 중앙 */
+  const sx = itemR.left + itemR.width  / 2;
+  const sy = itemR.top  + itemR.height / 2;
+  /* 끝점: 상자 중앙 상단 */
+  const ex = btnR.left  + btnR.width   / 2;
+  const ey = btnR.top   + btnR.height  * 0.2;
+
+  /* clone을 실제 렌더 크기(scale 반영)로 생성 */
+  const clone = itemNode.cloneNode(true);
+  clone.style.cssText = `
+    position:fixed;
+    left:${itemR.left}px;
+    top:${itemR.top}px;
+    width:${itemR.width}px;
+    height:${itemR.height}px;
+    margin:0;padding:0;
+    transform:none;
+    transform-origin:center center;
+    pointer-events:none;
+    z-index:9999;
+    will-change:transform,opacity;
+    transition:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  `;
+  /* clone 안의 img도 실제 크기에 맞게 조정 */
+  const img = clone.querySelector("img");
+  if(img){
+    img.style.width  = "100%";
+    img.style.height = "100%";
+    img.style.objectFit = "contain";
+  }
+  document.body.appendChild(clone);
+
+  /* 원본은 즉시 숨김 */
+  itemNode.style.visibility = "hidden";
+
+  /* 포물선 파라미터 — 높이도 실제 화면 기준 */
+  const DURATION = 420;
+  const PEAK     = -(itemR.height * 1.0);
+  let   start    = null;
+
+  function step(ts){
+    if(!start) start = ts;
+    const t    = Math.min((ts - start) / DURATION, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+
+    const lx = sx + (ex - sx) * ease;
+    const ly = sy + (ey - sy) * ease + PEAK * Math.sin(Math.PI * t);
+    const sc = 1 - t * 0.75;
+    const op = t > 0.8 ? 1 - (t - 0.8) / 0.2 : 1;
+
+    /* left/top 기준이 itemR.left/top이므로 sx-itemR.left/sy-itemR.top 오프셋 없음 */
+    clone.style.left    = `${itemR.left + (lx - sx)}px`;
+    clone.style.top     = `${itemR.top  + (ly - sy)}px`;
+    clone.style.transform = `scale(${sc})`;
+    clone.style.opacity   = `${op}`;
+
+    if(t < 1){
+      requestAnimationFrame(step);
+    } else {
+      if(clone.parentNode)    clone.parentNode.removeChild(clone);
+      if(itemNode.parentNode) itemNode.parentNode.removeChild(itemNode);
+      btnEl.classList.remove("box-absorb");
+      void btnEl.offsetWidth;
+      btnEl.classList.add("box-absorb");
+      setTimeout(()=>btnEl.classList.remove("box-absorb"), 350);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
 
 function onSort(type){
-  if(SV && !SV.ended) onSortSurvival(type);
+  if(SV && !SV.ended) { ensureSvLoop(); onSortSurvival(type); }
 }
 
 function popFeedback(text,kind,node){
@@ -1360,12 +1458,21 @@ function startSurvival(){
     charEl.innerHTML=ch.img?'<img src="'+ch.img+'" alt="'+ch.name+'">':ch.emoji;
     charEl.style.left="100px";charEl.className="game-character idle";
   }
-  G=SV;updateSvHUD();showScreen("game");requestAnimationFrame(svLoop);startBlinking();
+  G=SV;updateSvHUD();showScreen("game");
+  /* showScreen 후 다음 프레임에 시작 → screen display:flex 적용 보장 */
+  _svLoopRunning=false;
+  requestAnimationFrame(()=>{
+    SV.lastTick=performance.now();
+    requestAnimationFrame(svLoop);
+  });
+  startBlinking();
 }
 
 /* ── 수정: svLoop — jitter 적용, nextSpawnMs 갱신 ── */
+let _svLoopRunning = false;
 function svLoop(now){
-  if(!SV||SV.ended||SV.paused)return;
+  if(!SV||SV.ended||SV.paused){ _svLoopRunning=false; return; }
+  _svLoopRunning = true;
   const dt=Math.min(100,now-SV.lastTick);
   SV.lastTick=now;SV.elapsedMs+=dt;SV.elapsed=SV.elapsedMs/1000;
   const phase=getSvPhase(SV.elapsed);
@@ -1377,18 +1484,34 @@ function svLoop(now){
   if(SV.elapsedMs-SV.lastSpawn>=SV.nextSpawnMs){
     svSpawnItem(phase);
     SV.lastSpawn=SV.elapsedMs;
-    /* jitter ±20%, 최소 500ms */
     const jitter=phase.spawnBase*0.2;
     SV.nextSpawnMs=Math.max(500,phase.spawnBase+(Math.random()*2-1)*jitter);
   }
   moveItems(dt);updateCharPosition();updateSvHUD();checkComboBonus();
   requestAnimationFrame(svLoop);
 }
+/* svLoop가 죽었을 때 안전하게 재시작 */
+function ensureSvLoop(){
+  if(SV && !SV.ended && !SV.paused && !_svLoopRunning){
+    _svLoopRunning=true;
+    SV.lastTick=performance.now();
+    requestAnimationFrame(svLoop);
+  }
+}
 
 function svSpawnItem(phase){
   if(!SV._pool||SV._pool.length===0)SV._pool=buildSvPool(phase);
-  const itemDef=SV._pool[Math.floor(Math.random()*SV._pool.length)];
+  let itemDef=SV._pool[Math.floor(Math.random()*SV._pool.length)];
+  /* 직전과 같은 아이템(label 기준)이 연속으로 나오지 않도록 재추첨 */
+  if(SV._pool.length>1&&SV._lastItemLabel){
+    let tries=0;
+    while(itemDef&&itemDef.label===SV._lastItemLabel&&tries<10){
+      itemDef=SV._pool[Math.floor(Math.random()*SV._pool.length)];
+      tries++;
+    }
+  }
   if(!itemDef)return;
+  SV._lastItemLabel=itemDef.label;
   const cat=CATEGORIES[itemDef.type];
   const id=++SV.itemId;
   const node=document.createElement("div");
@@ -1404,16 +1527,23 @@ function svSpawnItem(phase){
 }
 
 function svMissItem(it){
-  if(!it.alive)return;it.alive=false;
+  if(!it.alive)return;
+  it.alive=false;
   if(it.type!=="trash"){
     SV.combo=0;SV.hearts--;
-    charReact("wrong-react");popFeedback("놓쳤어요!","bad",null);
+    charReact("wrong-react");
+    popFeedback("놓쳤어요!","bad",null);
     updateDangerEffect();
-    if(SV.hearts<=0){if(it.node.parentNode)it.node.parentNode.removeChild(it.node);endSurvival();return;}
+    if(SV.hearts<=0){
+      if(it.node.parentNode)it.node.parentNode.removeChild(it.node);
+      endSurvival();
+      return;
+    }
   }
-  it.node.style.transition="opacity .3s,transform .3s";
-  it.node.style.opacity="0";it.node.style.transform="translateY(-50%) translateX(22px)";
-  setTimeout(()=>{if(it.node.parentNode)it.node.parentNode.removeChild(it.node);},320);
+  /* rAF 사용 금지 (svLoop rAF와 중첩 → 프레임 블로킹 원인)
+     setTimeout으로만 처리, transform은 건드리지 않음 */
+  it.node.style.opacity="0";
+  setTimeout(()=>{if(it.node.parentNode)it.node.parentNode.removeChild(it.node);},250);
 }
 
 function onSortSurvival(type){
@@ -1426,14 +1556,19 @@ function onSortSurvival(type){
   if(!target)return;
   const btn=document.querySelector('.sort-btn[data-type="'+type+'"]');
   if(target.type===type){
-    target.alive=false;SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);
+    target.alive=false;
+    target._flying=true;   /* moveItems에서 건드리지 않도록 */
+    SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);
     const base=target.itemDef?.tricky?20:10;
     const gain=Math.floor(base*SV.sB*(SV.combo>=3?SV.cB:1));
-    SV.score+=gain;charReact("grab");target.node.classList.add("correct");
-    if(btn){btn.classList.add("ok");setTimeout(()=>btn.classList.remove("ok"),400);}
-    setTimeout(()=>{if(target.node.parentNode)target.node.parentNode.removeChild(target.node);},500);
+    SV.score+=gain;charReact("grab");
+    /* 피드백 팝업은 flyToBox 이전에 (노드 위치가 유효할 때) */
     popFeedback(target.itemDef?.tricky?"+"+gain+" 🎉":"+"+gain,"ok",target.node);
     document.getElementById("gameBubble").classList.remove("show");
+    /* 포물선 모션: 원본 아이템 노드를 상자로 날림 */
+    if(btn) flyToBox(target.node, btn);
+    else if(target.node.parentNode) target.node.parentNode.removeChild(target.node);
+    if(btn){btn.classList.add("ok");setTimeout(()=>btn.classList.remove("ok"),400);}
   }else{
     SV.combo=0;SV.hearts--;
     charReact("wrong-react");target.node.classList.add("wrong");
@@ -1552,7 +1687,7 @@ document.getElementById("gameRoot").addEventListener("click",e=>{
 });
 document.querySelectorAll(".sort-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
-    if(SV&&!SV.ended)onSortSurvival(btn.dataset.type);
+    if(SV&&!SV.ended){ensureSvLoop();onSortSurvival(btn.dataset.type);}
     else onSort(btn.dataset.type);
   });
 });
@@ -1565,7 +1700,15 @@ window.addEventListener("keydown",e=>{
   const m={"1":"toy","2":"snack","3":"cloth","4":"book","5":"trash"};
   if(m[e.key]){if(SV&&!SV.ended)onSortSurvival(m[e.key]);else onSort(m[e.key]);}
 });
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&!G?.ended)pauseGame();});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){
+    /* 탭 숨김: 게임 일시정지 */
+    if(G && !G.ended) pauseGame();
+  } else {
+    /* 탭 복귀: lastTick 리셋해서 dt 폭발 방지 */
+    if(SV && !SV.ended && !SV.paused) SV.lastTick = performance.now();
+  }
+});
 
 loadSave();
 showScreen("main");

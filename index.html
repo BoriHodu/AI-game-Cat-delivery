@@ -1029,10 +1029,17 @@ html,body{
     document.body.removeChild(el);
     return insets;
   }
+  function isStandalone(){
+    return (window.navigator.standalone === true) ||
+           (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches);
+  }
   function resize(){
     const vw = (window.visualViewport ? window.visualViewport.width  : window.innerWidth);
     const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
-    const insets = getSafeAreaInsets();
+    /* standalone(홈 화면에 추가해서 실행)일 땐 iOS가 뷰포트 크기 자체를 이미
+       safe-area만큼 줄여서 보고하므로, 여기서 또 빼면 이중 차감되어 화면이
+       필요 이상으로 작아지고 사방에 여백이 생긴다. 그럴 땐 insets를 0으로 둔다. */
+    const insets = isStandalone() ? {top:0,right:0,bottom:0,left:0} : getSafeAreaInsets();
     /* 노치/다이나믹 아일랜드/홈 인디케이터 영역을 뺀 실제 "보이는" 영역만 기준으로 계산 */
     const availW = Math.max(0, vw - insets.left - insets.right);
     const availH = Math.max(0, vh - insets.top - insets.bottom);

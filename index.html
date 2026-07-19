@@ -599,6 +599,19 @@ html,body{
 }
 /* 상자 흡수 시 상자 통통 튀기 */
 .sort-btn.box-absorb{animation:boxAbsorb .35s ease-out;}
+.box-particle{
+  position:fixed;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9998;
+  will-change:transform,opacity;
+  animation:boxParticlePop .5s cubic-bezier(.25,.8,.35,1) forwards;
+}
+@keyframes boxParticlePop{
+  0%{transform:translate(0,0) scale(1);opacity:1;}
+  70%{opacity:1;}
+  100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0;}
+}
 @keyframes boxAbsorb{
   0%  {transform:translateX(-50%) scale(1)}
   40% {transform:translateX(-50%) scale(1.12) translateY(-6px)}
@@ -816,10 +829,16 @@ html,body{
 .sort-btn[data-type=cloth]{left:812px;}
 .sort-btn[data-type=book]{left:1066px;}
 .sort-btn[data-type=trash]{left:1320px;}
+#screenWipe{
+  position:absolute;inset:0;z-index:50;pointer-events:none;
+  background:#2b2118;
+  clip-path:circle(0px at 50% 50%);
+}
 </style>
 </head>
 <body>
 <div id="gameRoot">
+<div id="screenWipe"></div>
 
 <section id="screen-main" class="screen screen-main active">
   <div class="paper-bg"></div>
@@ -1137,6 +1156,40 @@ function showScreen(name){
   if(name==="main")      document.getElementById("mainCatEmoji").textContent=getChar().emoji;
 }
 
+/* 클릭한 지점에서부터 원이 커지며 화면을 덮고, 그 사이 화면이 전환된 뒤
+   다시 원이 줄어들며 새 화면이 드러나는 아이리스(iris) 트랜지션 */
+function circleWipeTransition(originEl, doSwitch){
+  const wipe = document.getElementById("screenWipe");
+  const root = document.getElementById("gameRoot");
+  if(!wipe||!root){ doSwitch(); return; }
+  const BASE_W=1624, BASE_H=750;
+  const rootR = root.getBoundingClientRect();
+  const scale = rootR.width / BASE_W || 1;
+  const originR = originEl.getBoundingClientRect();
+  const cx = (originR.left + originR.width/2  - rootR.left) / scale;
+  const cy = (originR.top  + originR.height/2 - rootR.top)  / scale;
+  const maxR = Math.hypot(Math.max(cx,BASE_W-cx), Math.max(cy,BASE_H-cy));
+
+  wipe.style.transition = "none";
+  wipe.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
+  void wipe.offsetWidth;
+  requestAnimationFrame(()=>{
+    wipe.style.transition = "clip-path .45s cubic-bezier(.4,0,.2,1)";
+    wipe.style.clipPath = `circle(${maxR}px at ${cx}px ${cy}px)`;
+  });
+
+  setTimeout(()=>{
+    doSwitch();
+    wipe.style.transition = "none";
+    wipe.style.clipPath = `circle(${maxR}px at ${cx}px ${cy}px)`;
+    void wipe.offsetWidth;
+    requestAnimationFrame(()=>{
+      wipe.style.transition = "clip-path .45s cubic-bezier(.4,0,.2,1)";
+      wipe.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
+    });
+  }, 460);
+}
+
 let previewCharIdx=0;
 function renderCharacter(){
   previewCharIdx=CHARS.findIndex(c=>c.id===save.selected);
@@ -1253,7 +1306,7 @@ const CAT_IMG={
   normal:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png",
   happy :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_happy.png",
   fail  :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_fail.png",
-  blink :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_blink.png",
+  blink :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_blink.png",
 };
 let _blinkTimer=null;
 function startBlinking(){
@@ -1334,6 +1387,33 @@ function moveItems(dt){
 
 
 /* ── 포물선 날아가기: scale 보정된 clone을 정확한 화면좌표에 ── */
+function spawnBoxParticles(btnEl){
+  const r = btnEl.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = r.top  + r.height*0.28;
+  const colors = ["#ffd166","#ff8fab","#7ec4ff","#b18cff","#8de08a","#ffb562"];
+  const n = 10;
+  for(let i=0;i<n;i++){
+    const p = document.createElement("div");
+    p.className = "box-particle";
+    const angle = (Math.PI*2*i/n) + (Math.random()*0.6-0.3);
+    const dist  = 34 + Math.random()*28;
+    const dx = Math.cos(angle)*dist;
+    const dy = Math.sin(angle)*dist - 14; /* 살짝 위로 튀는 느낌 */
+    const size = 6 + Math.random()*5;
+    p.style.left = cx+"px";
+    p.style.top  = cy+"px";
+    p.style.width  = size+"px";
+    p.style.height = size+"px";
+    p.style.marginLeft = (-size/2)+"px";
+    p.style.marginTop  = (-size/2)+"px";
+    p.style.background = colors[i % colors.length];
+    p.style.setProperty("--dx", dx+"px");
+    p.style.setProperty("--dy", dy+"px");
+    document.body.appendChild(p);
+    setTimeout(()=>{ if(p.parentNode) p.parentNode.removeChild(p); }, 520);
+  }
+}
 function flyToBox(itemNode, btnEl){
   /* getBoundingClientRect = scale 적용 후 실제 화면 좌표/크기 */
   const itemR = itemNode.getBoundingClientRect();
@@ -1407,6 +1487,7 @@ function flyToBox(itemNode, btnEl){
       btnEl.classList.remove("box-absorb");
       void btnEl.offsetWidth;
       btnEl.classList.add("box-absorb");
+      spawnBoxParticles(btnEl);
       setTimeout(()=>btnEl.classList.remove("box-absorb"), 350);
     }
   }
@@ -1710,7 +1791,12 @@ function handleAction(a){
 
 document.getElementById("gameRoot").addEventListener("click",e=>{
   const el=e.target.closest("[data-action]");if(!el)return;
-  e.preventDefault();handleAction(el.dataset.action);
+  e.preventDefault();
+  if(el.dataset.action==="start-survival"){
+    circleWipeTransition(el, startSurvival);
+  }else{
+    handleAction(el.dataset.action);
+  }
 });
 document.querySelectorAll(".sort-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{

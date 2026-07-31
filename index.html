@@ -778,9 +778,15 @@ html,body{
   display:block;
 }
 
-/* 중앙 타겟 하이라이트 - 확대 없이 위치/크기는 다른 아이템과 동일하게 유지 */
+/* 중앙 타겟 하이라이트 */
 .belt-item.target-item{
+  transform:translateY(-62%) scale(1.18) rotate(0deg) !important;
+  animation:targetPulse 0.65s ease-in-out infinite !important;
   z-index:10;
+}
+@keyframes targetPulse{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.08);}
 }
 
 
@@ -1123,12 +1129,12 @@ const COMBO_TIERS=[{min:0,mult:1,lbl:"×1"},{min:3,mult:1.2,lbl:"×1.2"},{min:6,
 
 /* ── SV_PHASES: 즉각적인 긴장감 ── */
 const SV_PHASES=[
-  {until:20,  spawnBase:2400,trickyRatio:0.20,travelMs:11000},
-  {until:40,  spawnBase:1950,trickyRatio:0.28,travelMs:10000},
-  {until:70,  spawnBase:1650,trickyRatio:0.34,travelMs:9000},
-  {until:100, spawnBase:1350,trickyRatio:0.40,travelMs:8000},
-  {until:150, spawnBase:1125,trickyRatio:0.46,travelMs:7000},
-  {until:Infinity,spawnBase:900,trickyRatio:0.52,travelMs:6000},
+  {until:20,  spawnBase:1600,trickyRatio:0.20,travelMs:5500},
+  {until:40,  spawnBase:1300,trickyRatio:0.28,travelMs:5000},
+  {until:70,  spawnBase:1100,trickyRatio:0.34,travelMs:4500},
+  {until:100, spawnBase:900, trickyRatio:0.40,travelMs:4000},
+  {until:150, spawnBase:750, trickyRatio:0.46,travelMs:3500},
+  {until:Infinity,spawnBase:600,trickyRatio:0.52,travelMs:3000},
 ];
 
 const SAVE_KEY="catDelivery.v3";
@@ -1293,18 +1299,6 @@ function moveCharTo(xPercent){
   const px=W*xPercent/100;
   charEl.style.left=Math.max(40,Math.min(W-100,px-48-10))+"px";
 }
-function moveCharToPx(px){
-  const charEl=document.getElementById("gameCharacter");if(!charEl)return;
-  const field=document.getElementById("gameField");if(!field)return;
-  const W=field.clientWidth;
-  charEl.style.left=Math.max(40,Math.min(W-100,px-48-10))+"px";
-}
-/* 아이템을 맞출 때마다 고양이가 그 위치로 이동해서 그대로 머무름
-   (다음에 또 맞추면 그 다음 위치로 이동). 게임 시작 시엔 기본 위치(43%) */
-let charStayX = null;
-function focusCharAt(px){
-  charStayX = px;
-}
 
 
 let bubbleTimer=null;
@@ -1350,11 +1344,7 @@ function charReact(type){
 }
 
 function updateCharPosition(){
-  if(charStayX!=null){
-    moveCharToPx(charStayX);
-  }else{
-    moveCharTo(43);
-  }
+  moveCharTo(43);
   const items = (SV && !SV.ended) ? SV.items : (G ? G.items : []);
   const alive = items.filter(it => it.alive);
   let closest = null, minDist = Infinity;
@@ -1569,7 +1559,6 @@ function startSurvival(){
   document.getElementById("beltItems").innerHTML="";
   document.getElementById("gameBubble").classList.remove("show");
   clearDangerEffect();
-  charStayX=null;
   updateSvButtons();
   initHearts(maxH);
   const charEl=document.getElementById("gameCharacter");
@@ -1665,33 +1654,18 @@ function svMissItem(it){
   setTimeout(()=>{if(it.node.parentNode)it.node.parentNode.removeChild(it.node);},250);
 }
 
-/* 각 상자의 x좌표(1624px 캔버스 기준, .sort-btn[data-type=...] left값과 동일) */
-const SV_BOX_X = {toy:304, snack:558, cloth:812, book:1066, trash:1320};
-const SV_BOX_ZONE = 85; /* 상자 중심 기준 ±85px (총 판정 구간 폭 170px) */
-
 function onSortSurvival(type){
   if(!SV||SV.paused||SV.ended)return;
-  const wrap = getEl("beltItems");
-  const W = wrap ? wrap.clientWidth : 1624;
-  const boxX = SV_BOX_X[type];
-  const btn = document.querySelector('.sort-btn[data-type="'+type+'"]');
-
-  /* 이 상자와 "같은 종류"이면서, 지금 이 상자 바로 앞(정렬 구간) 안에 있는 아이템만 후보 */
-  let target=null, minDist=Infinity, targetCx=0;
+  // 중앙에 가장 가까운 아이템이 타겟
+  let target=null,minDist=Infinity;
   for(const it of SV.items){
-    if(!it.alive || it._flying) continue;
-    if(it.type!==type) continue;
-    const cx = -96 + (W+384)*it.prog; /* 아이템 중심 x (belt-item 폭 192px의 절반만큼 보정) */
-    const dist = Math.abs(cx-boxX);
-    if(dist<=SV_BOX_ZONE && dist<minDist){minDist=dist;target=it;targetCx=cx;}
+    if(it.alive){const dist=Math.abs(it.prog-0.5);if(dist<minDist){minDist=dist;target=it;}}
   }
-
-  if(target){
+  if(!target)return;
+  const btn=document.querySelector('.sort-btn[data-type="'+type+'"]');
+  if(target.type===type){
     target.alive=false;
     target._flying=true;   /* moveItems에서 건드리지 않도록 */
-    /* 터치한 순간, 고양이를 아이템이 있던 그 위치로 이동시켜 그대로 머무름
-       (다음에 또 맞추면 그 아이템 위치로 다시 이동) */
-    focusCharAt(targetCx);
     SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);
     const base=target.itemDef?.tricky?20:10;
     const gain=Math.floor(base*SV.sB*(SV.combo>=3?SV.cB:1));
@@ -1704,11 +1678,10 @@ function onSortSurvival(type){
     else if(target.node.parentNode) target.node.parentNode.removeChild(target.node);
     if(btn){btn.classList.add("ok");setTimeout(()=>btn.classList.remove("ok"),400);}
   }else{
-    /* 이 상자 앞에 해당 아이템이 없는 상태에서 누름 → 실패 처리 */
     SV.combo=0;SV.hearts--;
-    charReact("wrong-react");
-    if(btn){btn.classList.add("bad");setTimeout(()=>btn.classList.remove("bad"),500);}
-    popFeedback("-오답!","bad",btn);
+    charReact("wrong-react");target.node.classList.add("wrong");
+    if(btn){btn.classList.add("bad");setTimeout(()=>{target.node.classList.remove("wrong");btn.classList.remove("bad");},500);}
+    popFeedback(target.itemDef?.tricky?(target.itemDef.confuses||"-오답!"):"-오답!","bad",target.node);
     updateDangerEffect();
     if(SV.hearts<=0)endSurvival();
   }

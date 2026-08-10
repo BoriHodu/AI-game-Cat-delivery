@@ -479,26 +479,6 @@ html,body{
   90%{transform:translateX(6px)}
 }
 
-.game-bubble{
-  position:absolute;
-  bottom:88px;
-  background:#fff;
-  border:2.5px solid var(--brown);
-  border-radius:18px 18px 18px 4px;
-  padding:8px 14px;
-  min-width:120px;
-  box-shadow:0 4px 14px rgba(0,0,0,.18);
-  opacity:0;transform:scale(.7) translateY(10px);
-  transition:opacity .25s,transform .25s;
-  pointer-events:none;z-index:6;
-  white-space:nowrap;
-}
-.game-bubble.show{opacity:1;transform:scale(1) translateY(0);}
-.bubble-label{font-size:10px;color:var(--blt);font-weight:700;display:block;margin-bottom:2px;}
-.bubble-content{display:flex;align-items:center;gap:6px;}
-.bubble-emoji{font-size:28px;}
-.bubble-name{font-size:16px;font-weight:700;color:var(--bdk);}
-
 .game-belt{
   position:absolute;
   left:0;right:0;
@@ -546,6 +526,14 @@ html,body{
 .belt-item.target-item img{
   filter:drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 20px rgba(255,200,0,.6));
 }
+.belt-item.rush-item img{
+  filter:drop-shadow(0 0 10px rgba(255,90,60,.95)) drop-shadow(0 0 18px rgba(255,150,60,.65));
+  animation:rushPulse .45s ease-in-out infinite;
+}
+@keyframes rushPulse{
+  0%,100%{transform:scale(1);}
+  50%{transform:scale(1.1);}
+}
 .belt-item:hover{transform:translateY(-58%) scale(1.06);}
 .belt-item:active{transform:translateY(-46%) scale(.95);}
 .belt-item::after{display:none;}
@@ -587,7 +575,28 @@ html,body{
   transition:transform .1s;
   overflow:visible;
 }
+.sort-btn.swapping-lock{pointer-events:none;}
 .sort-btn>*{pointer-events:none;}
+
+/* ══ 박스 교체(고양이 손) 애니메이션 ══
+   CSS 클래스+keyframe(animation-fill-mode:forwards) 방식은, 다음 애니메이션을
+   걸기 위해 기존 클래스를 제거하는 순간 "애니메이션이 유지하던 위치값"이
+   사라지면서 기본 상태(=위치 이동 없음, 완전히 보이는 원래 자리)로 한 프레임
+   튕기는 문제가 있었음. 손은 기본 위치가 어차피 숨는 위치 근처라 안 티났지만
+   박스는 기본값이 "완전히 보임"이라 손이 새로 올라올 때 박스가 잠깐(때로는
+   꽤 길게) 원래 자리에 보이는 버그로 나타났음.
+   → JS의 Element.animate()(Web Animations API)로 완전히 교체.
+     클래스 토글이 필요 없어서 이런 튕김이 구조적으로 발생하지 않음. */
+.box-hand-layer{
+  position:absolute;left:0;bottom:0;width:100%;height:246px;
+  z-index:15;pointer-events:none;
+}
+.box-hand-anim{
+  position:absolute;
+  bottom:-10px;
+  width:389px;
+  pointer-events:none;
+}
 
 /* 상자로 날아가는 아이템 복사본 */
 .fly-item{
@@ -824,11 +833,11 @@ html,body{
   pointer-events:none;
 }
 .sort-btn:active{transform:translateX(-50%) translateY(6px);}
-.sort-btn[data-type=toy]{left:304px;}
-.sort-btn[data-type=snack]{left:558px;}
-.sort-btn[data-type=cloth]{left:812px;}
-.sort-btn[data-type=book]{left:1066px;}
-.sort-btn[data-type=trash]{left:1320px;}
+.sort-btn[data-slot="0"]{left:304px;}
+.sort-btn[data-slot="1"]{left:558px;}
+.sort-btn[data-slot="2"]{left:812px;}
+.sort-btn[data-slot="3"]{left:1066px;}
+.sort-btn[data-slot="4"]{left:1320px;}
 #screenWipe{
   position:absolute;inset:0;z-index:50;pointer-events:none;
   background:#2b2118;
@@ -958,13 +967,6 @@ html,body{
 
     <div class="game-character-layer" id="charLayer">
       <div class="game-character idle" id="gameCharacter"><img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png" alt="고양이"></div>
-      <div class="game-bubble" id="gameBubble">
-        <span class="bubble-label">지금 이건!</span>
-        <div class="bubble-content">
-          <span class="bubble-emoji" id="bubbleEmoji">📦</span>
-          <span class="bubble-name" id="bubbleName">택배</span>
-        </div>
-      </div>
     </div>
 
     <div class="game-belt">
@@ -974,21 +976,22 @@ html,body{
     <div class="feedback-layer" id="feedbackLayer"></div>
 
     <div class="sort-buttons">
-      <button class="sort-btn" data-type="toy">
+      <button class="sort-btn" data-slot="0" data-type="toy">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_toy.png" alt="장난감">
       </button>
-      <button class="sort-btn" data-type="snack">
+      <button class="sort-btn" data-slot="1" data-type="snack">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_food.png" alt="간식">
       </button>
-      <button class="sort-btn" data-type="cloth">
+      <button class="sort-btn" data-slot="2" data-type="cloth">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_cloth.png" alt="옷">
       </button>
-      <button class="sort-btn" data-type="book">
+      <button class="sort-btn" data-slot="3" data-type="book">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_book.png" alt="책">
       </button>
-      <button class="sort-btn" data-type="trash">
+      <button class="sort-btn" data-slot="4" data-type="trash">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_trash.png" alt="쓰레기">
       </button>
+      <div class="box-hand-layer" id="boxHandLayer"></div>
     </div>
   </div>
 </section>
@@ -1081,40 +1084,121 @@ html,body{
   screen.orientation && screen.orientation.addEventListener("change", ()=>setTimeout(resize,200));
 })();
 
+const ALL_CATS=["toy","snack","cloth","book","trash","it","kitchen","school","bath","plant"];
+const BASE_CATS=["toy","snack","cloth","book","trash"];
+
 const CATEGORIES={
-  toy:  {label:"장난감",emoji:"🧸",color:"#E89B6C",bg:"#FEF0E0"},
-  snack:{label:"간식",  emoji:"🍪",color:"#E8B84B",bg:"#FEF8E0"},
-  cloth:{label:"옷",    emoji:"👕",color:"#7FB5D9",bg:"#E6F2F9"},
-  book: {label:"책",    emoji:"📚",color:"#A478D0",bg:"#F2EBFA"},
-  trash:{label:"쓰레기",emoji:"🗑️",color:"#8FA67E",bg:"#E5EDDD"},
+  toy:{label:"장난감",emoji:"🧸",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_toy.png"},
+  snack:{label:"간식",emoji:"🍪",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_food.png"},
+  cloth:{label:"옷",emoji:"👕",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_cloth.png"},
+  book:{label:"책",emoji:"📚",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_book.png"},
+  trash:{label:"쓰레기",emoji:"🗑️",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_trash.png"},
+  it:{label:"가전",emoji:"📱",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_it.png"},
+  kitchen:{label:"주방용품",emoji:"🍳",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_kitchen.png"},
+  school:{label:"문구용품",emoji:"✏️",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_school.png"},
+  bath:{label:"욕실용품",emoji:"🧼",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_bath.png"},
+  plant:{label:"식물",emoji:"🌱",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_plant.png"},
 };
 
+/* ══ 박스/손 이미지 프리로드 ══
+   박스 교체 시 img.src를 바꿔도, 그 이미지가 브라우저에 처음 로딩되는
+   거라면 다운로드가 끝날 때까지 "이전 이미지"가 화면에 그대로 남아있는
+   경우가 있음(교체 애니메이션은 이미 다 끝났는데 그림만 뒤늦게 바뀌는
+   버그의 원인). 대분류 10종 + 손 5종은 개수가 적으니 게임 로드 시점에
+   전부 미리 받아둬서, 실제 교체 순간엔 항상 캐시에서 즉시 그려지게 함. */
+(function preloadBoxAndHandImages(){
+  const urls=[
+    ...Object.values(CATEGORIES).map(c=>c.boxImg),
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_01.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_02.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_03.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_04.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_05.png",
+  ];
+  urls.forEach(u=>{ const im=new Image(); im.src=u; });
+})();
+
 const ALL_ITEMS=[
-  {id:"bear",       emoji:"🧸",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_01.png",label:"곰인형",         type:"toy",  tricky:false,confuses:null},
-  {id:"ball",       emoji:"⚽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_02.png",label:"고무공",          type:"toy",  tricky:false,confuses:null},
-  {id:"car",        emoji:"🚗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_03.png",label:"장난감 자동차",   type:"toy",  tricky:false,confuses:null},
-  {id:"doll_dress", emoji:"👗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_04.png",label:"종이인형 옷세트", type:"toy",  tricky:true, confuses:"옷처럼 보이지만 장난감!"},
-  {id:"donut_toy",  emoji:"🍩",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_05.png",label:"도넛 튜브 장난감",type:"toy",  tricky:true, confuses:"간식처럼 보이지만 장난감!"},
-  {id:"cookie",     emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_01.png",label:"쿠키",              type:"snack",tricky:false,confuses:null},
-  {id:"churro",     emoji:"🥐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_02.png",label:"츄르",              type:"snack",tricky:false,confuses:null},
-  {id:"candy",      emoji:"🍬",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_03.png",label:"사탕",              type:"snack",tricky:false,confuses:null},
-  {id:"empty_bag",  emoji:"🛍️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_04.png",label:"먹다 남은 과자봉지",type:"snack",tricky:true, confuses:"쓰레기처럼 보이지만 간식!"},
-  {id:"bear_jelly", emoji:"🐻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_05.png",label:"곰돌이 젤리",       type:"snack",tricky:true, confuses:"장난감처럼 보이지만 간식!"},
-  {id:"tshirt",     emoji:"👕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_01.png",label:"일반 티셔츠", type:"cloth",tricky:false,confuses:null},
-  {id:"socks",      emoji:"🧦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_02.png",label:"양말",       type:"cloth",tricky:false,confuses:null},
-  {id:"hat",        emoji:"🧢",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_03.png",label:"모자",       type:"cloth",tricky:false,confuses:null},
-  {id:"bear_hood",  emoji:"🐻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_04.png",label:"곰돌이 후드", type:"cloth",tricky:true, confuses:"장난감처럼 보이지만 옷!"},
-  {id:"dirty_socks",emoji:"🧦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_05.png",label:"더러운 양말", type:"cloth",tricky:true, confuses:"쓰레기처럼 보이지만 옷!"},
-  {id:"comic",       emoji:"💬",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_01.png",label:"만화책",       type:"book", tricky:false,confuses:null},
-  {id:"old_magazine",emoji:"🗞️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_02.png",label:"오래된 잡지",   type:"book", tricky:true, confuses:"쓰레기처럼 보이지만 책!"},
-  {id:"diary",       emoji:"🔐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_03.png",label:"자물쇠 일기장", type:"book", tricky:false,confuses:null},
-  {id:"sticker_book",emoji:"⭐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_04.png",label:"스티커북",      type:"book", tricky:true, confuses:"별스티커처럼 보이지만 책!"},
-  {id:"webtoon_book",emoji:"📱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_05.png",label:"웹툰 단행본",   type:"book", tricky:true, confuses:"기계처럼 보이지만 책!"},
-  {id:"tissue",     emoji:"🧻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_01.png",label:"휴지뭉치",    type:"trash",tricky:false,confuses:null},
-  {id:"can",        emoji:"🥫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_02.png",label:"빈 캔",       type:"trash",tricky:false,confuses:null},
-  {id:"cup",        emoji:"☕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_03.png",label:"종이컵",      type:"trash",tricky:false,confuses:null},
-  {id:"torn_book",  emoji:"📄",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_04.png",label:"찢어진 책장", type:"trash",tricky:true, confuses:"책처럼 보이지만 쓰레기!"},
-  {id:"old_doll",   emoji:"🪆",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_05.png",label:"낡은 인형",   type:"trash",tricky:true, confuses:"장난감처럼 보이지만 쓰레기!"},
+  {id:"soccer_ball",emoji:"⚽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_01.png",label:"축구공",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"bear",emoji:"🧸",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_02.png",label:"곰인형",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"block_toy",emoji:"🧱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_03.png",label:"블록장난감",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"toy_car",emoji:"🚗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_04.png",label:"장난감 자동차",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"water_gun",emoji:"🔫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_05.png",label:"물총",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"duck_wind",emoji:"🦆",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_06.png",label:"오리태엽장난감",type:"toy",tricky:true,condCategory:"bath",confuses:"목욕용품처럼 보이지만 장난감!"},
+  {id:"toy_camera",emoji:"📷",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_07.png",label:"장난감 카메라",type:"toy",tricky:true,condCategory:"it",confuses:"가전제품처럼 보이지만 장난감!"},
+  {id:"duck_tube",emoji:"🦆",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_08.png",label:"오리튜브장난감",type:"toy",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 장난감!"},
+  {id:"cookie",emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_01.png",label:"쿠키",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"candy",emoji:"🍬",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_02.png",label:"사탕",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"donut",emoji:"🍩",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_03.png",label:"도넛",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"macaron",emoji:"🧁",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_04.png",label:"마카롱",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"tuna_can",emoji:"🥫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_05.png",label:"참치캔",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"bear_jelly",emoji:"🐻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_06.png",label:"곰젤리",type:"snack",tricky:true,condCategory:"toy",confuses:"장난감처럼 보이지만 간식!"},
+  {id:"choco_wafer_book",emoji:"📔",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_07.png",label:"책모양 초콜릿웨하스",type:"snack",tricky:true,condCategory:"book",confuses:"책처럼 보이지만 간식!"},
+  {id:"pot_cake",emoji:"🍰",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_08.png",label:"화분모양 초코케이크",type:"snack",tricky:true,condCategory:"plant",confuses:"화분처럼 보이지만 간식!"},
+  {id:"tshirt",emoji:"👕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_01.png",label:"티셔츠",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"socks",emoji:"🧦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_02.png",label:"양말",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"hoodie",emoji:"🧥",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_03.png",label:"후드티",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"jeans",emoji:"👖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_04.png",label:"청바지",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"cap",emoji:"🧢",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_05.png",label:"캡모자",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"towel_muffler",emoji:"🧣",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_06.png",label:"수건닮은 목도리",type:"cloth",tricky:true,condCategory:"bath",confuses:"수건처럼 보이지만 옷!"},
+  {id:"apron",emoji:"👚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_07.png",label:"앞치마",type:"cloth",tricky:true,condCategory:"kitchen",confuses:"주방용품처럼 보이지만 옷!"},
+  {id:"bear_hood",emoji:"🐻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_08.png",label:"곰후드",type:"cloth",tricky:true,condCategory:"toy",confuses:"장난감처럼 보이지만 옷!"},
+  {id:"picture_book",emoji:"📖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_01.png",label:"동화책",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"book_stack",emoji:"📚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_02.png",label:"책더미",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"pop_up_book",emoji:"📖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_03.png",label:"팝업북",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"kids_book",emoji:"📕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_04.png",label:"아동그림책",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"diary",emoji:"📔",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_05.png",label:"다이어리",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"newspaper_stack",emoji:"📰",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_06.png",label:"신문더미",type:"book",tricky:true,condCategory:"trash",confuses:"쓰레기처럼 보이지만 책!"},
+  {id:"audiobook",emoji:"🎧",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_07.png",label:"오디오북",type:"book",tricky:true,condCategory:"it",confuses:"가전제품처럼 보이지만 책!"},
+  {id:"cookie_recipe",emoji:"📝",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_08.png",label:"쿠키레시피",type:"book",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 책!"},
+  {id:"paper_ball",emoji:"🗞️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_01.png",label:"종이뭉치",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"plastic_bag",emoji:"🛍️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_02.png",label:"비닐봉지",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"crushed_can",emoji:"🥫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_03.png",label:"찌그러진 캔",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"crushed_cup",emoji:"🥤",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_04.png",label:"찌그러진 종이컵",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"crushed_bottle",emoji:"🧴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_05.png",label:"찌그러진 페트병",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"old_book_bundle",emoji:"📚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_06.png",label:"낡은 책 묶음",type:"trash",tricky:true,condCategory:"book",confuses:"책처럼 보이지만 쓰레기!"},
+  {id:"broken_doll",emoji:"🧸",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_07.png",label:"망가진 인형",type:"trash",tricky:true,condCategory:"toy",confuses:"장난감처럼 보이지만 쓰레기!"},
+  {id:"eaten_snack",emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_08.png",label:"다 먹은 과자",type:"trash",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 쓰레기!"},
+  {id:"headphones",emoji:"🎧",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_01.png",label:"헤드폰",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"smartphone",emoji:"📱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_02.png",label:"핸드폰",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"game_console",emoji:"🎮",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_03.png",label:"게임기",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"tablet_pc",emoji:"📲",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_04.png",label:"태블릿PC",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"camera",emoji:"📷",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_05.png",label:"카메라",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"alarm_clock",emoji:"⏰",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_06.png",label:"알람시계",type:"it",tricky:true,condCategory:"toy",confuses:"장난감처럼 보이지만 가전!"},
+  {id:"e_book",emoji:"📖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_07.png",label:"전자책",type:"it",tricky:true,condCategory:"book",confuses:"책처럼 보이지만 가전!"},
+  {id:"speaker",emoji:"🔊",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_08.png",label:"스피커",type:"it",tricky:true,condCategory:"kitchen",confuses:"주방용품처럼 보이지만 가전!"},
+  {id:"frying_pan",emoji:"🍳",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_01.png",label:"프라이팬",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"pot",emoji:"🍲",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_02.png",label:"냄비",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"kettle",emoji:"🫖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_03.png",label:"주전자",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"plate",emoji:"🍽️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_04.png",label:"접시",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"ladle",emoji:"🥄",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_05.png",label:"국자",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"pot_mug",emoji:"☕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_06.png",label:"화분모양 머그컵",type:"kitchen",tricky:true,condCategory:"plant",confuses:"화분처럼 보이지만 주방용품!"},
+  {id:"cookie_coaster",emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_07.png",label:"쿠키모양 컵받침",type:"kitchen",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 주방용품!"},
+  {id:"book_potholder",emoji:"📚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_08.png",label:"책모양 냄비받침",type:"kitchen",tricky:true,condCategory:"book",confuses:"책처럼 보이지만 주방용품!"},
+  {id:"pencil",emoji:"✏️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_01.png",label:"연필",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"eraser",emoji:"🧽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_02.png",label:"지우개",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"scissors",emoji:"✂️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_03.png",label:"가위",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"stapler",emoji:"📎",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_04.png",label:"스테이플러",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"ruler",emoji:"📏",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_05.png",label:"막대자",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"choco_tape",emoji:"🍫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_06.png",label:"초콜릿모양 수정테이프",type:"school",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 문구용품!"},
+  {id:"book_postit",emoji:"📚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_07.png",label:"책모양 포스트잇",type:"school",tricky:true,condCategory:"book",confuses:"책처럼 보이지만 문구용품!"},
+  {id:"pencil_holder",emoji:"🪴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_08.png",label:"연필꽂이",type:"school",tricky:true,condCategory:"plant",confuses:"화분처럼 보이지만 문구용품!"},
+  {id:"toothbrush",emoji:"🪥",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_01.png",label:"칫솔",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"shampoo",emoji:"🧴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_02.png",label:"샴푸",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"towel",emoji:"🛁",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_03.png",label:"수건",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"soap",emoji:"🧼",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_04.png",label:"비누",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"toothpaste",emoji:"🦷",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_05.png",label:"치약",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"macaron_showerball",emoji:"🧽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_06.png",label:"마카롱모양 샤워볼",type:"bath",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 욕실용품!"},
+  {id:"ladle_mirror",emoji:"🪞",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_07.png",label:"국자모양 손거울",type:"bath",tricky:true,condCategory:"kitchen",confuses:"주방용품처럼 보이지만 욕실용품!"},
+  {id:"hairband",emoji:"🎀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_08.png",label:"헤어밴드",type:"bath",tricky:true,condCategory:"cloth",confuses:"옷처럼 보이지만 욕실용품!"},
+  {id:"succulent",emoji:"🌵",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_01.png",label:"다육이",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"watering_can",emoji:"🪣",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_02.png",label:"물조리개",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"trowel",emoji:"🌱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_03.png",label:"모종삽",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"seed_bag",emoji:"🌰",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_04.png",label:"씨앗봉지",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"cactus",emoji:"🌵",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_05.png",label:"선인장",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"snack_seed_bag",emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_06.png",label:"과자모양 씨앗봉지",type:"plant",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 식물!"},
+  {id:"seedling_tray",emoji:"🌿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_07.png",label:"모종식물판",type:"plant",tricky:true,condCategory:"bath",confuses:"욕실용품처럼 보이지만 식물!"},
+  {id:"pencase_pot",emoji:"🪴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_08.png",label:"필통모양 화분",type:"plant",tricky:true,condCategory:"school",confuses:"문구용품처럼 보이지만 식물!"},
 ];
 
 const CHARS=[
@@ -1126,15 +1210,20 @@ const CHARS=[
 ];
 
 const COMBO_TIERS=[{min:0,mult:1,lbl:"×1"},{min:3,mult:1.2,lbl:"×1.2"},{min:6,mult:1.5,lbl:"×1.5"},{min:10,mult:2,lbl:"×2.0"}];
+function getComboMultiplier(combo){
+  let m=COMBO_TIERS[0].mult;
+  for(const t of COMBO_TIERS){ if(combo>=t.min) m=t.mult; }
+  return m;
+}
 
 /* ── SV_PHASES: 즉각적인 긴장감 ── */
 const SV_PHASES=[
-  {until:20,  spawnBase:1600,trickyRatio:0.20,travelMs:5500},
-  {until:40,  spawnBase:1300,trickyRatio:0.28,travelMs:5000},
-  {until:70,  spawnBase:1100,trickyRatio:0.34,travelMs:4500},
-  {until:100, spawnBase:900, trickyRatio:0.40,travelMs:4000},
-  {until:150, spawnBase:750, trickyRatio:0.46,travelMs:3500},
-  {until:Infinity,spawnBase:600,trickyRatio:0.52,travelMs:3000},
+  {until:20,  spawnBase:1600,trickyRatio:0.15,travelMs:5500},
+  {until:45,  spawnBase:1350,trickyRatio:0.22,travelMs:5000},
+  {until:75,  spawnBase:1150,trickyRatio:0.28,travelMs:4600},
+  {until:110, spawnBase:1000,trickyRatio:0.32,travelMs:4200},
+  {until:160, spawnBase:850, trickyRatio:0.36,travelMs:3900},
+  {until:Infinity,spawnBase:720,trickyRatio:0.40,travelMs:3600},
 ];
 
 const SAVE_KEY="catDelivery.v3";
@@ -1301,7 +1390,6 @@ function moveCharTo(xPercent){
 }
 
 
-let bubbleTimer=null;
 const CAT_IMG={
   normal:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png",
   happy :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_happy.png",
@@ -1353,21 +1441,6 @@ function updateCharPosition(){
     if(dist < minDist){ minDist = dist; closest = it; }
   }
   for(const it of alive) it.node.classList.toggle("target-item", it === closest);
-  const bubble = getEl("gameBubble");
-  if(bubble && closest && !bubble.classList.contains("show")) showBubble(closest);
-}
-
-
-function showBubble(item){
-  const bubble = getEl("gameBubble");
-  const charEl = document.getElementById("gameCharacter");
-  if(!bubble || !charEl || !item.itemDef) return;
-  getEl("bubbleEmoji").textContent = item.itemDef.emoji;
-  getEl("bubbleName").textContent  = item.itemDef.label;
-  bubble.style.left = (parseFloat(charEl.style.left || "100") + 90) + "px";
-  bubble.classList.add("show");
-  clearTimeout(bubbleTimer);
-  bubbleTimer = setTimeout(() => bubble.classList.remove("show"), 2000);
 }
 
 
@@ -1528,13 +1601,17 @@ let SV=null;
 function getSvPhase(s){return SV_PHASES.find(p=>s<p.until)||SV_PHASES[SV_PHASES.length-1];}
 
 function buildSvPool(phase){
-  const allCats=["toy","snack","cloth","book","trash"];
-  const basic=ALL_ITEMS.filter(it=>allCats.includes(it.type)&&!it.tricky);
-  const tricky=ALL_ITEMS.filter(it=>allCats.includes(it.type)&&it.tricky);
+  const active=getActiveCats();
+  const basic=ALL_ITEMS.filter(it=>active.includes(it.type)&&!it.tricky);
+  /* 조건부 트리키 아이템: 자기 카테고리(type)뿐 아니라 condCategory(연상되는 다른 대분류)의
+     박스도 화면에 떠 있어야만 스폰 풀에 포함됨 (안 그러면 정답 없는 아이템이 나올 수 있음) */
+  const tricky=ALL_ITEMS.filter(it=>active.includes(it.type)&&it.tricky&&active.includes(it.condCategory));
   const pool=[...basic];
   if(tricky.length>0&&phase.trickyRatio>0){
     const cnt=Math.max(1,Math.round(basic.length*(phase.trickyRatio/(1-phase.trickyRatio))));
-    for(let i=0;i<cnt;i++)pool.push(tricky[i%tricky.length]);
+    /* 셔플 후 뽑아 특정 아이템만 반복 등장하지 않고 골고루 등장하게 함 */
+    const shuffledTricky=[...tricky].sort(()=>Math.random()-0.5);
+    for(let i=0;i<cnt;i++)pool.push(shuffledTricky[i%shuffledTricky.length]);
   }
   return pool;
 }
@@ -1542,7 +1619,255 @@ function buildSvPool(phase){
 /* ── 수정: 서바이벌 버튼 항상 5개 표시 ── */
 function updateSvButtons(){
   document.querySelectorAll(".sort-btn").forEach(btn=>btn.style.display="");
+}
+
+/* ══ 분류함 카테고리 교체 기믹 ══
+   화면엔 5개 분류함만 뜨지만 대분류는 총 10종.
+   (위치는 고정 슬롯 0~4, data-slot으로 관리 / data-type만 동적으로 바뀜)
+
+   트리거는 "적재 개수"가 아니라 "시간(웨이브)" 기반:
+   박스마다 독립적으로 개수를 세면 우연히 여러 박스가 동시에 임계치를
+   채워서 의도치 않게 한꺼번에 여러 개가 바뀌는 문제가 있었음.
+   → 일정 주기(웨이브)마다 "이번엔 몇 개를 바꿀지"를 미리 정해서 트리거.
+
+   카테고리 등장 순서: 신규 대분류 5종(가전/주방/문구/욕실/식물)이
+   전부 한 번씩 등장하기 전까지는 기존 5종(장난감/간식/옷/책/쓰레기)이
+   교체 후보 풀에 들어가지 않음(순환 재등장 방지). */
+const BOX_SLOT_POSITIONS=[304,558,812,1066,1320];
+const HAND_IMAGES=[
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_01.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_02.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_03.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_04.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_05.png",
+];
+const NEW_CATS=["it","kitchen","school","bath","plant"];
+const HAND_RISE_MS=500;
+const HAND_GAP_MS=125;
+
+/* 웨이브 난이도 곡선: 주기(간격)는 겹침 러시(약 20~30초 주기)와 리듬이
+   겹치지 않도록 ~20초로 고정하고, 대신 "한번에 바뀌는 개수"만 회차가
+   지날수록 1개→2개→3개로 늘려서 난이도를 올린다.
+   1~5회차=1개(신규 5종 하나씩 소개), 6~10회차=2개, 11회차~=3개(최대치). */
+const WAVE_BASE_INTERVAL=20000;
+function getWavePlan(waveIndex){
+  if(waveIndex<=5) return {count:1};
+  if(waveIndex<=10) return {count:2};
+  return {count:3};
+}
+/* 웨이브 간격에 "오차값(마진)"을 더해준다: 정확히 20초에 맞춰 트리거하면
+   그 순간 벨트에 아이템이 지나가는 중일 확률이 있어서 실제 교체가
+   뒤로 밀리기 쉬움. 지금 난이도 구간의 아이템 이동시간(travelMs)만큼
+   더 여유를 둬서, 트리거 시점엔 통계적으로 벨트가 비어있을 확률을 높인다.
+   (그래서 정확히 20.000초가 아니라 20초+α 간격이 됨 — 의도된 것) */
+function getWaveInterval(){
+  const phase=getSvPhase(SV.elapsed);
+  return WAVE_BASE_INTERVAL+(phase.travelMs||0);
+}
+function getActiveCats(){
+  return SV && SV.boxSlots ? SV.boxSlots.map(s=>s.cat) : BASE_CATS;
+}
+function initBoxSlots(){
+  SV.boxSlots=BASE_CATS.map(cat=>({cat,everSwapped:false,swapping:false}));
+  SV.swapQueue=[];
+  SV.newCatsIntroduced=new Set(); /* 아직 신규 5종 중 아무것도 등장 안 함 */
+  SV.waveIndex=0;
+  SV.nextWaveAt=getWaveInterval();
+  document.getElementById("boxHandLayer").innerHTML="";
+  document.querySelectorAll(".sort-btn").forEach(btn=>{
+    btn.classList.remove("swapping-lock");
+    const img=btn.querySelector("img");
+    if(img){
+      img.getAnimations().forEach(a=>a.cancel()); /* 이전 라운드의 Web Animations 잔여분 정리 */
+      img.style.transform="";
+    }
+  });
+  BASE_CATS.forEach((cat,i)=>renderBoxSlot(i));
+}
+function renderBoxSlot(slotIdx){
+  const btn=document.querySelectorAll(".sort-btn")[slotIdx];
+  if(!btn)return;
+  const cat=SV.boxSlots[slotIdx].cat;
+  const def=CATEGORIES[cat];
+  btn.dataset.type=cat;
+  const img=btn.querySelector("img");
+  if(img){img.src=def.boxImg;img.alt=def.label;}
+}
+/* 이번 웨이브에서 바꿀 "물리적 슬롯"을 고른다. 우선순위: 한번도 교체
+   안된 슬롯 먼저(같은 우선순위 내에서는 랜덤 순서). */
+function pickSlotsToSwap(n){
+  let idxs=SV.boxSlots.map((_,i)=>i).filter(i=>!SV.boxSlots[i].swapping);
+  idxs.sort(()=>Math.random()-0.5);
+  idxs.sort((a,b)=>(SV.boxSlots[a].everSwapped?1:0)-(SV.boxSlots[b].everSwapped?1:0));
+  return idxs.slice(0,n);
+}
+/* 새로 채울 카테고리를 고른다. 신규 5종이 아직 다 소개되지 않았다면
+   신규 카테고리(그 중에서도 아직 한번도 안 나온 것 우선)만 후보로 삼고,
+   다 소개된 뒤에야 기존 5종도 후보 풀에 합류시킨다. */
+function pickReplacementCats(n,activeCats){
+  const allIntroduced=NEW_CATS.every(c=>SV.newCatsIntroduced.has(c));
+  let pool=(allIntroduced?ALL_CATS:NEW_CATS).filter(c=>!activeCats.includes(c));
+  pool=pool.sort(()=>Math.random()-0.5);
+  pool.sort((a,b)=>{
+    const aDone=!NEW_CATS.includes(a)||SV.newCatsIntroduced.has(a);
+    const bDone=!NEW_CATS.includes(b)||SV.newCatsIntroduced.has(b);
+    return (aDone?1:0)-(bDone?1:0); /* 아직 안 나온 신규 카테고리 우선 */
+  });
+  const picks=pool.slice(0,n);
+  picks.forEach(c=>{ if(NEW_CATS.includes(c)) SV.newCatsIntroduced.add(c); });
+  return picks;
+}
+/* 웨이브 트리거: 매 프레임 svLoop에서 시간 체크 후 호출 */
+function triggerBoxWave(){
+  SV.waveIndex++;
+  const plan=getWavePlan(SV.waveIndex);
+  SV.nextWaveAt=SV.elapsedMs+getWaveInterval();
+  const slots=pickSlotsToSwap(plan.count);
+  slots.forEach(idx=>{ if(!SV.swapQueue.includes(idx))SV.swapQueue.push(idx); });
+}
+/* 매 프레임 호출: 대기열을 처리해 교체 배치를 시작할 수 있는지 확인 */
+function processBoxSwapQueue(){
+  if(!SV||SV.paused||SV.ended)return;
+  if(SV.boxSlots.some(s=>s.swapping))return; /* 이전 배치가 끝날 때까지 대기 */
+  if(SV.swapQueue.length===0)return;
+  /* 우선순위: 한번도 교체 안된 슬롯 먼저 */
+  SV.swapQueue.sort((a,b)=>(SV.boxSlots[a].everSwapped?1:0)-(SV.boxSlots[b].everSwapped?1:0));
+  const batch=[];
+  for(const idx of SV.swapQueue){
+    if(batch.length>=3)break; /* 웨이브 스펙상 한번에 최대 3개 */
+    const cat=SV.boxSlots[idx].cat;
+    const stillOnBelt=SV.items.some(it=>it.alive&&it.type===cat);
+    if(stillOnBelt)continue; /* 규칙: 벨트에 해당 카테고리 아이템이 남아있으면 대기 */
+    batch.push(idx);
   }
+  if(batch.length===0)return;
+  SV.swapQueue=SV.swapQueue.filter(idx=>!batch.includes(idx));
+  startBoxSwapBatch(batch);
+}
+function startBoxSwapBatch(batch){
+  const active=getActiveCats();
+  const newCats=pickReplacementCats(batch.length,active);
+  if(newCats.length<batch.length)batch=batch.slice(0,newCats.length); /* 후보 부족 시(드묾) 배치 축소 */
+  batch.forEach((slotIdx,i)=>{
+    const newCat=newCats[i];
+    /* 손 이미지는 랜덤이 아니라 박스 위치(슬롯) 기준 고정: 맨 왼쪽=cat_hand_01 ... 맨 오른쪽=cat_hand_05 */
+    const handImg=HAND_IMAGES[slotIdx];
+    runBoxSwap(slotIdx,newCat,handImg);
+  });
+}
+/* 손 대기(숨김) Y오프셋 - 사용자 피드백: 기존보다 15px 아래로 내림
+   (너무 위로 올라와서 화면 하단부가 잘려 보이는 문제 개선) */
+const HAND_HIDE_Y=185, HAND_SHOW_Y=9;   /* 기존 -6 → 9 (15px 아래로) */
+const BOX_HIDE_Y=260,  BOX_SHOW_Y=0;
+const EASE_IN ="cubic-bezier(.3,1.1,.55,1)";
+const EASE_OUT="cubic-bezier(.45,0,.7,1)";
+/* Web Animations API로 요소를 translateY로 슬라이드. CSS 클래스 토글 방식과
+   달리 애니메이션을 새로 걸 때 "클래스 제거 → 기본 상태로 한 프레임 튕김"이
+   구조적으로 없음(끝나면 그 상태를 계속 유지, 다음 호출이 바로 이어받음). */
+function slideEl(el,fromY,toY,ms,easing,prefix){
+  const make=y=>(prefix||"")+"translateY("+y+"px)";
+  /* 방어적 처리: 이 엘리먼트에 이전에 걸려있던 애니메이션이 있다면 취소.
+     취소해도 어차피 같은 fromY 값으로 인라인 style을 다시 세팅하므로
+     화면상 끊김/점프는 없음 — 여러 애니메이션이 같은 속성을 두고
+     겹치는 모호한 상태 자체를 없애기 위한 안전장치. */
+  el.getAnimations().forEach(a=>a.cancel());
+  el.style.transform=make(fromY);
+  return el.animate(
+    [{transform:make(fromY)},{transform:make(toY)}],
+    {duration:ms,easing,fill:"forwards"}
+  );
+}
+function createHandEl(layer,x,src){
+  const el=document.createElement("img");
+  el.className="box-hand-anim";
+  el.src=src;
+  el.style.left=x+"px";
+  layer.appendChild(el);
+  return el;
+}
+function runBoxSwap(slotIdx,newCat,handImg,phase){
+  const slot=SV.boxSlots[slotIdx];
+  /* 게임이 재시작/종료된 뒤 이 애니메이션의 각 단계가 뒤늦게 실행되어
+     새 게임의 boxSlots를 잘못 건드리는 것을 막기 위한 가드 */
+  const stale=()=>!SV||SV.ended||SV.boxSlots[slotIdx]!==slot;
+  slot.swapping=true;
+  const btn=document.querySelectorAll(".sort-btn")[slotIdx];
+  if(btn)btn.classList.add("swapping-lock"); /* 클릭만 막음, 아직 안 가림 */
+  const boxImg=btn?btn.querySelector("img"):null;
+  const x=BOX_SLOT_POSITIONS[slotIdx];
+  const layer=document.getElementById("boxHandLayer");
+  const rise=HAND_RISE_MS,gap=HAND_GAP_MS;
+
+  const hand1=createHandEl(layer,x,handImg);
+  slideEl(hand1,HAND_HIDE_Y,HAND_SHOW_Y,rise,EASE_IN,"translateX(-50%) ");
+
+  setTimeout(()=>{
+    if(stale()){hand1.remove();return;}
+    /* 손이 박스를 다 덮은 시점 → 손과 박스가 "함께" 같은 속도로 내려감 */
+    if(boxImg)slideEl(boxImg,BOX_SHOW_Y,BOX_HIDE_Y,rise,EASE_OUT,"");
+    slideEl(hand1,HAND_SHOW_Y,HAND_HIDE_Y,rise,EASE_OUT,"translateX(-50%) ");
+    setTimeout(()=>{
+      hand1.remove();
+      if(stale())return;
+      setTimeout(()=>{
+        if(stale())return;
+        /* 손과 박스가 완전히 사라진 뒤(빈 슬롯) 실제 데이터 교체 */
+        slot.cat=newCat;slot.everSwapped=true;
+        renderBoxSlot(slotIdx); /* 같은 img 엘리먼트의 src만 바뀜(현재 translateY(260px)로 숨은 상태 유지) */
+
+        SV._pool=buildSvPool(getSvPhase(SV.elapsed));
+        SV._spawnBag=null; /* 스폰 풀이 바뀌었으니 셔플백도 다시 섞기 */
+
+        const hand2=createHandEl(layer,x,handImg);
+        slideEl(hand2,HAND_HIDE_Y,HAND_SHOW_Y,rise,EASE_IN,"translateX(-50%) ");
+        /* 손과 새 박스가 "함께" 아래에서 올라와 자리에 놓임 */
+        if(boxImg)slideEl(boxImg,BOX_HIDE_Y,BOX_SHOW_Y,rise,EASE_IN,"");
+        setTimeout(()=>{
+          if(stale()){hand2.remove();return;}
+          /* 박스는 이미 제자리에 놓였고, 이제 손만 내려가서 사라짐 */
+          slideEl(hand2,HAND_SHOW_Y,HAND_HIDE_Y,rise,EASE_OUT,"translateX(-50%) ");
+          setTimeout(()=>{
+            hand2.remove();
+            if(btn)btn.classList.remove("swapping-lock");
+            slot.swapping=false;
+          },rise);
+        },rise);
+      },gap);
+    },rise);
+  },rise);
+}
+
+
+/* ══ 겹침 러시 기믹 ══
+   가끔 아이템 2~3개를 짧은 간격으로 몰아서 스폰해, 벨트 위에 아이템이 겹쳐
+   보이게 만든다. 정답 판정 로직(가장 중앙에 가까운 아이템이 타겟)은 그대로라
+   컨셉은 안 깨지고, "몰아칠 때 빠르게 연속으로 정확히 처리"하는 순발력 압박만 추가된다. */
+function scheduleNextRush(){
+  /* 20~30초 사이 랜덤 간격으로 다음 러시 예약 */
+  return 20000+Math.random()*10000;
+}
+
+function startRush(){
+  if(!SV||SV.paused||SV.ended)return;
+  const count=Math.random()<0.5?2:3;
+  SV._rushActive=true;
+  SV._rushSpawnsLeft=count;
+  SV._rushGap=220+Math.random()*100; /* 아이템 사이 220~320ms 간격 */
+  SV._rushLastSpawn=SV.elapsedMs-SV._rushGap; /* 다음 틱에 바로 첫 스폰 */
+  SV._rushGroup={total:count,settled:0,failed:false,done:false};
+  showToast("🔥 러시타임! 몰려와요!");
+}
+
+function checkRushGroupDone(group,node){
+  if(!group||group.done)return;
+  if(group.settled>=group.total){
+    group.done=true;
+    if(!group.failed){
+      SV.score+=40;
+      popFeedback("⚡ 러시 클리어! +40","ok",node);
+    }
+  }
+}
 
 function startSurvival(){
   const ch=getChar();
@@ -1552,14 +1877,17 @@ function startSurvival(){
       elapsed:0,elapsedMs:0,
       paused:false,ended:false,
       items:[],itemId:0,lastSpawn:0,lastTick:performance.now(),
-      lastPhase:null,_pool:null,
+      lastPhase:null,_pool:null,_spawnBag:null,
       nextSpawnMs:1800,   /* ── 수정: 첫 스폰 간격 초기값 ── */
+      nextRushMs:scheduleNextRush(),lastRush:0,
+      _rushActive:false,_rushSpawnsLeft:0,_rushGap:0,_rushLastSpawn:0,_rushGroup:null,
+      boxSlots:null,swapQueue:[],
       sB:ch.key==="scoreBoost"?ch.val:1,
       cB:ch.key==="comboScore"?ch.val:1};
   document.getElementById("beltItems").innerHTML="";
-  document.getElementById("gameBubble").classList.remove("show");
   clearDangerEffect();
   updateSvButtons();
+  initBoxSlots();
   initHearts(maxH);
   const charEl=document.getElementById("gameCharacter");
   if(charEl){
@@ -1587,14 +1915,36 @@ function svLoop(now){
   if(phase!==SV.lastPhase){
     SV.lastPhase=phase;
     SV._pool=buildSvPool(phase);
+    SV._spawnBag=null;
     updateSvButtons();
   }
-  if(SV.elapsedMs-SV.lastSpawn>=SV.nextSpawnMs){
-    svSpawnItem(phase);
-    SV.lastSpawn=SV.elapsedMs;
-    const jitter=phase.spawnBase*0.2;
-    SV.nextSpawnMs=Math.max(500,phase.spawnBase+(Math.random()*2-1)*jitter);
+  if(SV._rushActive){
+    if(SV.elapsedMs-SV._rushLastSpawn>=SV._rushGap){
+      svSpawnItem(phase,{rush:true});
+      SV._rushLastSpawn=SV.elapsedMs;
+      SV._rushSpawnsLeft--;
+      if(SV._rushSpawnsLeft<=0){
+        SV._rushActive=false;
+        SV.lastSpawn=SV.elapsedMs; /* 러시 직후 평소 스폰이 곧바로 겹치지 않도록 리셋 */
+      }
+    }
+  }else{
+    if(SV.elapsedMs-SV.lastSpawn>=SV.nextSpawnMs){
+      svSpawnItem(phase);
+      SV.lastSpawn=SV.elapsedMs;
+      const jitter=phase.spawnBase*0.2;
+      SV.nextSpawnMs=Math.max(500,phase.spawnBase+(Math.random()*2-1)*jitter);
+    }
+    if(SV.elapsed>=15&&SV.elapsedMs-SV.lastRush>=SV.nextRushMs){
+      SV.lastRush=SV.elapsedMs;
+      SV.nextRushMs=scheduleNextRush();
+      startRush();
+    }
   }
+  if(SV.elapsedMs>=SV.nextWaveAt){
+    triggerBoxWave();
+  }
+  processBoxSwapQueue();
   moveItems(dt);updateCharPosition();updateSvHUD();checkComboBonus();
   requestAnimationFrame(svLoop);
 }
@@ -1607,17 +1957,28 @@ function ensureSvLoop(){
   }
 }
 
-function svSpawnItem(phase){
-  if(!SV._pool||SV._pool.length===0)SV._pool=buildSvPool(phase);
-  let itemDef=SV._pool[Math.floor(Math.random()*SV._pool.length)];
-  /* 직전과 같은 아이템(label 기준)이 연속으로 나오지 않도록 재추첨 */
-  if(SV._pool.length>1&&SV._lastItemLabel){
-    let tries=0;
-    while(itemDef&&itemDef.label===SV._lastItemLabel&&tries<10){
-      itemDef=SV._pool[Math.floor(Math.random()*SV._pool.length)];
-      tries++;
-    }
+/* ══ 아이템 스폰 셔플백 ══
+   순수 Math.random() 추첨은 표본이 적으면 특정 아이템이 짧은 구간에
+   몰려서 나오는 "체감상 안 랜덤함"이 생기기 쉬움(생일 문제).
+   → 카드게임처럼 풀 전체를 한번 섞어서 순서대로 다 뽑고, 다 뽑히면
+   다시 섞는 "셔플백" 방식으로 바꿔서 짧은 구간 내 반복 등장을 줄임. */
+function drawFromSpawnBag(){
+  if(!SV._spawnBag||SV._spawnBag.length===0){
+    SV._spawnBag=[...SV._pool].sort(()=>Math.random()-0.5);
   }
+  let itemDef=SV._spawnBag.pop();
+  /* 백 경계에서 직전과 같은 아이템이 연속으로 나오는 것만 추가로 방지 */
+  if(itemDef&&itemDef.label===SV._lastItemLabel&&SV._spawnBag.length>0){
+    const swapIdx=Math.floor(Math.random()*SV._spawnBag.length);
+    const alt=SV._spawnBag[swapIdx];
+    SV._spawnBag[swapIdx]=itemDef;
+    itemDef=alt;
+  }
+  return itemDef;
+}
+function svSpawnItem(phase,opts){
+  if(!SV._pool||SV._pool.length===0)SV._pool=buildSvPool(phase);
+  const itemDef=drawFromSpawnBag();
   if(!itemDef)return;
   SV._lastItemLabel=itemDef.label;
   const cat=CATEGORIES[itemDef.type];
@@ -1630,8 +1991,10 @@ function svSpawnItem(phase){
   if(!itemDef.img){node.style.background=cat.bg;node.style.borderColor=cat.color;}
   if(itemDef.tricky&&!itemDef.img)node.style.boxShadow="0 6px 0 "+cat.color+", 0 0 0 3px rgba(255,200,50,.5), 0 8px 20px rgba(0,0,0,.2)";
   const sp=document.createElement("div");sp.className="item-sparkle";node.appendChild(sp);
+  const rushGroup=(opts&&opts.rush)?SV._rushGroup:null;
+  if(rushGroup)node.classList.add("rush-item");
   document.getElementById("beltItems").appendChild(node);
-  SV.items.push({id,itemDef,type:itemDef.type,node,prog:0,travelMs:phase.travelMs||5500,alive:true});
+  SV.items.push({id,itemDef,type:itemDef.type,node,prog:0,travelMs:phase.travelMs||5500,alive:true,rushGroup});
 }
 
 function svMissItem(it){
@@ -1642,11 +2005,14 @@ function svMissItem(it){
     charReact("wrong-react");
     popFeedback("놓쳤어요!","bad",null);
     updateDangerEffect();
+    if(it.rushGroup){it.rushGroup.failed=true;it.rushGroup.settled++;checkRushGroupDone(it.rushGroup,null);}
     if(SV.hearts<=0){
       if(it.node.parentNode)it.node.parentNode.removeChild(it.node);
       endSurvival();
       return;
     }
+  }else if(it.rushGroup){
+    it.rushGroup.settled++;checkRushGroupDone(it.rushGroup,null);
   }
   /* rAF 사용 금지 (svLoop rAF와 중첩 → 프레임 블로킹 원인)
      setTimeout으로만 처리, transform은 건드리지 않음 */
@@ -1668,11 +2034,12 @@ function onSortSurvival(type){
     target._flying=true;   /* moveItems에서 건드리지 않도록 */
     SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);
     const base=target.itemDef?.tricky?20:10;
-    const gain=Math.floor(base*SV.sB*(SV.combo>=3?SV.cB:1));
+    const comboMult=getComboMultiplier(SV.combo);
+    const gain=Math.floor(base*SV.sB*comboMult*(SV.combo>=3?SV.cB:1));
     SV.score+=gain;charReact("grab");
     /* 피드백 팝업은 flyToBox 이전에 (노드 위치가 유효할 때) */
     popFeedback(target.itemDef?.tricky?"+"+gain+" 🎉":"+"+gain,"ok",target.node);
-    document.getElementById("gameBubble").classList.remove("show");
+    if(target.rushGroup){target.rushGroup.settled++;checkRushGroupDone(target.rushGroup,target.node);}
     /* 포물선 모션: 원본 아이템 노드를 상자로 날림 */
     if(btn) flyToBox(target.node, btn);
     else if(target.node.parentNode) target.node.parentNode.removeChild(target.node);
@@ -1682,6 +2049,7 @@ function onSortSurvival(type){
     charReact("wrong-react");target.node.classList.add("wrong");
     if(btn){btn.classList.add("bad");setTimeout(()=>{target.node.classList.remove("wrong");btn.classList.remove("bad");},500);}
     popFeedback(target.itemDef?.tricky?(target.itemDef.confuses||"-오답!"):"-오답!","bad",target.node);
+    if(target.rushGroup){target.rushGroup.failed=true;target.rushGroup.settled++;checkRushGroupDone(target.rushGroup,null);}
     updateDangerEffect();
     if(SV.hearts<=0)endSurvival();
   }
@@ -1720,7 +2088,6 @@ function updateSvHUD(){
 function endSurvival(){
   if(!SV||SV.ended)return;SV.ended=true;SV.paused=true;
   clearDangerEffect();
-  document.getElementById("gameBubble").classList.remove("show");
   const prev=save.survivalBest||{score:0,time:0,combo:0};
   const nr={
     score:Math.max(prev.score,Math.floor(SV.score)),

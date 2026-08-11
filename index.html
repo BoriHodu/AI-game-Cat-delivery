@@ -523,9 +523,6 @@ html,body{
   transition:transform .12s;
 }
 .belt-item img{width:192px;height:192px;object-fit:contain;pointer-events:none;}
-.belt-item.target-item img{
-  filter:drop-shadow(0 0 10px rgba(255,200,0,1)) drop-shadow(0 0 20px rgba(255,200,0,.6));
-}
 .belt-item.rush-item img{
   filter:drop-shadow(0 0 10px rgba(255,90,60,.95)) drop-shadow(0 0 18px rgba(255,150,60,.65));
   animation:rushPulse .45s ease-in-out infinite;
@@ -610,16 +607,16 @@ html,body{
 .sort-btn.box-absorb{animation:boxAbsorb .35s ease-out;}
 .box-particle{
   position:fixed;
-  border-radius:50%;
+  border-radius:2px;
   pointer-events:none;
   z-index:9998;
   will-change:transform,opacity;
-  animation:boxParticlePop .5s cubic-bezier(.25,.8,.35,1) forwards;
+  animation:boxParticlePop .65s cubic-bezier(.25,.46,.45,.94) forwards;
 }
 @keyframes boxParticlePop{
-  0%{transform:translate(0,0) scale(1);opacity:1;}
-  70%{opacity:1;}
-  100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0;}
+  0%{transform:translate(0,0) rotate(var(--rot0,0deg)) scale(1);opacity:1;}
+  65%{opacity:1;}
+  100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.7);opacity:0;}
 }
 @keyframes boxAbsorb{
   0%  {transform:translateX(-50%) scale(1)}
@@ -787,16 +784,7 @@ html,body{
   display:block;
 }
 
-/* 중앙 타겟 하이라이트 */
-.belt-item.target-item{
-  transform:translateY(-62%) scale(1.18) rotate(0deg) !important;
-  animation:targetPulse 0.65s ease-in-out infinite !important;
-  z-index:10;
-}
-@keyframes targetPulse{
-  0%,100%{filter:brightness(1);}
-  50%{filter:brightness(1.08);}
-}
+
 
 
 .main-corner-btn{background:none;border:none;padding:0;cursor:pointer;}
@@ -815,6 +803,20 @@ html,body{
   top:293px;
   width:2192px;height:224px;
   z-index:3;pointer-events:none;
+}
+/* 벨트 표면 위에 얹혀서 좌→우로 흐르는 줄무늬 레이어.
+   ingame_conveyor_link.png는 약 71px 주기로 이음새 없이 반복되도록
+   만들어진 리소스라 background-repeat로 무한 스크롤 가능.
+   실제 스크롤 속도는 JS(svLoop)에서 현재 아이템 이동 속도에 맞춰 갱신함. */
+.ingame-belt-link{
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  top:293px;
+  width:2192px;height:224px;
+  z-index:4;pointer-events:none;
+  background-image:url(https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_conveyor_link.png);
+  background-repeat:repeat-x;
+  background-size:2274px 224px;
 }
 /* 박스: center anchor, position:absolute */
 .ingame-box{
@@ -963,6 +965,7 @@ html,body{
   <div class="game-field" id="gameField">
     <!-- 컨베이어 벨트 -->
     <img class="ingame-belt" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_conveyor_belt.png" alt="">
+    <div class="ingame-belt-link" id="beltLink"></div>
     <!-- 분류 박스는 sort-btn 이미지로 표시 -->
 
     <div class="game-character-layer" id="charLayer">
@@ -1227,6 +1230,23 @@ const SV_PHASES=[
 ];
 
 const SAVE_KEY="catDelivery.v3";
+
+/* ══ 벨트 흐름 모션 ══
+   ingame_conveyor_link.png(줄무늬 오버레이)를 아이템이 벨트 위를
+   이동하는 속도(=현재 난이도 구간의 travelMs)에 맞춰 좌→우로 스크롤.
+   아이템이 이동하는 총 거리(대략 캔버스 폭+384px)를 travelMs 동안
+   이동하는 속도와 동일한 px/ms로 배경을 흘려서, 벨트가 아이템을
+   "실어 나르는" 것처럼 보이게 함. */
+const ITEM_TRAVEL_PX=1624+384; /* BASE_W(1624)+아이템 폭 여유(384), scaleGame의 BASE_W와 동일 */
+const BELT_LINK_TILE_PX=2274;  /* ingame_conveyor_link.png 원본 폭(반복 주기 기준, 2274px로 업데이트됨) */
+function updateBeltLinkScroll(dt,phase){
+  const el=document.getElementById("beltLink");
+  if(!el)return;
+  const speed=ITEM_TRAVEL_PX/phase.travelMs; /* px per ms, 아이템 이동 속도와 동일 */
+  SV._beltLinkX=((SV._beltLinkX||0)+dt*speed)%BELT_LINK_TILE_PX;
+  el.style.backgroundPositionX=SV._beltLinkX+"px";
+}
+
 let save={cleared:{},unlocked:["cat"],selected:"cat"};
 function loadSave(){
   try{const r=localStorage.getItem(SAVE_KEY);if(r)Object.assign(save,JSON.parse(r));}catch(e){}
@@ -1433,14 +1453,6 @@ function charReact(type){
 
 function updateCharPosition(){
   moveCharTo(43);
-  const items = (SV && !SV.ended) ? SV.items : (G ? G.items : []);
-  const alive = items.filter(it => it.alive);
-  let closest = null, minDist = Infinity;
-  for(const it of alive){
-    const dist = Math.abs(it.prog - 0.5);
-    if(dist < minDist){ minDist = dist; closest = it; }
-  }
-  for(const it of alive) it.node.classList.toggle("target-item", it === closest);
 }
 
 
@@ -1465,26 +1477,31 @@ function spawnBoxParticles(btnEl){
   const cx = r.left + r.width/2;
   const cy = r.top  + r.height*0.28;
   const colors = ["#ffd166","#ff8fab","#7ec4ff","#b18cff","#8de08a","#ffb562"];
-  const n = 10;
+  const n = 16;
   for(let i=0;i<n;i++){
     const p = document.createElement("div");
     p.className = "box-particle";
     const angle = (Math.PI*2*i/n) + (Math.random()*0.6-0.3);
-    const dist  = 34 + Math.random()*28;
+    const dist  = 40 + Math.random()*46; /* 색종이답게 더 넓게 퍼지도록 */
     const dx = Math.cos(angle)*dist;
-    const dy = Math.sin(angle)*dist - 14; /* 살짝 위로 튀는 느낌 */
-    const size = 6 + Math.random()*5;
+    const dy = Math.sin(angle)*dist - 20; /* 위로 팡 튀는 느낌 */
+    const w = 5 + Math.random()*4;   /* 색종이 조각(사각형) 크기 */
+    const h = 8 + Math.random()*6;
+    const rot0 = Math.floor(Math.random()*360);
+    const rot = rot0 + (Math.random()<0.5?-1:1) * (200 + Math.random()*400); /* 회전하며 흩날림 */
     p.style.left = cx+"px";
     p.style.top  = cy+"px";
-    p.style.width  = size+"px";
-    p.style.height = size+"px";
-    p.style.marginLeft = (-size/2)+"px";
-    p.style.marginTop  = (-size/2)+"px";
+    p.style.width  = w+"px";
+    p.style.height = h+"px";
+    p.style.marginLeft = (-w/2)+"px";
+    p.style.marginTop  = (-h/2)+"px";
     p.style.background = colors[i % colors.length];
     p.style.setProperty("--dx", dx+"px");
     p.style.setProperty("--dy", dy+"px");
+    p.style.setProperty("--rot0", rot0+"deg");
+    p.style.setProperty("--rot", rot+"deg");
     document.body.appendChild(p);
-    setTimeout(()=>{ if(p.parentNode) p.parentNode.removeChild(p); }, 520);
+    setTimeout(()=>{ if(p.parentNode) p.parentNode.removeChild(p); }, 680);
   }
 }
 function flyToBox(itemNode, btnEl){
@@ -1543,13 +1560,11 @@ function flyToBox(itemNode, btnEl){
 
     const lx = sx + (ex - sx) * ease;
     const ly = sy + (ey - sy) * ease + PEAK * Math.sin(Math.PI * t);
-    const sc = 1 - t * 0.75;
     const op = t > 0.8 ? 1 - (t - 0.8) / 0.2 : 1;
 
     /* left/top 기준이 itemR.left/top이므로 sx-itemR.left/sy-itemR.top 오프셋 없음 */
     clone.style.left    = `${itemR.left + (lx - sx)}px`;
     clone.style.top     = `${itemR.top  + (ly - sy)}px`;
-    clone.style.transform = `scale(${sc})`;
     clone.style.opacity   = `${op}`;
 
     if(t < 1){
@@ -1849,10 +1864,14 @@ function scheduleNextRush(){
 
 function startRush(){
   if(!SV||SV.paused||SV.ended)return;
-  const count=Math.random()<0.5?2:3;
+  const count=3+Math.floor(Math.random()*3); /* 3~5개 */
   SV._rushActive=true;
   SV._rushSpawnsLeft=count;
-  SV._rushGap=220+Math.random()*100; /* 아이템 사이 220~320ms 간격 */
+  /* 간격을 고정값이 아니라 "현재 아이템 이동 속도"에 맞춰 계산해서 겹치지
+     않게 함: 아이템 폭(192px) + 여유(40px)만큼 벨트 위에서 떨어지도록. */
+  const phase=getSvPhase(SV.elapsed);
+  const speed=ITEM_TRAVEL_PX/phase.travelMs; /* px per ms */
+  SV._rushGap=(192+40)/speed;
   SV._rushLastSpawn=SV.elapsedMs-SV._rushGap; /* 다음 틱에 바로 첫 스폰 */
   SV._rushGroup={total:count,settled:0,failed:false,done:false};
   showToast("🔥 러시타임! 몰려와요!");
@@ -1912,6 +1931,7 @@ function svLoop(now){
   const dt=Math.min(100,now-SV.lastTick);
   SV.lastTick=now;SV.elapsedMs+=dt;SV.elapsed=SV.elapsedMs/1000;
   const phase=getSvPhase(SV.elapsed);
+  updateBeltLinkScroll(dt,phase);
   if(phase!==SV.lastPhase){
     SV.lastPhase=phase;
     SV._pool=buildSvPool(phase);
@@ -2022,14 +2042,24 @@ function svMissItem(it){
 
 function onSortSurvival(type){
   if(!SV||SV.paused||SV.ended)return;
-  // 중앙에 가장 가까운 아이템이 타겟
-  let target=null,minDist=Infinity;
+  /* 순서 무관 정답 인정: 클릭한 타입과 일치하는 살아있는 아이템이 있으면
+     그중 가장 급한(벨트를 가장 많이 지나간, prog가 큰) 아이템을 정답 처리.
+     일치하는 게 하나도 없으면 오답 — 이땐 화면에서 가장 중앙에 가까운
+     아이템을 시각적 기준(흔들림 표시용)으로만 사용. */
+  let target=null,bestProg=-1;
   for(const it of SV.items){
-    if(it.alive){const dist=Math.abs(it.prog-0.5);if(dist<minDist){minDist=dist;target=it;}}
+    if(it.alive&&it.type===type&&it.prog>bestProg){bestProg=it.prog;target=it;}
+  }
+  const isMatch=!!target;
+  if(!target){
+    let minDist=Infinity;
+    for(const it of SV.items){
+      if(it.alive){const dist=Math.abs(it.prog-0.5);if(dist<minDist){minDist=dist;target=it;}}
+    }
   }
   if(!target)return;
   const btn=document.querySelector('.sort-btn[data-type="'+type+'"]');
-  if(target.type===type){
+  if(isMatch){
     target.alive=false;
     target._flying=true;   /* moveItems에서 건드리지 않도록 */
     SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);

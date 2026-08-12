@@ -607,16 +607,35 @@ html,body{
 .sort-btn.box-absorb{animation:boxAbsorb .35s ease-out;}
 .box-particle{
   position:fixed;
-  border-radius:2px;
   pointer-events:none;
   z-index:9998;
   will-change:transform,opacity;
-  animation:boxParticlePop .65s cubic-bezier(.25,.46,.45,.94) forwards;
+  animation:boxParticlePop 1.05s cubic-bezier(.15,.6,.4,1) forwards;
 }
+.box-particle.shape-rect{border-radius:2px;}
+.box-particle.shape-ribbon{border-radius:2px;}
+.box-particle.shape-dot{border-radius:50%;}
 @keyframes boxParticlePop{
-  0%{transform:translate(0,0) rotate(var(--rot0,0deg)) scale(1);opacity:1;}
-  65%{opacity:1;}
-  100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.7);opacity:0;}
+  0%  {transform:translate(0,0) rotate(var(--rot0,0deg)) scale(1);opacity:1;}
+  32% {transform:translate(var(--midx),var(--midy)) rotate(var(--rotmid)) scale(1);opacity:1;}
+  75% {opacity:1;}
+  100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.55);opacity:0;}
+}
+/* 터지는 순간의 플래시 링 - 색종이와 별개로 한번만 재생 */
+.box-flash{
+  position:fixed;
+  width:150px;height:150px;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:9997;
+  background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,214,102,.6) 42%,rgba(255,214,102,0) 74%);
+  transform:translate(-50%,-50%) scale(0);
+  animation:boxFlashPop .4s ease-out forwards;
+}
+@keyframes boxFlashPop{
+  0%  {transform:translate(-50%,-50%) scale(0);opacity:1;}
+  55% {opacity:.9;}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:0;}
 }
 @keyframes boxAbsorb{
   0%  {transform:translateX(-50%) scale(1)}
@@ -1237,7 +1256,7 @@ const SAVE_KEY="catDelivery.v3";
    아이템이 이동하는 총 거리(대략 캔버스 폭+384px)를 travelMs 동안
    이동하는 속도와 동일한 px/ms로 배경을 흘려서, 벨트가 아이템을
    "실어 나르는" 것처럼 보이게 함. */
-const ITEM_TRAVEL_PX=1624+384; /* BASE_W(1624)+아이템 폭 여유(384), scaleGame의 BASE_W와 동일 */
+const ITEM_TRAVEL_PX=1624+384+300; /* BASE_W(1624)+아이템 폭 여유(384)+진입 여유(300, moveItems의 ENTRY_BUFFER와 동일) */
 const BELT_LINK_TILE_PX=2274;  /* ingame_conveyor_link.png 원본 폭(반복 주기 기준, 2274px로 업데이트됨) */
 function updateBeltLinkScroll(dt,phase){
   const el=document.getElementById("beltLink");
@@ -1461,11 +1480,17 @@ function moveItems(dt){
   const W = wrap.clientWidth;
   if(W < 100) return;   /* W=0 또는 비정상값이면 이동 중단 (오판정 방지) */
   const items = SV ? SV.items : (G ? G.items : []);
+  /* 진입 여유(ENTRY_BUFFER): 기존엔 스폰 시점(prog=0)에 아이템 오른쪽 끝이
+     정확히 화면 경계(x=0)에 걸쳐 있어서, 화면 밖에서 다가오는 구간 없이
+     "경계에서 툭 튀어나오는" 것처럼 보였음. 시작 위치를 더 왼쪽으로 밀어서
+     실제로 화면 밖에서 슬라이드 들어오는 구간을 만듦. 나가는 쪽(오른쪽,
+     prog=1일 때 위치)은 기존과 동일하게 유지. */
+  const ENTRY_BUFFER = 300;
   for(let i = items.length - 1; i >= 0; i--){
     const it = items[i];
     if(!it.alive || it._flying) continue;
     it.prog += dt / it.travelMs;
-    it.node.style.left = (-192 + (W + 384) * it.prog) + "px";
+    it.node.style.left = (-192-ENTRY_BUFFER + (W + 384 + ENTRY_BUFFER) * it.prog) + "px";
     if(it.prog >= 1) svMissItem(it);
   }
 }
@@ -1476,19 +1501,44 @@ function spawnBoxParticles(btnEl){
   const r = btnEl.getBoundingClientRect();
   const cx = r.left + r.width/2;
   const cy = r.top  + r.height*0.28;
-  const colors = ["#ffd166","#ff8fab","#7ec4ff","#b18cff","#8de08a","#ffb562"];
-  const n = 16;
+  const colors = ["#ffd166","#ff8fab","#7ec4ff","#b18cff","#8de08a","#ffb562","#ff6b6b","#5ee6d0"];
+  const shapes = ["shape-rect","shape-ribbon","shape-dot"];
+
+  /* 터지는 순간 플래시 링 (한번만) */
+  const flash = document.createElement("div");
+  flash.className = "box-flash";
+  flash.style.left = cx+"px";
+  flash.style.top  = cy+"px";
+  document.body.appendChild(flash);
+  setTimeout(()=>{ if(flash.parentNode) flash.parentNode.removeChild(flash); }, 420);
+
+  const n = 30;
   for(let i=0;i<n;i++){
     const p = document.createElement("div");
-    p.className = "box-particle";
-    const angle = (Math.PI*2*i/n) + (Math.random()*0.6-0.3);
-    const dist  = 40 + Math.random()*46; /* 색종이답게 더 넓게 퍼지도록 */
-    const dx = Math.cos(angle)*dist;
-    const dy = Math.sin(angle)*dist - 20; /* 위로 팡 튀는 느낌 */
-    const w = 5 + Math.random()*4;   /* 색종이 조각(사각형) 크기 */
-    const h = 8 + Math.random()*6;
+    const shape = shapes[Math.floor(Math.random()*shapes.length)];
+    p.className = "box-particle "+shape;
+
+    /* 1단계: 위로 솟구침(넓은 부채꼴, 위쪽 편향) */
+    const angle = -Math.PI/2 + (Math.random()*2-1)*(Math.PI*0.75);
+    const burstDist = 110 + Math.random()*150; /* 기존 40~86 → 훨씬 넓게 */
+    const midx = Math.cos(angle)*burstDist;
+    const midy = Math.sin(angle)*burstDist;
+
+    /* 2단계: 중력 받아 아래로 낙하 + 좌우 드리프트 */
+    const fallExtra = 150 + Math.random()*180;
+    const drift = (Math.random()*100-50);
+    const dx = midx + drift;
+    const dy = midy + fallExtra;
+
     const rot0 = Math.floor(Math.random()*360);
-    const rot = rot0 + (Math.random()<0.5?-1:1) * (200 + Math.random()*400); /* 회전하며 흩날림 */
+    const rotmid = rot0 + (Math.random()<0.5?-1:1)*(150+Math.random()*150);
+    const rot = rotmid + (Math.random()<0.5?-1:1)*(150+Math.random()*250);
+
+    let w,h;
+    if(shape==="shape-ribbon"){ w=3+Math.random()*3; h=12+Math.random()*10; }
+    else if(shape==="shape-dot"){ w=h=5+Math.random()*6; }
+    else{ w=6+Math.random()*6; h=8+Math.random()*8; }
+
     p.style.left = cx+"px";
     p.style.top  = cy+"px";
     p.style.width  = w+"px";
@@ -1496,12 +1546,15 @@ function spawnBoxParticles(btnEl){
     p.style.marginLeft = (-w/2)+"px";
     p.style.marginTop  = (-h/2)+"px";
     p.style.background = colors[i % colors.length];
+    p.style.setProperty("--midx", midx+"px");
+    p.style.setProperty("--midy", midy+"px");
     p.style.setProperty("--dx", dx+"px");
     p.style.setProperty("--dy", dy+"px");
     p.style.setProperty("--rot0", rot0+"deg");
+    p.style.setProperty("--rotmid", rotmid+"deg");
     p.style.setProperty("--rot", rot+"deg");
     document.body.appendChild(p);
-    setTimeout(()=>{ if(p.parentNode) p.parentNode.removeChild(p); }, 680);
+    setTimeout(()=>{ if(p.parentNode) p.parentNode.removeChild(p); }, 1080);
   }
 }
 function flyToBox(itemNode, btnEl){

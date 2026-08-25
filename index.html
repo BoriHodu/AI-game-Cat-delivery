@@ -833,7 +833,7 @@ html,body{
   top:293px;
   width:2192px;height:224px;
   z-index:4;pointer-events:none;
-  background-image:url(https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_conveyor_link.png);
+  background-image:url(https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_conveyor_link.png);
   background-repeat:repeat-x;
   background-size:2274px 224px;
 }
@@ -958,7 +958,7 @@ html,body{
 
 <section id="screen-game" class="screen">
   <div class="danger-vignette" id="dangerVignette"></div>
-  <img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_bg.png" alt="">
+  <img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png" alt="">
   <header class="game-hud">
     <!-- 좌측: 콤보 + 하트 -->
     <div class="hud-left">
@@ -983,12 +983,12 @@ html,body{
 
   <div class="game-field" id="gameField">
     <!-- 컨베이어 벨트 -->
-    <img class="ingame-belt" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/ingame_conveyor_belt.png" alt="">
+    <img class="ingame-belt" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_conveyor_belt.png" alt="">
     <div class="ingame-belt-link" id="beltLink"></div>
     <!-- 분류 박스는 sort-btn 이미지로 표시 -->
 
     <div class="game-character-layer" id="charLayer">
-      <div class="game-character idle" id="gameCharacter"><img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png" alt="고양이"></div>
+      <div class="game-character idle" id="gameCharacter"><img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_normal.png" alt="고양이"></div>
     </div>
 
     <div class="game-belt">
@@ -999,19 +999,19 @@ html,body{
 
     <div class="sort-buttons">
       <button class="sort-btn" data-slot="0" data-type="toy">
-        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_toy.png" alt="장난감">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_toy.png" alt="장난감">
       </button>
       <button class="sort-btn" data-slot="1" data-type="snack">
-        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_food.png" alt="간식">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_food.png" alt="간식">
       </button>
       <button class="sort-btn" data-slot="2" data-type="cloth">
-        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_cloth.png" alt="옷">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_cloth.png" alt="옷">
       </button>
       <button class="sort-btn" data-slot="3" data-type="book">
-        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_book.png" alt="책">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_book.png" alt="책">
       </button>
       <button class="sort-btn" data-slot="4" data-type="trash">
-        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_trash.png" alt="쓰레기">
+        <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_trash.png" alt="쓰레기">
       </button>
       <div class="box-hand-layer" id="boxHandLayer"></div>
     </div>
@@ -1110,16 +1110,16 @@ const ALL_CATS=["toy","snack","cloth","book","trash","it","kitchen","school","ba
 const BASE_CATS=["toy","snack","cloth","book","trash"];
 
 const CATEGORIES={
-  toy:{label:"장난감",emoji:"🧸",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_toy.png"},
-  snack:{label:"간식",emoji:"🍪",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_food.png"},
-  cloth:{label:"옷",emoji:"👕",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_cloth.png"},
-  book:{label:"책",emoji:"📚",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_book.png"},
-  trash:{label:"쓰레기",emoji:"🗑️",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_trash.png"},
-  it:{label:"가전",emoji:"📱",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_it.png"},
-  kitchen:{label:"주방용품",emoji:"🍳",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_kitchen.png"},
-  school:{label:"문구용품",emoji:"✏️",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_school.png"},
-  bath:{label:"욕실용품",emoji:"🧼",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_bath.png"},
-  plant:{label:"식물",emoji:"🌱",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/box_plant.png"},
+  toy:{label:"장난감",emoji:"🧸",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_toy.png"},
+  snack:{label:"간식",emoji:"🍪",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_food.png"},
+  cloth:{label:"옷",emoji:"👕",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_cloth.png"},
+  book:{label:"책",emoji:"📚",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_book.png"},
+  trash:{label:"쓰레기",emoji:"🗑️",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_trash.png"},
+  it:{label:"가전",emoji:"📱",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_it.png"},
+  kitchen:{label:"주방용품",emoji:"🍳",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_kitchen.png"},
+  school:{label:"문구용품",emoji:"✏️",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_school.png"},
+  bath:{label:"욕실용품",emoji:"🧼",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_bath.png"},
+  plant:{label:"식물",emoji:"🌱",boxImg:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_plant.png"},
 };
 
 /* ══ 박스/손 이미지 프리로드 ══
@@ -1131,11 +1131,11 @@ const CATEGORIES={
 (function preloadBoxAndHandImages(){
   const urls=[
     ...Object.values(CATEGORIES).map(c=>c.boxImg),
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_01.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_02.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_03.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_04.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_05.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_01.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_02.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_03.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_04.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_05.png",
   ];
   urls.forEach(u=>{ const im=new Image(); im.src=u; });
 })();
@@ -1224,7 +1224,7 @@ const ALL_ITEMS=[
 ];
 
 const CHARS=[
-  {id:"cat",      emoji:"🐱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png",  name:"냐옹이",title:"신입 택배기사",   desc:"꼼꼼하고 차분한 신입. 정답 점수 +10%",  ability:"정답 점수 +10%", abilityDesc:"정리 미션에서 획득하는 정답 점수가 10% 증가해요.",  key:"scoreBoost",val:1.1, unlock:0},
+  {id:"cat",      emoji:"🐱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_normal.png",  name:"냐옹이",title:"신입 택배기사",   desc:"꼼꼼하고 차분한 신입. 정답 점수 +10%",  ability:"정답 점수 +10%", abilityDesc:"정리 미션에서 획득하는 정답 점수가 10% 증가해요.",  key:"scoreBoost",val:1.1, unlock:0},
   {id:"dog",      emoji:"🐶",img:null,name:"멍멍이",title:"활기찬 베테랑",   desc:"콤보가 잘 안 끊기는 베테랑.",            ability:"콤보 유지 +15%", abilityDesc:"콤보가 끊기지 않아 더 오래 유지돼요.",              key:"comboBoost",val:1.15,unlock:5},
   {id:"otter",    emoji:"🦦",img:null,name:"해달이",title:"느긋한 손재주꾼", desc:"느긋하지만 시작 시간이 5초 더 있어요.",  ability:"시작 시간 +5초", abilityDesc:"게임 시작 시 제한 시간이 5초 더 길어요.",            key:"extraTime", val:5,   unlock:10},
   {id:"sea_otter",emoji:"🦫",img:null,name:"수달이",title:"재빠른 장난꾸러기",desc:"콤보 점수 보너스가 큰 장난꾸러기.",     ability:"콤보 점수 1.5배",abilityDesc:"콤보 연속 시 획득 점수가 1.5배로 늘어요.",          key:"comboScore",val:1.5, unlock:15},
@@ -1430,10 +1430,10 @@ function moveCharTo(xPercent){
 
 
 const CAT_IMG={
-  normal:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_normal.png",
-  happy :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_happy.png",
-  fail  :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_fail.png",
-  blink :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_blink.png",
+  normal:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_normal.png",
+  happy :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_happy.png",
+  fail  :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_fail.png",
+  blink :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_blink.png",
 };
 let _blinkTimer=null;
 function startBlinking(){
@@ -1703,11 +1703,11 @@ function updateSvButtons(){
    교체 후보 풀에 들어가지 않음(순환 재등장 방지). */
 const BOX_SLOT_POSITIONS=[304,558,812,1066,1320];
 const HAND_IMAGES=[
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_01.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_02.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_03.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_04.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/ingame/cat_hand_05.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_01.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_02.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_03.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_04.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_05.png",
 ];
 const NEW_CATS=["it","kitchen","school","bath","plant"];
 const HAND_RISE_MS=500;

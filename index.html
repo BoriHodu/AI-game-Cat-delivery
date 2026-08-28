@@ -10,6 +10,12 @@
 <link rel="apple-touch-icon" href="cat_appicon.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&display=swap');
+@font-face{
+  font-family:"MemomentKkukkukk";
+  src:url("MemomentKkukkukk.ttf") format("truetype");
+  font-weight:normal;
+  font-display:swap;
+}
 
 :root{
   --W:1624px; --H:750px;
@@ -19,7 +25,7 @@
   --green:#A8C988; --gdk:#7FAA66; --coral:#E08B7C;
   --ink:#4A3520; --inks:#6B523A;
   --sh:rgba(92,58,26,.18);
-  --font:"Jua","Gaegu","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --font:"MemomentKkukkukk","Jua","Gaegu","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --f-xs:11px; --f-sm:13px; --f-md:16px; --f-lg:20px; --f-xl:26px; --f-xxl:36px;
 }
 
@@ -56,7 +62,7 @@ html,body{
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 .btn{
-  font-family:var(--font);font-size:var(--f-lg);font-weight:700;
+  font-family:var(--font);font-size:var(--f-lg);font-weight:normal;
   padding:10px 28px;border-radius:20px;border:none;cursor:pointer;
   display:inline-flex;align-items:center;gap:8px;justify-content:center;
   transition:transform .1s,box-shadow .1s;transform:rotate(-.4deg);
@@ -75,7 +81,7 @@ html,body{
   width:52px;height:52px;border-radius:50%;font-size:22px;
   color:var(--bdk);cursor:pointer;flex-shrink:0;
   box-shadow:0 3px 0 var(--paper-sh),0 4px 10px var(--sh);
-  display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:700;
+  display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:normal;
 }
 .btn-back:active{transform:translateY(2px);}
 
@@ -84,7 +90,7 @@ html,body{
   justify-content:space-between;padding:16px 24px;gap:16px;flex-shrink:0;
 }
 .scr-title{
-  font-size:var(--f-xl);color:var(--bdk);font-weight:700;
+  font-size:var(--f-xl);color:var(--bdk);font-weight:normal;
   text-shadow:2px 2px 0 var(--cream-dark);
 }
 
@@ -139,7 +145,7 @@ html,body{
   margin-bottom:4px;display:block;
 }
 .game-title{
-  font-size:56px;color:var(--bdk);font-weight:700;
+  font-size:56px;color:var(--bdk);font-weight:normal;
   line-height:1.05;margin:0 0 4px;
   text-shadow:3px 3px 0 var(--cream-dark),6px 6px 0 rgba(139,90,43,.15);
   letter-spacing:-.5px;
@@ -176,7 +182,7 @@ html,body{
 }
 .char-badge{
   display:inline-block;background:var(--orange);color:#fff;
-  font-size:var(--f-sm);font-weight:700;padding:5px 14px;border-radius:20px;
+  font-size:var(--f-sm);font-weight:normal;padding:5px 14px;border-radius:20px;
   border:2px solid var(--brown);box-shadow:0 3px 0 var(--odk);
   align-self:flex-start;
 }
@@ -186,7 +192,7 @@ html,body{
   box-shadow:0 5px 0 var(--paper-sh),0 8px 20px var(--sh);
 }
 .char-info-name{
-  font-size:36px;font-weight:700;color:var(--bdk);
+  font-size:36px;font-weight:normal;color:var(--bdk);
   display:flex;align-items:center;gap:8px;margin-bottom:6px;
 }
 .char-info-name-paw{font-size:22px;}
@@ -205,7 +211,7 @@ html,body{
   box-shadow:0 2px 0 var(--gdk);
 }
 .char-ability-text{}
-.char-ability-title{font-size:var(--f-md);font-weight:700;color:var(--gdk);}
+.char-ability-title{font-size:var(--f-md);font-weight:normal;color:var(--gdk);}
 .char-ability-desc{font-size:var(--f-xs);color:var(--inks);margin-top:2px;line-height:1.5;}
 
 .char-spotlight{
@@ -253,7 +259,7 @@ html,body{
   position:absolute;top:50%;transform:translateY(-50%);
   width:44px;height:44px;border-radius:50%;
   background:rgba(255,255,255,.85);border:2px solid var(--blt);
-  cursor:pointer;font-size:18px;color:var(--bdk);font-weight:700;
+  cursor:pointer;font-size:18px;color:var(--bdk);font-weight:normal;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 3px 10px var(--sh);z-index:5;
   transition:transform .1s;
@@ -273,7 +279,7 @@ html,body{
 .char-confirm-btn{
   width:340px;
   font-size:22px;padding:15px 0;border-radius:28px;
-  font-weight:700;position:relative;z-index:3;
+  font-weight:normal;position:relative;z-index:3;
   letter-spacing:.02em;
 }
 
@@ -283,7 +289,7 @@ html,body{
   padding:12px 20px 12px 12px;gap:8px;z-index:2;
 }
 .char-list-title{
-  font-size:var(--f-sm);font-weight:700;color:var(--blt);
+  font-size:var(--f-sm);font-weight:normal;color:var(--blt);
   text-align:center;padding:6px 0;
   display:flex;align-items:center;justify-content:center;gap:8px;
 }
@@ -329,12 +335,12 @@ html,body{
   border-color:var(--orange);
 }
 .char-list-info{flex:1;min-width:0;}
-.char-list-name{font-size:var(--f-lg);font-weight:700;color:var(--bdk);}
+.char-list-name{font-size:var(--f-lg);font-weight:normal;color:var(--bdk);}
 .char-list-sub{font-size:var(--f-xs);color:var(--inks);margin-top:3px;display:flex;align-items:center;gap:5px;}
 .char-list-sub .lock-icon{font-size:11px;}
 .char-list-selected-badge{
   background:var(--orange);color:#fff;
-  font-size:var(--f-xs);font-weight:700;padding:3px 10px;border-radius:10px;
+  font-size:var(--f-xs);font-weight:normal;padding:3px 10px;border-radius:10px;
   border:1.5px solid var(--odk);display:flex;align-items:center;gap:4px;
   white-space:nowrap;
 }
@@ -369,7 +375,7 @@ html,body{
 .hud-combo-val{
   position:absolute;
   bottom:18px;
-  font-size:46px;font-weight:700;color:#8e6eac;
+  font-size:46px;font-weight:normal;color:#8e6eac;
   line-height:1;
 }
 .hud-combo-wrap.hot .hud-combo-val{animation:comboPop .4s ease-out;color:#E05A1E;}
@@ -385,7 +391,7 @@ html,body{
   padding-top:8px;
 }
 .hud-score-val{
-  font-size:72px;font-weight:700;color:var(--bdk);line-height:1;
+  font-size:72px;font-weight:normal;color:var(--bdk);line-height:1;
   position:absolute;left:50%;transform:translateX(-50%);
   top:12px;white-space:nowrap;
 }
@@ -659,11 +665,11 @@ html,body{
   75%{transform:translateX(-50%) translateY(3px)}
 }
 .sort-emoji{font-size:36px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.25));}
-.sort-label{font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
+.sort-label{font-size:22px;font-weight:normal;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
 
 .feedback-layer{position:absolute;inset:0;pointer-events:none;z-index:20;}
 .fb-pop{
-  position:absolute;font-size:30px;font-weight:700;pointer-events:none;
+  position:absolute;font-size:30px;font-weight:normal;pointer-events:none;
   animation:fbRise .85s ease-out forwards;
   text-shadow:2px 2px 0 rgba(255,255,255,.8);
 }
@@ -693,15 +699,15 @@ html,body{
   background:rgba(232,155,108,.52);border:1px dashed rgba(139,90,43,.38);}
 .tape-l{left:14%;transform:rotate(-8deg);}
 .tape-r{right:14%;transform:rotate(6deg);}
-.m-region{font-size:var(--f-sm);font-weight:700;color:var(--odk);letter-spacing:.06em;}
-.m-title {font-size:var(--f-xxl);color:var(--bdk);font-weight:700;margin:6px 0 10px;}
+.m-region{font-size:var(--f-sm);font-weight:normal;color:var(--odk);letter-spacing:.06em;}
+.m-title {font-size:var(--f-xxl);color:var(--bdk);font-weight:normal;margin:6px 0 10px;}
 .m-desc  {font-size:var(--f-md);color:var(--inks);line-height:1.55;margin-bottom:12px;}
 .m-targets{display:flex;gap:12px;justify-content:center;margin:12px 0;}
 .tgt{background:#fff;border:2px solid var(--blt);border-radius:14px;
   padding:10px 16px;display:flex;flex-direction:column;align-items:center;flex:1;max-width:160px;}
 .tgt-e{font-size:22px;}
 .tgt-l{font-size:var(--f-xs);color:var(--blt);margin:3px 0;}
-.tgt-v{font-size:var(--f-xl);font-weight:700;color:var(--bdk);}
+.tgt-v{font-size:var(--f-xl);font-weight:normal;color:var(--bdk);}
 .m-hint{font-size:var(--f-sm);color:var(--gdk);margin:6px 0 14px;font-style:italic;}
 .m-btns{display:flex;gap:10px;justify-content:center;margin-top:10px;}
 .m-btns-v{flex-direction:column;align-items:stretch;max-width:290px;margin:10px auto 0;}
@@ -750,12 +756,12 @@ html,body{
 .mode-card-badge{
   position:absolute;top:-14px;left:18px;
   background:var(--orange);color:#fff;
-  font-size:13px;font-weight:700;padding:4px 12px;
+  font-size:13px;font-weight:normal;padding:4px 12px;
   border-radius:20px;border:2px solid var(--odk);
   box-shadow:0 3px 8px rgba(232,155,108,.4);
 }
 .mode-card-icon{font-size:50px;line-height:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15));}
-.mode-card-title{font-size:24px;font-weight:700;color:var(--bdk);}
+.mode-card-title{font-size:24px;font-weight:normal;color:var(--bdk);}
 .mode-card-desc{font-size:12px;color:var(--inks);line-height:1.5;}
 .mode-card-paw{font-size:16px;opacity:.5;margin-top:2px;}
 
@@ -782,8 +788,8 @@ html,body{
   padding:4px 14px;display:flex;flex-direction:column;align-items:center;
   box-shadow:0 3px 0 var(--paper-sh);min-width:90px;
 }
-.hud-survival-time .hud-lbl{font-size:10px;color:var(--blt);font-weight:700;}
-.hud-survival-time .hud-val{font-size:20px;color:var(--bdk);font-weight:700;}
+.hud-survival-time .hud-lbl{font-size:10px;color:var(--blt);font-weight:normal;}
+.hud-survival-time .hud-val{font-size:20px;color:var(--bdk);font-weight:normal;}
 
 .modal-survival .survival-best-board{
   background:rgba(255,255,255,.7);border:1.5px solid var(--blt);border-radius:14px;
@@ -794,7 +800,7 @@ html,body{
   display:flex;justify-content:space-between;align-items:center;
   font-size:13px;color:var(--inks);
 }
-.survival-best-row span:last-child{font-weight:700;color:var(--bdk);}
+.survival-best-row span:last-child{font-weight:normal;color:var(--bdk);}
 
 
 /* 버튼 이미지: multiply로 버튼 테두리/배경 자연스럽게 */
@@ -805,10 +811,6 @@ html,body{
 
 
 
-
-.main-corner-btn{background:none;border:none;padding:0;cursor:pointer;}
-.main-corner-btns{position:static;}.main-corner-btn-rank{position:absolute;left:595px;top:618px;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;z-index:3;}.main-corner-btn-char{position:absolute;left:811px;top:618px;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;z-index:3;}.main-corner-btn-shop{position:absolute;left:1027px;top:618px;transform:translate(-50%,-50%);background:none;border:none;padding:0;cursor:pointer;z-index:3;}
-.main-corner-btn-rank img,.main-corner-btn-char img,.main-corner-btn-shop img{display:block;}
 
 /* ── 인게임 배경/벨트/박스 이미지 ── */
 .ingame-bg{
@@ -859,17 +861,132 @@ html,body{
 .sort-btn[data-slot="2"]{left:812px;}
 .sort-btn[data-slot="3"]{left:1066px;}
 .sort-btn[data-slot="4"]{left:1320px;}
-#screenWipe{
-  position:absolute;inset:0;z-index:50;pointer-events:none;
-  background:#2b2118;
-  clip-path:circle(0px at 50% 50%);
+
+/* 모바일 세이프에어리어 가이드 — 편집 모드일 때만 노출(레이아웃 편집기가 토글) */
+#safeAreaOverlay{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:9000;pointer-events:none;opacity:.55;
+  display:none;
 }
+#safeAreaOverlay.show{display:block;}
+
+/* 스테이지 선택 화면 좌표 정렬용 임시 가이드 — 편집 모드일 때만 노출, 나중에 삭제 예정 */
+#guideOverlay1{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:9500;pointer-events:none;opacity:.7;
+  display:none;
+}
+#guideOverlay1.show{display:block;}
+
+/* ══════════ 월드맵 화면 ══════════ */
+#screen-worldmap{background:#BFE3EE;}
+.wm-scroll{
+  position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.wm-scroll::-webkit-scrollbar{display:none;}
+.wm-track{position:relative;width:3600px;height:750px;}
+.wm-bg{position:absolute;left:0;top:0;width:3600px;height:750px;display:block;pointer-events:none;}
+.wm-village{
+  position:absolute;top:110px;width:320px;height:420px;
+  transform:translateX(-50%);
+  background:none;border:none;padding:0;cursor:pointer;
+}
+.wm-village-bubble{position:absolute;top:0;left:50%;transform:translateX(-50%);width:181px;display:block;}
+.wm-village-status{position:absolute;top:66px;left:50%;transform:translateX(-50%);height:30px;display:block;}
+#wmVillage1 .wm-village-bubble{left:363px;top:8px;}
+#wmVillage1 .wm-village-status{left:364px;top:46px;}
+#wmVillage2 .wm-village-bubble{left:150px;top:51px;}
+#wmVillage2 .wm-village-status{left:148px;top:88px;}
+#wmVillage3 .wm-village-bubble{left:170px;top:27px;}
+#wmVillage3 .wm-village-status{left:165px;top:63px;}
+#wmVillage4 .wm-village-status{left:160px;top:39px;}
+.wm-village.locked{cursor:not-allowed;}
+
+/* 상단 재화 바(코인/보석/하트) — 숫자만 텍스트로 겹쳐 그림.
+   각 알약/설정버튼을 개별 position:absolute로 둬서 편집모드에서 하나씩 따로 드래그 가능하게 함. */
+.wm-topbar{position:absolute;top:20px;right:24px;z-index:30;width:643px;height:78px;}
+.wm-pill{position:relative;width:180px;height:62px;flex-shrink:0;}
+.wm-topbar .wm-pill{position:absolute;top:8px;}
+.wm-topbar .wm-pill:nth-child(1){left:0;}
+.wm-topbar .wm-pill:nth-child(2){left:190px;}
+.wm-topbar .wm-pill:nth-child(3){left:380px;}
+.wm-pill-bg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.wm-topbar .wm-pill:nth-child(1) .wm-pill-bg{left:-64px;top:0;}
+.wm-topbar .wm-pill:nth-child(2) .wm-pill-bg{left:-70px;top:0;}
+.wm-topbar .wm-pill:nth-child(3) .wm-pill-bg{left:-75px;top:0;}
+.wm-pill-val{
+  position:absolute;left:54px;top:0;width:78px;height:62px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:normal;color:#6B4A28;white-space:nowrap;
+}
+.wm-topbar .wm-pill-val{font-size:24px;color:rgb(106,73,29);}
+#wmCoinVal{left:-8px;top:-1px;}
+#wmGemVal{left:3px;top:-1px;}
+#wmHeartVal{left:1px;top:-2px;}
+.wm-settings-btn{position:absolute;left:490px;top:0;width:73px;height:78px;background:none;border:none;padding:0;cursor:pointer;}
+.wm-settings-btn img{width:100%;height:100%;display:block;}
+
+/* 좌하단: 랭킹/캐릭터/상점 — 마찬가지로 버튼 3개를 개별 absolute로 배치 */
+.wm-corner-btns{position:absolute;left:24px;bottom:24px;z-index:30;width:460px;height:144px;}
+.wm-corner-btn{position:absolute;top:0;width:144px;background:none;border:none;padding:0;cursor:pointer;}
+.wm-corner-btn:nth-child(1){left:77px;}
+.wm-corner-btn:nth-child(2){left:221px;}
+.wm-corner-btn:nth-child(3){left:366px;}
+.wm-corner-btn img{width:100%;display:block;}
+
+/* 우하단: 현재 진행중인 마을 진행도 패널 */
+.wm-progress-panel{
+  position:absolute;right:24px;bottom:24px;z-index:30;
+  width:457px;height:149px;cursor:pointer;
+  background:none;border:none;padding:0;text-align:left;
+  font-family:var(--font);
+}
+.wm-progress-bg{position:absolute;left:-77px;top:0;width:100%;height:100%;display:block;}
+.wm-progress-now{position:absolute;top:-11px;left:-44px;width:102px;display:block;}
+.wm-progress-name{position:absolute;left:-38px;top:27px;font-family:var(--font);font-size:31px;font-weight:normal;color:rgb(106,73,29);}
+.wm-progress-desc{position:absolute;left:-38px;top:60px;font-family:var(--font);font-size:20px;color:rgb(149,108,51);}
+.wm-progress-track{position:absolute;left:-40px;top:90px;width:222px;height:21px;}
+.wm-progress-track-bg{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.wm-progress-fill{position:absolute;left:0;top:0;height:21px;}
+.wm-progress-fill img{position:absolute;top:0;height:21px;width:44.4px;display:block;}
+.wm-progress-count{position:absolute;left:191px;top:86px;font-size:25px;font-weight:normal;color:rgb(149,108,51);}
+
+/* ══════════ 스테이지 선택 화면 ══════════ */
+#screen-stageselect{background:#F5E6D3;}
+.ss-bg{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none;}
+.ss-header{position:relative;z-index:2;height:103px;}
+.ss-back-btn{position:absolute;left:104px;top:14px;width:78px;height:83px;background:none;border:none;padding:0;cursor:pointer;}
+.ss-back-btn img{width:100%;display:block;}
+.ss-chapter-img{position:absolute;left:198px;top:34px;height:40px;display:block;}
+.ss-heart-pill{position:absolute;left:1380px;top:31px;}
+
+/* 카드 5장: left는 JS(renderStageSelect)에서 인라인으로 지정 */
+.ss-cards{position:absolute;left:0;top:0;z-index:2;}
+.ss-card{position:absolute;top:101px;width:280px;height:490px;background:none;border:none;padding:0;cursor:pointer;}
+.ss-card .ss-card-art{width:100%;height:100%;display:block;border-radius:26px;}
+.ss-card.locked{cursor:not-allowed;}
+.ss-card-locked-overlay{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}
+.ss-card-badge{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:block;}
+
+.ss-bottom{position:absolute;left:64px;top:584px;width:1496px;height:142px;z-index:2;}
+.ss-panel{position:absolute;left:0;top:0;width:850px;height:142px;}
+.ss-panel-bg{position:absolute;left:40px;top:8px;width:100%;height:100%;display:block;}
+.ss-panel-number{position:absolute;left:57px;top:24px;width:104px;height:104px;display:block;}
+.ss-panel-number-val{position:absolute;left:56px;top:62px;width:104px;text-align:center;font-size:55px;font-weight:normal;color:rgb(105,60,9);}
+.ss-panel-title{position:absolute;left:172px;top:43px;font-size:33px;font-weight:normal;color:rgb(117,82,41);}
+.ss-panel-desc{position:absolute;left:172px;top:82px;font-size:22px;color:rgb(171,122,65);}
+.ss-panel-icons{position:absolute;left:450px;top:39px;display:flex;gap:8px;}
+.ss-panel-icons img{width:75px;height:75px;display:block;}
+.ss-start-btn{position:absolute;left:1011px;top:14px;width:453px;height:138px;background:none;border:none;padding:0;cursor:pointer;}
+#ssHeartVal{left:31px;top:-9px;font-size:25px;color:rgb(106,73,29);}
+.ss-heart-pill .wm-pill-bg{left:-42px;top:-7px;}
+.ss-start-btn img{width:100%;display:block;}
 </style>
 </head>
 <body>
 <div id="gameRoot">
-<div id="screenWipe"></div>
-
+<img id="safeAreaOverlay" src="safe_area.png" alt="">
 <section id="screen-main" class="screen screen-main active">
   <div class="paper-bg"></div>
 
@@ -885,32 +1002,20 @@ html,body{
       
       <div id="mainCatEmoji" style="display:none">🐱</div>
     </div>
-    <div class="main-mode-cards">
-      <button class="mode-card mode-card--survival-img" data-action="start-survival" style="background:none;border:none;box-shadow:none;padding:0;overflow:visible;">
+    <div class="main-mode-cards" data-editable="메인-시작버튼">
+      <button class="mode-card mode-card--survival-img" data-action="goto-worldmap" style="background:none;border:none;box-shadow:none;padding:0;overflow:visible;">
         <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_start_btn.png" style="display:block;" alt="게임 시작">
       </button>
     </div><!-- /main-mode-cards -->
     </div><!-- /main-cat-btn-wrap -->
   </div><!-- /main-card -->
-
-  <div class="main-corner-btns">
-    <button class="main-corner-btn-rank" data-action="goto-ranking">
-      <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_rank_btn.png" alt="순위">
-    </button>
-    <button class="main-corner-btn-char" data-action="goto-character">
-      <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_cha_btn.png" alt="캐릭터">
-    </button>
-    <button class="main-corner-btn-shop" data-action="goto-shop">
-      <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_shop_btn.png" alt="상점">
-    </button>
-  </div>
 </section>
 
 
 <section id="screen-character" class="screen">
   <div class="paper-bg"></div>
   <header class="scr-header" style="padding:12px 20px;flex-shrink:0;">
-    <button class="btn-back" data-action="goto-main">←</button>
+    <button class="btn-back" data-action="back-from-character">←</button>
     <div style="display:flex;flex-direction:column;align-items:center;">
       <h2 class="scr-title">🐾 캐릭터 선택 🐾</h2>
       <p style="font-size:var(--f-sm);color:var(--inks);margin-top:2px;">함께할 택배 기사를 선택해 주세요!</p>
@@ -998,23 +1103,112 @@ html,body{
     <div class="feedback-layer" id="feedbackLayer"></div>
 
     <div class="sort-buttons">
-      <button class="sort-btn" data-slot="0" data-type="toy">
+      <button class="sort-btn" data-slot="0" data-type="toy" data-editable="인게임-박스-장난감">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_toy.png" alt="장난감">
       </button>
-      <button class="sort-btn" data-slot="1" data-type="snack">
+      <button class="sort-btn" data-slot="1" data-type="snack" data-editable="인게임-박스-간식">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_food.png" alt="간식">
       </button>
-      <button class="sort-btn" data-slot="2" data-type="cloth">
+      <button class="sort-btn" data-slot="2" data-type="cloth" data-editable="인게임-박스-옷">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_cloth.png" alt="옷">
       </button>
-      <button class="sort-btn" data-slot="3" data-type="book">
+      <button class="sort-btn" data-slot="3" data-type="book" data-editable="인게임-박스-책">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_book.png" alt="책">
       </button>
-      <button class="sort-btn" data-slot="4" data-type="trash">
+      <button class="sort-btn" data-slot="4" data-type="trash" data-editable="인게임-박스-쓰레기">
         <img src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/box_trash.png" alt="쓰레기">
       </button>
       <div class="box-hand-layer" id="boxHandLayer"></div>
     </div>
+  </div>
+</section>
+
+
+<section id="screen-worldmap" class="screen">
+  <div class="wm-scroll" id="wmScroll">
+    <div class="wm-track">
+      <img class="wm-bg" src="worldmap_bg.png" alt="">
+
+      <button class="wm-village" id="wmVillage1" data-action="goto-stageselect" data-village="1" data-editable="월드맵-골목마을" style="left:537px;">
+        <img class="wm-village-bubble" src="village_town_box_01.png" alt="골목마을">
+        <img class="wm-village-status" src="village_town_lock.png" alt="">
+      </button>
+      <button class="wm-village" id="wmVillage2" data-action="goto-stageselect" data-village="2" data-editable="월드맵-해안마을" style="left:1226px;top:131px;">
+        <img class="wm-village-bubble" src="village_town_box_02.png" alt="해안마을">
+        <img class="wm-village-status" src="village_town_lock.png" alt="">
+      </button>
+      <button class="wm-village" id="wmVillage3" data-action="goto-stageselect" data-village="3" data-editable="월드맵-숲속마을" style="left:2314px;top:152px;">
+        <img class="wm-village-bubble" src="village_town_box_03.png" alt="숲속마을">
+        <img class="wm-village-status" src="village_town_lock.png" alt="">
+      </button>
+      <button class="wm-village" id="wmVillage4" data-action="goto-stageselect" data-village="4" data-editable="월드맵-눈꽃마을" style="left:3037px;">
+        <img class="wm-village-bubble" src="village_town_box_04.png" alt="눈꽃마을">
+        <img class="wm-village-status" src="village_town_lock.png" alt="">
+      </button>
+    </div>
+  </div>
+
+  <div class="wm-topbar" data-editable="월드맵-상단재화바">
+    <div class="wm-pill">
+      <img class="wm-pill-bg" src="common_coin_bar.png" alt="">
+      <span class="wm-pill-val" id="wmCoinVal">0</span>
+    </div>
+    <div class="wm-pill">
+      <img class="wm-pill-bg" src="common_jewel_bar.png" alt="">
+      <span class="wm-pill-val" id="wmGemVal">0</span>
+    </div>
+    <div class="wm-pill">
+      <img class="wm-pill-bg" src="common_heart_bar.png" alt="">
+      <span class="wm-pill-val" id="wmHeartVal">0</span>
+    </div>
+    <button class="wm-settings-btn"><img src="worldmap_setting_icon.png" alt="설정"></button>
+  </div>
+
+  <div class="wm-corner-btns" data-editable="월드맵-좌하단버튼들">
+    <button class="wm-corner-btn" data-action="goto-ranking"><img src="worldmap_ranking_icon.png" alt="랭킹"></button>
+    <button class="wm-corner-btn" data-action="goto-character"><img src="worldmap_character_icon.png" alt="캐릭터"></button>
+    <button class="wm-corner-btn" data-action="goto-shop"><img src="worldmap_shop_icon.png" alt="상점"></button>
+  </div>
+
+  <button class="wm-progress-panel" id="wmProgressPanel" data-action="goto-stageselect" data-editable="월드맵-진행도패널">
+    <img class="wm-progress-bg" src="village_progress_panel_bg.png" alt="">
+    <img class="wm-progress-now" src="village_progress_now_badge.png" alt="">
+    <span class="wm-progress-name" id="wmProgName">골목마을</span>
+    <span class="wm-progress-desc" id="wmProgDesc">배송 2건 더 완료하면 해금</span>
+    <div class="wm-progress-track">
+      <img class="wm-progress-track-bg" src="progress_pip_bar.png" alt="" data-noedit>
+      <div class="wm-progress-fill" id="wmProgFill" data-noedit></div>
+    </div>
+    <span class="wm-progress-count" id="wmProgCount">3/5</span>
+  </button>
+</section>
+
+
+<section id="screen-stageselect" class="screen">
+  <img class="ss-bg" id="ssBg" src="village1_stageselect_bg.png" alt="">
+  <img id="guideOverlay1" src="guide_01.png" alt="" data-noedit>
+
+  <header class="ss-header">
+    <button class="ss-back-btn" data-action="back-to-worldmap"><img src="stage_back_btn.png" alt="뒤로가기"></button>
+    <img class="ss-chapter-img" id="ssChapterImg" src="stage_chapter_01.png" alt="">
+    <div class="wm-pill ss-heart-pill">
+      <img class="wm-pill-bg" src="common_heart_bar.png" alt="">
+      <span class="wm-pill-val" id="ssHeartVal">0</span>
+    </div>
+  </header>
+
+  <div class="ss-cards" id="ssCards"></div>
+
+  <div class="ss-bottom">
+    <div class="ss-panel">
+      <img class="ss-panel-bg" src="stage_panel_bg.png" alt="">
+      <img class="ss-panel-number" src="stage_number_badge.png" alt="">
+      <span class="ss-panel-number-val" id="ssPanelNumberVal">1</span>
+      <span class="ss-panel-title" id="ssPanelTitle">-</span>
+      <span class="ss-panel-desc" id="ssPanelDesc">-</span>
+      <div class="ss-panel-icons" id="ssPanelIcons"></div>
+    </div>
+    <button class="ss-start-btn" data-action="start-stage"><img src="stage_start_btn.png" alt="배송시작"></button>
   </div>
 </section>
 
@@ -1042,7 +1236,7 @@ html,body{
       <div class="tgt"><span class="tgt-e">⏱</span><span class="tgt-l">생존 시간</span><span class="tgt-v" id="sEndTime">0초</span></div>
       <div class="tgt"><span class="tgt-e">🔥</span><span class="tgt-l">최대 콤보</span><span class="tgt-v" id="sEndCombo">0</span></div>
     </div>
-    <p class="m-hint" id="sEndRecord" style="color:var(--odk);font-weight:700;font-size:16px;"></p>
+    <p class="m-hint" id="sEndRecord" style="color:var(--odk);font-weight:normal;font-size:16px;"></p>
     <div class="survival-best-board" id="survivalBestBoard"></div>
     <div class="m-btns">
       <button class="btn btn-secondary" data-action="quit-survival">← 홈으로</button>
@@ -1238,6 +1432,164 @@ function getComboMultiplier(combo){
   return m;
 }
 
+/* ══ 월드맵 / 스테이지 선택 데이터 ══ */
+const VILLAGES=[
+  {id:1,name:"골목마을",  chapterImg:"stage_chapter_01.png",bg:"village1_stageselect_bg.png"},
+  {id:2,name:"해안마을",  chapterImg:"stage_chapter_02.png",bg:"village2_stageselect_bg.png"},
+  {id:3,name:"숲속마을",  chapterImg:"stage_chapter_03.png",bg:"village3_stageselect_bg.png"},
+  {id:4,name:"눈꽃마을",  chapterImg:"stage_chapter_04.png",bg:"village4_stageselect_bg.png"},
+];
+const STAGES_PER_VILLAGE=5;
+const TOTAL_STAGES=VILLAGES.length*STAGES_PER_VILLAGE;
+
+/* TODO: 실제 배송 미션 밸런스(설명 문구 / 노출 아이콘 조합)는 추후 기획 데이터로 교체 예정.
+   지금은 20개 스테이지 모두 동일한 임시 플레이스홀더를 사용함. */
+const STAGE_INFO=Array.from({length:TOTAL_STAGES},()=>({
+  title:"꽃집으로 배송",
+  desc:"예쁜 꽃을 전해요!",
+  icons:["toy","snack","cloth","book","trash"],
+}));
+
+function villageOfStage(g){ return Math.ceil(g/STAGES_PER_VILLAGE); }
+function stageCardImg(g){
+  const v=villageOfStage(g);
+  const local=g-(v-1)*STAGES_PER_VILLAGE;
+  return `village${v}_stage${String(local).padStart(2,"0")}_card.png`;
+}
+function getStageStatus(g){
+  const cleared=save.storyCleared||0;
+  if(g<=cleared) return"delivered";
+  if(g===cleared+1) return"transit";
+  return"locked";
+}
+function getVillageStatus(villageId){
+  const cleared=save.storyCleared||0;
+  const startIdx=(villageId-1)*STAGES_PER_VILLAGE+1;
+  const endIdx=villageId*STAGES_PER_VILLAGE;
+  if(cleared>=endIdx) return"complete";
+  if(cleared+1>=startIdx && cleared+1<=endIdx) return"in_progress";
+  return"locked";
+}
+function fmtNum(n){ return (n||0).toLocaleString("ko-KR"); }
+
+let currentVillageId=1;
+let charReturnScreen="worldmap"; // 캐릭터 화면 진입 전 화면 — 뒤로가기 시 여기로 복귀
+let selectedStageIdx=1;
+
+function renderWorldMap(){
+  const cv=getEl("wmCoinVal"); if(cv)cv.textContent=fmtNum(save.coins);
+  const gv=getEl("wmGemVal");  if(gv)gv.textContent=fmtNum(save.gems);
+  const hv=getEl("wmHeartVal");if(hv)hv.textContent=fmtNum(save.heartsCurrency);
+
+  VILLAGES.forEach(v=>{
+    const status=getVillageStatus(v.id);
+    const btn=document.getElementById("wmVillage"+v.id);
+    if(!btn)return;
+    btn.classList.toggle("locked",status==="locked");
+    const statusImg=btn.querySelector(".wm-village-status");
+    if(statusImg){
+      statusImg.src = status==="complete" ? "village_town_complete.png"
+                    : status==="in_progress" ? "village_town_in_progress.png"
+                    : "village_town_lock.png";
+    }
+  });
+
+  const activeVillage = VILLAGES.find(v=>getVillageStatus(v.id)==="in_progress") || VILLAGES[VILLAGES.length-1];
+  const cleared=save.storyCleared||0;
+  const startIdx=(activeVillage.id-1)*STAGES_PER_VILLAGE;
+  const doneInVillage=Math.max(0,Math.min(STAGES_PER_VILLAGE,cleared-startIdx));
+  const remain=STAGES_PER_VILLAGE-doneInVillage;
+
+  getEl("wmProgName").textContent=activeVillage.name;
+  getEl("wmProgDesc").textContent= remain>0 ? `배송 ${remain}건 더 완료하면 해금` : "모든 배송 완료!";
+  getEl("wmProgCount").textContent=`${doneInVillage}/${STAGES_PER_VILLAGE}`;
+  getEl("wmProgressPanel").dataset.village=activeVillage.id;
+
+  const TRACK_W=222;
+  const SLOT_W=TRACK_W/STAGES_PER_VILLAGE;
+  const fillEl=getEl("wmProgFill");
+  fillEl.innerHTML="";
+  for(let i=0;i<doneInVillage;i++){
+    const tile=document.createElement("img");
+    tile.src = i===0 ? "progress_pip_filled_left.png"
+             : i===STAGES_PER_VILLAGE-1 ? "progress_pip_filled_right.png"
+             : "progress_pip_filled_middle.png";
+    tile.style.left=(i*SLOT_W)+"px";
+    fillEl.appendChild(tile);
+  }
+}
+
+function renderStageSelect(villageId){
+  currentVillageId=villageId;
+  const village=VILLAGES.find(v=>v.id===villageId)||VILLAGES[0];
+  getEl("ssBg").src=village.bg;
+  getEl("ssChapterImg").src=village.chapterImg;
+  getEl("ssHeartVal").textContent=fmtNum(save.heartsCurrency);
+
+  const startIdx=(villageId-1)*STAGES_PER_VILLAGE+1;
+  let defaultPick=startIdx;
+  const wrap=getEl("ssCards");
+  wrap.innerHTML="";
+  const CARD_LEFTS=[102,387,672,957,1242]; // 카드5장(폭280+간격5) 전체를 화면(1624px) 가로 중앙 정렬
+  const BADGE_POS=[{left:36,top:380},{left:36,top:381},{left:39,top:384},{left:39,top:384},{left:39,top:384}];
+  for(let i=0;i<STAGES_PER_VILLAGE;i++){
+    const g=startIdx+i;
+    const status=getStageStatus(g);
+    if(status!=="locked") defaultPick=g;
+
+    const btn=document.createElement("button");
+    btn.className="ss-card "+status;
+    btn.dataset.action="select-stage";
+    btn.dataset.stage=g;
+    btn.style.left=CARD_LEFTS[i]+"px";
+
+    const art=document.createElement("img");
+    art.className="ss-card-art";
+    art.src=stageCardImg(g);
+    btn.appendChild(art);
+
+    const badge=document.createElement("img");
+    badge.className="ss-card-badge";
+    badge.src = status==="delivered" ? "stage_badge_delivered.png"
+              : status==="transit"   ? "stage_badge_transit.png"
+              : "stage_badge_locked.png";
+    badge.style.left=BADGE_POS[i].left+"px";
+    badge.style.top=BADGE_POS[i].top+"px";
+    badge.style.transform="none";
+    btn.appendChild(badge);
+
+    if(status==="locked"){
+      /* 잠금 반투명 오버레이는 배지보다 나중(=위)에 그려서 캐릭터 아트뿐
+         아니라 LOCKED 배지까지 같이 톤다운되게 함 */
+      const lockOverlay=document.createElement("img");
+      lockOverlay.className="ss-card-locked-overlay";
+      lockOverlay.src="stage_card_locked.png";
+      btn.appendChild(lockOverlay);
+    }
+
+    wrap.appendChild(btn);
+  }
+  selectStageCard(defaultPick);
+}
+
+function selectStageCard(g){
+  selectedStageIdx=g;
+  document.querySelectorAll(".ss-card").forEach(el=>{
+    el.classList.toggle("picked", Number(el.dataset.stage)===g);
+  });
+  const info=STAGE_INFO[g-1]||STAGE_INFO[0];
+  getEl("ssPanelNumberVal").textContent=g;
+  getEl("ssPanelTitle").textContent=info.title;
+  getEl("ssPanelDesc").textContent=info.desc;
+  const iconWrap=getEl("ssPanelIcons");
+  iconWrap.innerHTML="";
+  info.icons.forEach(k=>{
+    const im=document.createElement("img");
+    im.src=`cat_icon_${k}.png`;
+    iconWrap.appendChild(im);
+  });
+}
+
 /* ── SV_PHASES: 즉각적인 긴장감 ── */
 const SV_PHASES=[
   {until:20,  spawnBase:1600,trickyRatio:0.15,travelMs:5500},
@@ -1266,12 +1618,16 @@ function updateBeltLinkScroll(dt,phase){
   el.style.backgroundPositionX=SV._beltLinkX+"px";
 }
 
-let save={cleared:{},unlocked:["cat"],selected:"cat"};
+let save={cleared:{},unlocked:["cat"],selected:"cat",storyCleared:0,coins:12500,gems:153,heartsCurrency:20};
 function loadSave(){
   try{const r=localStorage.getItem(SAVE_KEY);if(r)Object.assign(save,JSON.parse(r));}catch(e){}
   if(!Array.isArray(save.unlocked)||!save.unlocked.length)save.unlocked=["cat"];
   if(!save.selected)save.selected="cat";
   if(!save.cleared)save.cleared={};
+  if(typeof save.storyCleared!=="number")save.storyCleared=0;
+  if(typeof save.coins!=="number")save.coins=12500;
+  if(typeof save.gems!=="number")save.gems=153;
+  if(typeof save.heartsCurrency!=="number")save.heartsCurrency=20;
 }
 function persist(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
 function getChar(){return CHARS.find(c=>c.id===save.selected)||CHARS[0];}
@@ -1282,40 +1638,8 @@ function showScreen(name){
   document.querySelectorAll(".screen").forEach(el=>el.classList.toggle("active",el.id==="screen-"+name));
   if(name==="character") renderCharacter();
   if(name==="main")      document.getElementById("mainCatEmoji").textContent=getChar().emoji;
-}
-
-/* 클릭한 지점에서부터 원이 커지며 화면을 덮고, 그 사이 화면이 전환된 뒤
-   다시 원이 줄어들며 새 화면이 드러나는 아이리스(iris) 트랜지션 */
-function circleWipeTransition(originEl, doSwitch){
-  const wipe = document.getElementById("screenWipe");
-  const root = document.getElementById("gameRoot");
-  if(!wipe||!root){ doSwitch(); return; }
-  const BASE_W=1624, BASE_H=750;
-  const rootR = root.getBoundingClientRect();
-  const scale = rootR.width / BASE_W || 1;
-  const originR = originEl.getBoundingClientRect();
-  const cx = (originR.left + originR.width/2  - rootR.left) / scale;
-  const cy = (originR.top  + originR.height/2 - rootR.top)  / scale;
-  const maxR = Math.hypot(Math.max(cx,BASE_W-cx), Math.max(cy,BASE_H-cy));
-
-  wipe.style.transition = "none";
-  wipe.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
-  void wipe.offsetWidth;
-  requestAnimationFrame(()=>{
-    wipe.style.transition = "clip-path .45s cubic-bezier(.4,0,.2,1)";
-    wipe.style.clipPath = `circle(${maxR}px at ${cx}px ${cy}px)`;
-  });
-
-  setTimeout(()=>{
-    doSwitch();
-    wipe.style.transition = "none";
-    wipe.style.clipPath = `circle(${maxR}px at ${cx}px ${cy}px)`;
-    void wipe.offsetWidth;
-    requestAnimationFrame(()=>{
-      wipe.style.transition = "clip-path .45s cubic-bezier(.4,0,.2,1)";
-      wipe.style.clipPath = `circle(0px at ${cx}px ${cy}px)`;
-    });
-  }, 460);
+  if(name==="worldmap")  renderWorldMap();
+  if(name==="stageselect") renderStageSelect(currentVillageId);
 }
 
 let previewCharIdx=0;
@@ -2187,7 +2511,7 @@ function endSurvival(){
   document.getElementById("survivalEndEmoji").textContent=SV.elapsed>=60?"😸":"😿";
   const board=document.getElementById("survivalBestBoard");
   if(board){
-    board.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--blt);margin-bottom:4px;">📋 최고 기록</div>';
+    board.innerHTML='<div style="font-size:12px;font-weight:normal;color:var(--blt);margin-bottom:4px;">📋 최고 기록</div>';
     [["최고 점수",nr.score.toLocaleString()+"점"],
      ["최장 생존",(()=>{const m2=Math.floor(nr.time/60),s2=nr.time%60;return m2>0?m2+"분 "+s2+"초":s2+"초";})()],
      ["최대 콤보","×"+nr.combo]
@@ -2218,12 +2542,26 @@ function showToast(msg){
   clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("show"),2300);
 }
 
-function handleAction(a){
+function handleAction(a, el){
   switch(a){
-    case"goto-character":showScreen("character");break;
-    case"goto-main":
-      if(G&&!G.ended){SV=null;G=null;document.getElementById("beltItems").innerHTML="";hideAllModals();clearDangerEffect();}
-      showScreen("main");break;
+    case"goto-character":
+      charReturnScreen=curScreen;
+      showScreen("character");break;
+    case"back-from-character":showScreen(charReturnScreen);break;
+    case"goto-worldmap":showScreen("worldmap");break;
+    case"goto-stageselect":{
+      const vid=Number(el&&el.dataset.village||1);
+      if(getVillageStatus(vid)==="locked"){showToast("아직 잠긴 마을이에요!");return;}
+      currentVillageId=vid;
+      showScreen("stageselect");break;
+    }
+    case"back-to-worldmap":showScreen("worldmap");break;
+    case"select-stage":{
+      const g=Number(el&&el.dataset.stage);
+      if(getStageStatus(g)==="locked"){showToast("이전 스테이지를 먼저 완료해주세요!");return;}
+      selectStageCard(g);break;
+    }
+    case"start-stage":showToast("스테이지 배송 게임은 준비 중이에요!");break;
     case"confirm-character":{
       const selCh=CHARS[previewCharIdx];
       if(!selCh||!save.unlocked.includes(selCh.id)){showToast("먼저 해금이 필요해요!");break;}
@@ -2242,12 +2580,33 @@ function handleAction(a){
 document.getElementById("gameRoot").addEventListener("click",e=>{
   const el=e.target.closest("[data-action]");if(!el)return;
   e.preventDefault();
-  if(el.dataset.action==="start-survival"){
-    circleWipeTransition(el, startSurvival);
-  }else{
-    handleAction(el.dataset.action);
-  }
+  handleAction(el.dataset.action, el);
 });
+
+/* ── 월드맵 가로 스크롤: 마우스 드래그 + 세로휠→가로스크롤 보조 ── */
+(function enableWorldMapDragScroll(){
+  const el=document.getElementById("wmScroll");
+  if(!el)return;
+  let isDown=false,startX=0,scrollStart=0,moved=false;
+  el.addEventListener("pointerdown",e=>{
+    isDown=true;moved=false;startX=e.clientX;scrollStart=el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener("pointermove",e=>{
+    if(!isDown)return;
+    const dx=e.clientX-startX;
+    if(Math.abs(dx)>4)moved=true;
+    el.scrollLeft=scrollStart-dx;
+  });
+  el.addEventListener("pointerup",()=>{isDown=false;});
+  el.addEventListener("pointercancel",()=>{isDown=false;});
+  el.addEventListener("click",e=>{
+    if(moved){e.preventDefault();e.stopPropagation();moved=false;}
+  },true);
+  el.addEventListener("wheel",e=>{
+    if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){el.scrollLeft+=e.deltaY;e.preventDefault();}
+  },{passive:false});
+})();
 document.querySelectorAll(".sort-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
     if(SV&&!SV.ended){ensureSvLoop();onSortSurvival(btn.dataset.type);}
@@ -2273,8 +2632,464 @@ document.addEventListener("visibilitychange",()=>{
   }
 });
 
+/* ══════════════════════════════════════════════════════════
+   🛠 레이아웃 편집 모드 (개발용)
+   Ctrl+E 로 켜고 끄기. [data-editable="이름"]이 붙은 요소를 마우스로
+   드래그해서 위치를 옮기고, 패널의 "좌표 복사" 버튼으로 현재 좌표를
+   JSON으로 클립보드에 복사 — 그걸 채팅에 붙여넣으면 코드에 반영함.
+   실제 플레이에는 전혀 관여하지 않는 순수 개발 도구.
+   ══════════════════════════════════════════════════════════ */
+(function setupLayoutEditor(){
+  let editMode=false, panel=null, dragEl=null, selectedEl=null, dragged=false;
+  let selectedEls=new Set(); // 정렬/분포용 다중 선택 (Ctrl/Shift+클릭)
+  let lastOutlined=new Set();
+  let startX=0,startY=0,startLeft=0,startTop=0;
+  let listTimer=null;
+  const root=document.getElementById("gameRoot");
+  const undoStack=[];
+  const touched=new Set(); // 이번 세션에서 좌표/스타일을 건드린 요소들
+  let currentLabels=new Map(); // 가장 최근 refreshList() 기준 el -> 표시 라벨
+
+  /* ── 좌표/스케일 유틸 ── */
+  function getScale(){
+    const r=root.getBoundingClientRect();
+    return (r.width/1624)||1;
+  }
+  function getPos(el){
+    const cs=getComputedStyle(el);
+    let left=parseFloat(cs.left), top=parseFloat(cs.top);
+    if(isNaN(left)||isNaN(top)){
+      const parent=el.offsetParent||root;
+      const pr=parent.getBoundingClientRect();
+      const r=el.getBoundingClientRect();
+      const scale=getScale();
+      if(isNaN(left)) left=(r.left-pr.left)/scale;
+      if(isNaN(top))  top =(r.top -pr.top )/scale;
+    }
+    return {left:Math.round(left),top:Math.round(top)};
+  }
+  function rgbToHex(rgb){
+    const m=String(rgb).match(/(\d+),\s*(\d+),\s*(\d+)/);
+    if(!m)return"#000000";
+    return"#"+[1,2,3].map(i=>Number(m[i]).toString(16).padStart(2,"0")).join("");
+  }
+
+  /* ── 어떤 요소가 "드래그 가능한 리소스"인가: 현재 화면 안에서 position:absolute 로
+     실제로 배치되어 있고, 화면에 그려지는(0px 아닌) 모든 요소를 대상으로 함.
+     → 이미지든 텍스트든, 좌표를 잡아둔 리소스는 전부 개별적으로 잡힘. ── */
+  function isEligible(el){
+    if(!el || el.nodeType!==1) return false;
+    if(el.id==="gameRoot"||el.id==="screenWipe"||el.id==="wmScroll") return false;
+    if(el.closest("#layoutEditorPanel")) return false;
+    if(el.classList.contains("screen")) return false;
+    /* data-noedit: 좌표를 코드가 실시간으로 계산해서 배치하는 부품(진행바 조각 등)은
+       손으로 옮기면 안 되므로 편집 대상에서 제외. 이 속성이 붙은 요소 자신과
+       그 하위 요소 전부 제외됨. */
+    if(el.closest("[data-noedit]")) return false;
+    const cs=getComputedStyle(el);
+    if(cs.position!=="absolute") return false;
+    /* overflow:auto/scroll 인 요소는 스크롤 뷰포트(구조 틀)이지 배치용 리소스가
+       아니므로 제외. inset:0로 화면 크기를 채우던 요소인데 여기서 left/top만
+       고정하고 right/bottom을 지워버리면 크기 기준을 잃어 스크롤이 깨짐. */
+    if(["auto","scroll"].includes(cs.overflowX)||["auto","scroll"].includes(cs.overflowY)) return false;
+    const r=el.getBoundingClientRect();
+    if(r.width<2||r.height<2) return false;
+    return true;
+  }
+  function findEligibleTarget(startEl){
+    let el=startEl;
+    while(el && el!==document.body){
+      if(isEligible(el)) return el;
+      el=el.parentElement;
+    }
+    return null;
+  }
+  function collectEligible(){
+    const activeScreen=document.querySelector(".screen.active")||document;
+    return Array.from(activeScreen.querySelectorAll("*")).filter(isEligible);
+  }
+  function getLabel(el){
+    if(el.dataset.editable) return el.dataset.editable;
+    if(el.tagName==="IMG" && el.alt) return el.alt;
+    if(el.id) return "#"+el.id;
+    const cls=(typeof el.className==="string"?el.className:"").split(" ")[0];
+    return cls || el.tagName.toLowerCase();
+  }
+  /* 같은 base 라벨이 여러 개면 #2, #3 ... 붙여서 항상 유일한 이름을 부여 */
+  function computeLabels(els){
+    const count=new Map(), out=new Map();
+    els.forEach(el=>{
+      const base=getLabel(el);
+      const n=(count.get(base)||0)+1;
+      count.set(base,n);
+      out.set(el, n>1 ? `${base}#${n}` : base);
+    });
+    return out;
+  }
+  function labelFor(el){
+    return currentLabels.get(el) || getLabel(el);
+  }
+
+  /* ── undo (한 번의 조작으로 여러 요소가 바뀔 수 있어 항상 배열로 저장) ── */
+  function pushUndo(items){ if(!items||!items.length)return; undoStack.push(items); if(undoStack.length>200) undoStack.shift(); }
+  function undo(){
+    const items=undoStack.pop();
+    if(!items)return;
+    items.forEach(action=>{ action.props.forEach(p=>{ action.el.style[p.prop]=p.before; }); });
+    refreshList();
+    updateInspector();
+    showToast("실행취소");
+  }
+
+  /* ── 다중 선택 표시 ── */
+  function updateSelectionOutlines(){
+    lastOutlined.forEach(el=>{ if(!selectedEls.has(el)) el.style.outline=""; });
+    selectedEls.forEach(el=>{ el.style.outline="2px solid #4da3ff"; });
+    lastOutlined=new Set(selectedEls);
+  }
+  function getSelectedArray(){
+    return Array.from(selectedEls).filter(el=>document.body.contains(el));
+  }
+
+  /* ── 정렬 · 분포 (포토샵 Align/Distribute와 동일) ── */
+  function alignSelected(type){
+    const els=getSelectedArray();
+    if(els.length<2){ showToast("정렬하려면 2개 이상 선택하세요 (Ctrl/Shift+클릭)"); return; }
+    const items=els.map(el=>{
+      const p=getPos(el);
+      return {el,left:p.left,top:p.top,w:el.offsetWidth,h:el.offsetHeight,
+        beforeLeft:el.style.left||p.left+"px", beforeTop:el.style.top||p.top+"px"};
+    });
+    const minLeft=Math.min(...items.map(i=>i.left));
+    const maxRight=Math.max(...items.map(i=>i.left+i.w));
+    const minTop=Math.min(...items.map(i=>i.top));
+    const maxBottom=Math.max(...items.map(i=>i.top+i.h));
+    const undoItems=[];
+    items.forEach(it=>{
+      let newLeft=it.left, newTop=it.top;
+      if(type==="left") newLeft=minLeft;
+      else if(type==="hcenter") newLeft=(minLeft+maxRight)/2-it.w/2;
+      else if(type==="right") newLeft=maxRight-it.w;
+      else if(type==="top") newTop=minTop;
+      else if(type==="vcenter") newTop=(minTop+maxBottom)/2-it.h/2;
+      else if(type==="bottom") newTop=maxBottom-it.h;
+      newLeft=Math.round(newLeft); newTop=Math.round(newTop);
+      const props=[];
+      if(newLeft!==it.left){ it.el.style.left=newLeft+"px"; it.el.style.right="auto"; props.push({prop:"left",before:it.beforeLeft}); }
+      if(newTop!==it.top){ it.el.style.top=newTop+"px"; it.el.style.bottom="auto"; props.push({prop:"top",before:it.beforeTop}); }
+      if(props.length){ touched.add(it.el); undoItems.push({el:it.el,props}); }
+    });
+    pushUndo(undoItems);
+    refreshList();
+    showToast("정렬 완료");
+  }
+  function distributeSelected(axis){
+    const els=getSelectedArray();
+    if(els.length<3){ showToast("분포하려면 3개 이상 선택하세요"); return; }
+    const items=els.map(el=>{
+      const p=getPos(el);
+      const w=el.offsetWidth,h=el.offsetHeight;
+      return {el,left:p.left,top:p.top,w,h,
+        center: axis==="h" ? p.left+w/2 : p.top+h/2,
+        beforeLeft:el.style.left||p.left+"px", beforeTop:el.style.top||p.top+"px"};
+    });
+    items.sort((a,b)=>a.center-b.center);
+    const first=items[0].center, last=items[items.length-1].center;
+    const step=(last-first)/(items.length-1);
+    const undoItems=[];
+    items.forEach((it,i)=>{
+      if(i===0||i===items.length-1)return;
+      const newCenter=first+step*i;
+      if(axis==="h"){
+        const newLeft=Math.round(newCenter-it.w/2);
+        if(newLeft!==it.left){
+          it.el.style.left=newLeft+"px"; it.el.style.right="auto";
+          touched.add(it.el);
+          undoItems.push({el:it.el,props:[{prop:"left",before:it.beforeLeft}]});
+        }
+      }else{
+        const newTop=Math.round(newCenter-it.h/2);
+        if(newTop!==it.top){
+          it.el.style.top=newTop+"px"; it.el.style.bottom="auto";
+          touched.add(it.el);
+          undoItems.push({el:it.el,props:[{prop:"top",before:it.beforeTop}]});
+        }
+      }
+    });
+    pushUndo(undoItems);
+    refreshList();
+    showToast("분포 완료");
+  }
+
+  /* ── 패널 UI ── */
+  function buildPanel(){
+    panel=document.createElement("div");
+    panel.id="layoutEditorPanel";
+    panel.style.cssText="position:fixed;top:8px;left:8px;z-index:99999;background:#222;color:#fff;"
+      +"font:12px/1.5 monospace;padding:10px;border-radius:8px;max-height:90vh;overflow:auto;width:280px;"
+      +"box-shadow:0 4px 20px rgba(0,0,0,.5);";
+    const alignBtnStyle="padding:4px 0;cursor:pointer;background:#333;color:#fff;border:1px solid #555;border-radius:4px;font-size:10px;";
+    panel.innerHTML=
+      '<div id="leHandle" style="font-weight:bold;margin-bottom:4px;cursor:move;user-select:none;">🛠 레이아웃 편집 모드 <span style="opacity:.5;font-weight:normal;font-size:10px;">(드래그해서 이동)</span></div>'
+      +'<div style="opacity:.7;margin-bottom:8px;">아무 요소나 드래그 · 클릭하면 선택 · Ctrl/Shift+클릭 다중선택 · Shift+드래그 수평/수직 고정 (Ctrl+Z 실행취소 · Ctrl+E 종료)</div>'
+      +'<button id="leCopyBtn" style="width:100%;padding:6px;margin-bottom:8px;cursor:pointer;">📋 변경된 좌표/스타일 복사</button>'
+      +'<div id="leInspector"></div>'
+      +'<div id="leAlign" style="border-top:1px solid #555;padding-top:8px;margin-top:8px;">'
+      +'<div style="font-weight:bold;margin-bottom:6px;">정렬 · 분포 <span style="opacity:.6;font-weight:normal;">(2개+ 선택)</span></div>'
+      +`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:4px;">`
+      +`<button data-align="left" title="왼쪽 정렬" style="${alignBtnStyle}">좌</button>`
+      +`<button data-align="hcenter" title="가로 중앙 정렬" style="${alignBtnStyle}">가운데</button>`
+      +`<button data-align="right" title="오른쪽 정렬" style="${alignBtnStyle}">우</button>`
+      +`<button data-distribute="h" title="가로 균등분포 (3개+)" style="${alignBtnStyle}">가로분산</button>`
+      +`</div>`
+      +`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">`
+      +`<button data-align="top" title="위 정렬" style="${alignBtnStyle}">위</button>`
+      +`<button data-align="vcenter" title="세로 중앙 정렬" style="${alignBtnStyle}">가운데</button>`
+      +`<button data-align="bottom" title="아래 정렬" style="${alignBtnStyle}">아래</button>`
+      +`<button data-distribute="v" title="세로 균등분포 (3개+)" style="${alignBtnStyle}">세로분산</button>`
+      +`</div>`
+      +'</div>'
+      +'<div style="font-weight:bold;margin:8px 0 4px;border-top:1px solid #555;padding-top:8px;">이번 화면 요소</div>'
+      +'<div id="leList"></div>';
+    document.body.appendChild(panel);
+    document.getElementById("leCopyBtn").addEventListener("click",copyChanges);
+    document.getElementById("leAlign").addEventListener("click",e=>{
+      const btn=e.target.closest("button");
+      if(!btn)return;
+      if(btn.dataset.align) alignSelected(btn.dataset.align);
+      else if(btn.dataset.distribute) distributeSelected(btn.dataset.distribute);
+    });
+    makePanelDraggable();
+    updateInspector();
+  }
+
+  /* 패널 자체를 자유롭게 옮길 수 있도록: 제목줄(#leHandle)을 손잡이로 드래그.
+     패널은 position:fixed로 뷰포트 좌표를 그대로 쓰므로 스케일 보정이 필요 없음. */
+  function makePanelDraggable(){
+    const handle=document.getElementById("leHandle");
+    if(!handle)return;
+    let dragging=false, sx=0, sy=0, sl=0, st=0;
+    handle.addEventListener("pointerdown",e=>{
+      dragging=true;
+      sx=e.clientX; sy=e.clientY;
+      const r=panel.getBoundingClientRect();
+      sl=r.left; st=r.top;
+      handle.setPointerCapture(e.pointerId);
+      e.preventDefault(); e.stopPropagation();
+    });
+    handle.addEventListener("pointermove",e=>{
+      if(!dragging)return;
+      const nl=sl+(e.clientX-sx);
+      const nt=st+(e.clientY-sy);
+      const maxL=window.innerWidth-40, maxT=window.innerHeight-40;
+      panel.style.left=Math.min(Math.max(0,nl),maxL)+"px";
+      panel.style.top=Math.min(Math.max(0,nt),maxT)+"px";
+      panel.style.right="auto";
+    });
+    handle.addEventListener("pointerup",e=>{ dragging=false; handle.releasePointerCapture(e.pointerId); });
+  }
+
+  function updateInspector(){
+    if(!panel)return;
+    const box=document.getElementById("leInspector");
+    if(!selectedEl){ box.innerHTML=""; return; }
+    const cs=getComputedStyle(selectedEl);
+    const fs=parseInt(cs.fontSize)||16;
+    const hex=rgbToHex(cs.color);
+    box.innerHTML=
+      '<div style="border-top:1px solid #555;padding-top:8px;margin-top:4px;">'
+      +`<div style="font-weight:bold;margin-bottom:6px;">선택됨: ${labelFor(selectedEl)}</div>`
+      +'<label style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">글자 크기 '
+      +`<input type="number" id="leFontSize" value="${fs}" style="width:56px;">px</label>`
+      +'<label style="display:flex;align-items:center;gap:6px;">색상 '
+      +`<input type="color" id="leColor" value="${hex}"></label>`
+      +'</div>';
+    const fsInput=document.getElementById("leFontSize");
+    const colorInput=document.getElementById("leColor");
+    let fsBefore=selectedEl.style.fontSize||cs.fontSize;
+    let colorBefore=selectedEl.style.color||cs.color;
+    fsInput.addEventListener("focus",()=>{ fsBefore=selectedEl.style.fontSize||getComputedStyle(selectedEl).fontSize; });
+    fsInput.addEventListener("input",()=>{
+      selectedEl.style.fontSize=fsInput.value+"px";
+      touched.add(selectedEl);
+    });
+    fsInput.addEventListener("change",()=>{
+      pushUndo([{el:selectedEl,props:[{prop:"fontSize",before:fsBefore}]}]);
+    });
+    colorInput.addEventListener("input",()=>{
+      selectedEl.style.color=colorInput.value;
+      touched.add(selectedEl);
+    });
+    colorInput.addEventListener("change",()=>{
+      pushUndo([{el:selectedEl,props:[{prop:"color",before:colorBefore}]}]);
+      colorBefore=colorInput.value;
+    });
+  }
+
+  function refreshList(){
+    if(!panel)return;
+    const list=document.getElementById("leList");
+    list.innerHTML="";
+    const els=collectEligible();
+    currentLabels=computeLabels(els);
+    els.forEach(el=>{
+      const p=getPos(el);
+      const label=currentLabels.get(el);
+      const row=document.createElement("div");
+      row.style.cssText="padding:3px 0;border-bottom:1px solid #444;cursor:pointer;"
+        +(selectedEls.has(el)?"color:#4da3ff;font-weight:bold;":(el===selectedEl?"color:#ffcc00;":""));
+      row.textContent=`${label}: ${p.left}, ${p.top}`;
+      row.addEventListener("click",(e)=>{
+        if(e.ctrlKey||e.metaKey||e.shiftKey){
+          if(selectedEls.has(el)) selectedEls.delete(el); else selectedEls.add(el);
+        }else{
+          selectedEls.clear();
+          selectedEls.add(el);
+        }
+        updateSelectionOutlines();
+        selectedEl=el;
+        updateInspector();
+        refreshList();
+      });
+      list.appendChild(row);
+    });
+  }
+
+  function copyChanges(){
+    const out={};
+    const touchedLabels=computeLabels(Array.from(touched));
+    touched.forEach(el=>{
+      const p=getPos(el);
+      out[touchedLabels.get(el)]={
+        left:p.left, top:p.top,
+        fontSize:el.style.fontSize||undefined,
+        color:el.style.color||undefined,
+      };
+    });
+    if(!Object.keys(out).length){ showToast("아직 변경한 요소가 없어요"); return; }
+    const json=JSON.stringify(out,null,2);
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(json).then(
+        ()=>showToast("좌표 복사됨! 채팅에 붙여넣어주세요"),
+        ()=>{ console.log(json); showToast("복사 실패 — 콘솔(F12)에 출력했어요"); }
+      );
+    }else{
+      console.log(json);
+      showToast("클립보드 접근 불가 — 콘솔(F12)에 출력했어요");
+    }
+  }
+
+  /* ── 드래그 ── */
+  function onPointerDown(e){
+    if(!editMode)return;
+    const el=findEligibleTarget(e.target);
+    if(!el)return;
+    e.preventDefault();e.stopPropagation();
+    const p=getPos(el);
+    el.style.left=p.left+"px";
+    el.style.top =p.top+"px";
+    el.style.right="auto";
+    el.style.bottom="auto";
+    dragEl=el; dragged=false;
+    startX=e.clientX;startY=e.clientY;
+    startLeft=p.left;startTop=p.top;
+    el.setPointerCapture(e.pointerId);
+    el.style.outline="2px dashed #ffcc00";
+  }
+  function onPointerMove(e){
+    if(!dragEl)return;
+    const scale=getScale();
+    let dx=(e.clientX-startX)/scale;
+    let dy=(e.clientY-startY)/scale;
+    if(Math.abs(dx)>2||Math.abs(dy)>2) dragged=true;
+    if(!dragged)return;
+    /* Shift: 포토샵처럼 이동을 수평/수직 한쪽 축으로만 제한 (더 많이 움직인 축 기준) */
+    if(e.shiftKey){
+      if(Math.abs(dx)>Math.abs(dy)) dy=0;
+      else dx=0;
+    }
+    dragEl.style.left=Math.round(startLeft+dx)+"px";
+    dragEl.style.top =Math.round(startTop +dy)+"px";
+    refreshList();
+  }
+  function onPointerUp(e){
+    if(!dragEl)return;
+    if(dragged){
+      const p=getPos(dragEl);
+      if(p.left!==startLeft||p.top!==startTop){
+        pushUndo([{el:dragEl,props:[
+          {prop:"left",before:startLeft+"px"},
+          {prop:"top", before:startTop +"px"},
+        ]}]);
+        touched.add(dragEl);
+      }
+      selectedEls.clear();
+      selectedEls.add(dragEl);
+    }else if(e && (e.ctrlKey||e.metaKey||e.shiftKey)){
+      if(selectedEls.has(dragEl)) selectedEls.delete(dragEl); else selectedEls.add(dragEl);
+    }else{
+      selectedEls.clear();
+      selectedEls.add(dragEl);
+    }
+    updateSelectionOutlines();
+    selectedEl=dragEl;
+    updateInspector();
+    refreshList();
+    dragEl=null; dragged=false;
+  }
+
+  /* ── 모드 토글 ── */
+  function toggleEditMode(){
+    editMode=!editMode;
+    const safeArea=document.getElementById("safeAreaOverlay");
+    const guide1=document.getElementById("guideOverlay1");
+    if(editMode){
+      buildPanel();
+      refreshList();
+      listTimer=setInterval(()=>{ if(!dragEl) refreshList(); },600);
+      if(safeArea) safeArea.classList.add("show");
+      if(guide1) guide1.classList.add("show");
+      showToast("편집 모드 ON — 드래그로 이동, 클릭으로 선택");
+    }else{
+      if(listTimer){ clearInterval(listTimer); listTimer=null; }
+      selectedEl=null;
+      selectedEls.forEach(el=>{ el.style.outline=""; });
+      selectedEls.clear();
+      lastOutlined.clear();
+      if(panel){ panel.remove(); panel=null; }
+      if(safeArea) safeArea.classList.remove("show");
+      if(guide1) guide1.classList.remove("show");
+      showToast("편집 모드 OFF");
+    }
+  }
+
+  window.addEventListener("keydown",e=>{
+    if(e.ctrlKey && e.key.toLowerCase()==="e"){
+      e.preventDefault();
+      toggleEditMode();
+      return;
+    }
+    if(editMode && e.ctrlKey && e.key.toLowerCase()==="z"){
+      e.preventDefault();
+      undo();
+    }
+  });
+  document.addEventListener("pointerdown",onPointerDown,true);
+  document.addEventListener("pointermove",onPointerMove,true);
+  document.addEventListener("pointerup",onPointerUp,true);
+
+  /* 편집 모드 중엔 리소스를 클릭/드래그해도 게임 쪽 click 핸들러(화면 전환,
+     정렬 등)가 실행되지 않도록 capture 단계에서 막음. 편집 패널 자체의
+     버튼/입력창은 정상 동작해야 하므로 그건 제외. */
+  document.addEventListener("click",e=>{
+    if(!editMode) return;
+    if(e.target.closest("#layoutEditorPanel")) return;
+    e.preventDefault();
+    e.stopPropagation();
+  },true);
+})();
+
 loadSave();
 showScreen("main");
-
 
 </script>

@@ -395,6 +395,13 @@ html,body{
   position:absolute;left:50%;transform:translateX(-50%);
   top:12px;white-space:nowrap;
 }
+/* 스토리 모드 전용: 점수 아래 목표 진행도("18 / 31") — 서바이벌엔 안 씀 */
+.hud-story-progress{
+  position:absolute;left:50%;transform:translateX(-50%);
+  top:88px;font-size:20px;font-weight:700;color:var(--blt);
+  background:rgba(255,255,255,.75);padding:2px 14px;border-radius:12px;
+  white-space:nowrap;
+}
 /* 하트 */
 .hud-hearts-wrap{
   position:relative;flex-shrink:0;
@@ -894,6 +901,15 @@ html,body{
 }
 .wm-village-bubble{position:absolute;top:0;left:50%;transform:translateX(-50%);width:181px;display:block;}
 .wm-village-status{position:absolute;top:66px;left:50%;transform:translateX(-50%);height:30px;display:block;}
+/* 진행 중인 마을 말풍선(이름+상태알약)이 한 세트로 통통 튀는 모션 */
+@keyframes villageBubbleBounce{
+  0%,100%{transform:translateX(-50%) translateY(0);}
+  50%{transform:translateX(-50%) translateY(-8px);}
+}
+.wm-village.in-progress .wm-village-bubble,
+.wm-village.in-progress .wm-village-status{
+  animation:villageBubbleBounce 1.4s ease-in-out infinite;
+}
 #wmVillage1 .wm-village-bubble{left:363px;top:8px;}
 #wmVillage1 .wm-village-status{left:364px;top:46px;}
 #wmVillage2 .wm-village-bubble{left:150px;top:51px;}
@@ -968,6 +984,8 @@ html,body{
 .ss-card.locked{cursor:not-allowed;}
 .ss-card-locked-overlay{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}
 .ss-card-badge{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:block;}
+.ss-card-select-overlay{position:absolute;left:50%;top:262px;transform:translate(-50%,calc(-50% - 30px));width:278px;height:500px;display:none;}
+.ss-card.picked .ss-card-select-overlay{display:block;}
 
 .ss-bottom{position:absolute;left:64px;top:584px;width:1496px;height:142px;z-index:2;}
 .ss-panel{position:absolute;left:0;top:0;width:850px;height:142px;}
@@ -1079,6 +1097,7 @@ html,body{
     <!-- 중앙: 점수 -->
     <div class="hud-center">
       <div class="hud-score-val" id="hudScore">0</div>
+      <div class="hud-story-progress" id="hudStoryProgress" style="display:none;">0 / 0</div>
     </div>
     <!-- 우측: 일시정지 -->
     <button class="hud-pause-btn" data-action="pause-game">
@@ -1241,6 +1260,26 @@ html,body{
     <div class="m-btns">
       <button class="btn btn-secondary" data-action="quit-survival">← 홈으로</button>
       <button class="btn btn-primary"   data-action="restart-survival">↻ 다시 도전</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 스토리 스테이지 종료(클리어/실패) -->
+<div id="modal-story-end" class="modal-overlay">
+  <div class="modal-card modal-survival">
+    <div class="fail-emoji" id="stEndEmoji">😻</div>
+    <h3 class="m-title" id="stEndTitle">스테이지 클리어!</h3>
+    <div class="m-targets" style="flex-wrap:wrap;gap:8px;">
+      <div class="tgt"><span class="tgt-e">💯</span><span class="tgt-l">획득 점수</span><span class="tgt-v" id="stEndScore">0</span></div>
+      <div class="tgt"><span class="tgt-e">📦</span><span class="tgt-l">배송 개수</span><span class="tgt-v" id="stEndProgress">0 / 0</span></div>
+      <div class="tgt"><span class="tgt-e">🔥</span><span class="tgt-l">최대 콤보</span><span class="tgt-v" id="stEndCombo">×0</span></div>
+    </div>
+    <p class="m-hint" id="stEndBonus" style="color:var(--odk);font-weight:700;font-size:16px;"></p>
+    <p class="m-hint" id="stEndUnlock" style="color:var(--gdk);font-weight:700;font-size:16px;"></p>
+    <div class="m-btns">
+      <button class="btn btn-secondary" data-action="quit-story-stage">← 스테이지 선택</button>
+      <button class="btn btn-secondary" data-action="restart-story-stage">↻ 다시 도전</button>
+      <button class="btn btn-primary"   data-action="next-story-stage" id="stEndNextBtn">다음 스테이지 →</button>
     </div>
   </div>
 </div>
@@ -1442,13 +1481,35 @@ const VILLAGES=[
 const STAGES_PER_VILLAGE=5;
 const TOTAL_STAGES=VILLAGES.length*STAGES_PER_VILLAGE;
 
-/* TODO: 실제 배송 미션 밸런스(설명 문구 / 노출 아이콘 조합)는 추후 기획 데이터로 교체 예정.
-   지금은 20개 스테이지 모두 동일한 임시 플레이스홀더를 사용함. */
-const STAGE_INFO=Array.from({length:TOTAL_STAGES},()=>({
-  title:"꽃집으로 배송",
-  desc:"예쁜 꽃을 전해요!",
-  icons:["toy","snack","cloth","book","trash"],
-}));
+/* cat_delivery_stage_balance_v1.md 기준 20스테이지 밸런스 데이터.
+   boxes = 그 스테이지의 박스 카테고리(패널 아이콘 행 + 실제 박스 슬롯 둘 다 이걸 사용),
+   targetCount = 클리어 목표 개수, targetTime(초) = 이 시간 안에 클리어하면 점수 +30% 보너스,
+   boss = 5/10/15/20 보스 스테이지 여부(기믹 트리거 + 클리어 시 캐릭터 해금 조건). */
+const STAGE_INFO=[
+  {title:"미미의 첫 주문",           desc:"장난감・간식 31개를 배송해요!",       boxes:["toy","snack"],                    targetCount:31,targetTime:60,boss:false},
+  {title:"베이커리의 모카",          desc:"간식・책 31개를 배송해요!",           boxes:["snack","book"],                   targetCount:31,targetTime:60,boss:false},
+  {title:"편집샵 루루",              desc:"장난감・옷 32개를 배송해요!",         boxes:["toy","cloth"],                    targetCount:32,targetTime:60,boss:false},
+  {title:"문구점 아저씨 사부",       desc:"책・쓰레기 33개를 배송해요!",         boxes:["book","trash"],                   targetCount:33,targetTime:60,boss:false},
+  {title:"헌옷가게 코코 — 골목마을 대청소", desc:"옷・쓰레기 34개를 배송해요! (보스)", boxes:["cloth","trash"],             targetCount:34,targetTime:60,boss:true},
+
+  {title:"서프샵 나나",              desc:"장난감・옷・욕실용품 38개를 배송해요!", boxes:["toy","cloth","bath"],            targetCount:38,targetTime:65,boss:false},
+  {title:"아이스크림가게 보리",       desc:"간식・장난감・쓰레기 39개를 배송해요!", boxes:["snack","toy","trash"],           targetCount:39,targetTime:65,boss:false},
+  {title:"등대지기 하루",            desc:"책・가전・욕실용품 40개를 배송해요!",   boxes:["book","it","bath"],              targetCount:40,targetTime:65,boss:false},
+  {title:"조개공방 유자",            desc:"옷・문구용품・쓰레기 42개를 배송해요!", boxes:["cloth","school","trash"],        targetCount:42,targetTime:65,boss:false},
+  {title:"요트클럽 대장 모카투 — 해안마을 큰 파티", desc:"장난감・간식・가전 43개를 배송해요! (보스)", boxes:["toy","snack","it"], targetCount:43,targetTime:65,boss:true},
+
+  {title:"원예상점 로즈",            desc:"장난감・책・식물・간식 49개를 배송해요!", boxes:["toy","book","plant","snack"],  targetCount:49,targetTime:70,boss:false},
+  {title:"오두막 셰프 두부",         desc:"간식・주방용품・옷・쓰레기 51개를 배송해요!", boxes:["snack","kitchen","cloth","trash"], targetCount:51,targetTime:70,boss:false},
+  {title:"캠핑샵 조이",              desc:"장난감・옷・식물・가전 53개를 배송해요!", boxes:["toy","cloth","plant","it"],    targetCount:53,targetTime:70,boss:false},
+  {title:"버섯마을 약초상",          desc:"책・식물・주방용품・욕실용품 55개를 배송해요!", boxes:["book","plant","kitchen","bath"], targetCount:55,targetTime:70,boss:false},
+  {title:"숲의 수호자 — 숲속마을 축제", desc:"장난감・간식・옷・책 58개를 배송해요! (보스)", boxes:["toy","snack","cloth","book"], targetCount:58,targetTime:70,boss:true},
+
+  {title:"눈사람공방 하양이",        desc:"장난감・간식・옷・책・쓰레기 65개를 배송해요!", boxes:["toy","snack","cloth","book","trash"], targetCount:65,targetTime:75,boss:false},
+  {title:"온천여관 유키",            desc:"욕실용품・주방용품・옷・간식・식물 68개를 배송해요!", boxes:["bath","kitchen","cloth","snack","plant"], targetCount:68,targetTime:75,boss:false},
+  {title:"스케이트샵 은비",          desc:"장난감・가전・문구용품・옷・쓰레기 72개를 배송해요!", boxes:["toy","it","school","cloth","trash"], targetCount:72,targetTime:75,boss:false},
+  {title:"크리스마스마켓 코코넛",     desc:"간식・식물・책・가전・주방용품 75개를 배송해요!", boxes:["snack","plant","book","it","kitchen"], targetCount:75,targetTime:75,boss:false},
+  {title:"대표 미미 — 눈꽃마을 그랜드 오픈", desc:"전 카테고리 90개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:90,targetTime:85,boss:true},
+];
 
 function villageOfStage(g){ return Math.ceil(g/STAGES_PER_VILLAGE); }
 function stageCardImg(g){
@@ -1486,6 +1547,7 @@ function renderWorldMap(){
     const btn=document.getElementById("wmVillage"+v.id);
     if(!btn)return;
     btn.classList.toggle("locked",status==="locked");
+    btn.classList.toggle("in-progress",status==="in_progress");
     const statusImg=btn.querySelector(".wm-village-status");
     if(statusImg){
       statusImg.src = status==="complete" ? "village_town_complete.png"
@@ -1558,6 +1620,11 @@ function renderStageSelect(villageId){
     badge.style.transform="none";
     btn.appendChild(badge);
 
+    const selectOverlay=document.createElement("img");
+    selectOverlay.className="ss-card-select-overlay";
+    selectOverlay.src="stage_card_select.png";
+    btn.appendChild(selectOverlay);
+
     if(status==="locked"){
       /* 잠금 반투명 오버레이는 배지보다 나중(=위)에 그려서 캐릭터 아트뿐
          아니라 LOCKED 배지까지 같이 톤다운되게 함 */
@@ -1583,7 +1650,7 @@ function selectStageCard(g){
   getEl("ssPanelDesc").textContent=info.desc;
   const iconWrap=getEl("ssPanelIcons");
   iconWrap.innerHTML="";
-  info.icons.forEach(k=>{
+  info.boxes.forEach(k=>{
     const im=document.createElement("img");
     im.src=`cat_icon_${k}.png`;
     iconWrap.appendChild(im);
@@ -1599,6 +1666,28 @@ const SV_PHASES=[
   {until:160, spawnBase:850, trickyRatio:0.36,travelMs:3900},
   {until:Infinity,spawnBase:720,trickyRatio:0.40,travelMs:3600},
 ];
+
+/* ══ 스토리 모드 난이도 곡선 (cat_delivery_stage_balance_v1.md 2번 섹션) ══
+   서바이벌의 SV_PHASES(경과시간 기준 구간)와 달리, 스토리는 "스테이지 번호"
+   기준으로 챕터 내에서 시작값→끝값을 선형보간한다. */
+const STORY_CHAPTER_DIFFICULTY=[
+  {spawnBase:[1700,1550], trickyRatio:[0.00,0.08], travelMs:[6000,5600]}, // 1챕터: 골목마을
+  {spawnBase:[1500,1300], trickyRatio:[0.10,0.18], travelMs:[5400,5000]}, // 2챕터: 해안마을
+  {spawnBase:[1250,1050], trickyRatio:[0.20,0.28], travelMs:[4800,4400]}, // 3챕터: 숲속마을
+  {spawnBase:[1000,820],  trickyRatio:[0.28,0.36], travelMs:[4200,3800]}, // 4챕터: 눈꽃마을
+];
+function getStoryPhase(stageNum){
+  const chapterIdx=Math.floor((stageNum-1)/STAGES_PER_VILLAGE); // 0~3
+  const withinIdx=(stageNum-1)%STAGES_PER_VILLAGE;              // 0~4
+  const t=withinIdx/(STAGES_PER_VILLAGE-1);                     // 0~1
+  const d=STORY_CHAPTER_DIFFICULTY[chapterIdx];
+  const lerp=(a,b)=>a+(b-a)*t;
+  return{
+    spawnBase:lerp(d.spawnBase[0],d.spawnBase[1]),
+    trickyRatio:lerp(d.trickyRatio[0],d.trickyRatio[1]),
+    travelMs:lerp(d.travelMs[0],d.travelMs[1]),
+  };
+}
 
 const SAVE_KEY="catDelivery.v3";
 
@@ -2066,8 +2155,11 @@ function initBoxSlots(){
   SV.waveIndex=0;
   SV.nextWaveAt=getWaveInterval();
   document.getElementById("boxHandLayer").innerHTML="";
-  document.querySelectorAll(".sort-btn").forEach(btn=>{
+  document.querySelectorAll(".sort-btn").forEach((btn,i)=>{
     btn.classList.remove("swapping-lock");
+    /* 스토리 모드(박스 2~4개, 중앙 재배치)에서 넘어온 잔여 스타일 복구 */
+    btn.style.left=BOX_SLOT_POSITIONS[i]+"px";
+    btn.style.display="";
     const img=btn.querySelector("img");
     if(img){
       img.getAnimations().forEach(a=>a.cancel()); /* 이전 라운드의 Web Animations 잔여분 정리 */
@@ -2084,6 +2176,35 @@ function renderBoxSlot(slotIdx){
   btn.dataset.type=cat;
   const img=btn.querySelector("img");
   if(img){img.src=def.boxImg;img.alt=def.label;}
+}
+
+/* ══ 스토리 모드 박스 슬롯 (2~5개, 화면 중앙 기준 재배치) ══
+   기존 5슬롯 간격(254px)을 유지한 채 박스 개수에 맞춰 중앙(x=812) 대칭 배치. */
+const SLOT_SPACING=254, SLOT_CENTER_X=812;
+function centeredSlotPositions(n){
+  const start=SLOT_CENTER_X-((n-1)*SLOT_SPACING)/2;
+  return Array.from({length:n},(_,i)=>Math.round(start+i*SLOT_SPACING));
+}
+function initStoryBoxSlots(boxes){
+  SV.boxSlots=boxes.map(cat=>({cat,everSwapped:false,swapping:false}));
+  SV.swapQueue=[];
+  SV.slotPositions=centeredSlotPositions(boxes.length);
+  document.getElementById("boxHandLayer").innerHTML="";
+  document.querySelectorAll(".sort-btn").forEach((btn,i)=>{
+    btn.classList.remove("swapping-lock");
+    const img=btn.querySelector("img");
+    if(img){
+      img.getAnimations().forEach(a=>a.cancel());
+      img.style.transform="";
+    }
+    if(i<boxes.length){
+      btn.style.display="";
+      btn.style.left=SV.slotPositions[i]+"px";
+    }else{
+      btn.style.display="none";
+    }
+  });
+  boxes.forEach((cat,i)=>renderBoxSlot(i));
 }
 /* 이번 웨이브에서 바꿀 "물리적 슬롯"을 고른다. 우선순위: 한번도 교체
    안된 슬롯 먼저(같은 우선순위 내에서는 랜덤 순서). */
@@ -2186,7 +2307,7 @@ function runBoxSwap(slotIdx,newCat,handImg,phase){
   const btn=document.querySelectorAll(".sort-btn")[slotIdx];
   if(btn)btn.classList.add("swapping-lock"); /* 클릭만 막음, 아직 안 가림 */
   const boxImg=btn?btn.querySelector("img"):null;
-  const x=BOX_SLOT_POSITIONS[slotIdx];
+  const x=(SV&&SV.slotPositions?SV.slotPositions:BOX_SLOT_POSITIONS)[slotIdx];
   const layer=document.getElementById("boxHandLayer");
   const rise=HAND_RISE_MS,gap=HAND_GAP_MS;
 
@@ -2246,7 +2367,7 @@ function startRush(){
   SV._rushSpawnsLeft=count;
   /* 간격을 고정값이 아니라 "현재 아이템 이동 속도"에 맞춰 계산해서 겹치지
      않게 함: 아이템 폭(192px) + 여유(40px)만큼 벨트 위에서 떨어지도록. */
-  const phase=getSvPhase(SV.elapsed);
+  const phase=getCurrentPhase();
   const speed=ITEM_TRAVEL_PX/phase.travelMs; /* px per ms */
   SV._rushGap=(192+40)/speed;
   SV._rushLastSpawn=SV.elapsedMs-SV._rushGap; /* 다음 틱에 바로 첫 스폰 */
@@ -2262,7 +2383,188 @@ function checkRushGroupDone(group,node){
       SV.score+=40;
       popFeedback("⚡ 러시 클리어! +40","ok",node);
     }
+    /* 보스 스테이지5/20 "더블 러시": 첫 러시 그룹이 끝나자마자 간격 없이 두번째 러시 발동 */
+    if(SV.mode==="story" && SV._storyDoubleRushPending){
+      SV._storyDoubleRushPending=false;
+      startRush();
+    }
   }
+}
+
+/* ══ 스토리 모드 전용 ══ */
+
+/* 현재 라운드(서바이벌/스토리)에 맞는 난이도 phase를 반환하는 단일 진입점.
+   svLoop/startRush 등 phase를 소비하는 기존 코드는 이 함수 하나만 보고 동작하므로
+   서바이벌 쪽 로직은 전혀 안 건드려도 됨. */
+function getCurrentPhase(){
+  if(!SV||SV.mode!=="story") return getSvPhase(SV?SV.elapsed:0);
+  /* svLoop가 phase!==SV.lastPhase로 "구간이 바뀌었는지"를 판단하므로,
+     boosted 상태가 안 바뀌는 한 같은 객체 참조를 계속 돌려줘야 함
+     (매번 새 객체를 주면 매 프레임 풀/셔플백을 재생성하는 낭비가 생김). */
+  const boosted=!!(SV._storyBoostUntilMs && SV.elapsedMs<SV._storyBoostUntilMs);
+  if(!SV._storyPhaseCache||SV._storyPhaseCache._boosted!==boosted){
+    const base=getStoryPhase(SV.stageNum);
+    SV._storyPhaseCache=boosted?{...base,travelMs:base.travelMs/2,_boosted:true}:{...base,_boosted:false};
+  }
+  return SV._storyPhaseCache;
+}
+
+/* 스테이지 시작 시 "몇 초 시점에 무슨 이벤트"를 미리 계산해두는 스케줄표.
+   일반 스테이지는 문서 2번 섹션(챕터별 박스교체/러시 횟수), 보스 스테이지는
+   4번 섹션 기믹을 그대로 반영. 애니메이션 자체는 기존 startRush()/박스교체
+   큐/startBoxSwapBatch를 그대로 재사용하고, 여기서는 "언제"만 정한다. */
+function buildStoryEventPlan(stageNum,info){
+  const chapterIdx=Math.floor((stageNum-1)/STAGES_PER_VILLAGE); // 0~3
+  const withinIdx=(stageNum-1)%STAGES_PER_VILLAGE;              // 0~4 (4=그 챕터의 보스)
+  const T=info.targetTime;
+  const events=[];
+  const spread=(count)=>{ /* count개 이벤트를 목표시간 안에 균등 배치 */
+    const list=[];
+    for(let i=0;i<count;i++) list.push(T*(i+1)/(count+1));
+    return list;
+  };
+  if(info.boss){
+    if(stageNum===5){
+      events.push({atSec:T*0.35,type:"doublerush"});
+    }else if(stageNum===10){
+      events.push({atSec:T*0.5,type:"boxbatch",count:3});
+    }else if(stageNum===15){
+      events.push({atSec:T*0.4,type:"speedboost",ms:10000});
+    }else if(stageNum===20){
+      events.push({atSec:T*0.2,type:"doublerush"});
+      events.push({atSec:T*0.5,type:"boxbatch",count:5});
+      events.push({atSec:T*0.75,type:"speedboost",ms:10000});
+    }
+  }else{
+    let swapCount=0, rushCount=0;
+    if(chapterIdx===1){                    /* 해안마을: 스테이지7부터 1회 */
+      swapCount = withinIdx>=1 ? 1 : 0;
+    }else if(chapterIdx===2){              /* 숲속마을: 박스교체 2회, 스테이지13부터 러시 1회 */
+      swapCount=2;
+      rushCount = withinIdx>=2 ? 1 : 0;
+    }else if(chapterIdx===3){              /* 눈꽃마을: 2~3회 / 1~2회, 매 플레이 랜덤 */
+      swapCount = 2+Math.floor(Math.random()*2);
+      rushCount = 1+Math.floor(Math.random()*2);
+    }
+    spread(swapCount).forEach(atSec=>events.push({atSec,type:"swap"}));
+    spread(rushCount).forEach(atSec=>events.push({atSec,type:"rush"}));
+  }
+  events.sort((a,b)=>a.atSec-b.atSec);
+  return events;
+}
+function fireDueStoryEvents(){
+  if(!SV._storyEvents||!SV._storyEvents.length)return;
+  while(SV._storyEvents.length && SV.elapsed>=SV._storyEvents[0].atSec){
+    fireStoryEvent(SV._storyEvents.shift());
+  }
+}
+function fireStoryEvent(ev){
+  if(!SV||SV.ended)return;
+  if(ev.type==="swap"){
+    pickSlotsToSwap(1).forEach(idx=>{ if(!SV.swapQueue.includes(idx)) SV.swapQueue.push(idx); });
+  }else if(ev.type==="rush"){
+    startRush();
+  }else if(ev.type==="doublerush"){
+    SV._storyDoubleRushPending=true;
+    startRush();
+  }else if(ev.type==="boxbatch"){
+    const n=Math.min(ev.count,SV.boxSlots.length);
+    const idxs=SV.boxSlots.map((_,i)=>i).sort(()=>Math.random()-0.5).slice(0,n);
+    startBoxSwapBatch(idxs);
+  }else if(ev.type==="speedboost"){
+    SV._storyBoostUntilMs=SV.elapsedMs+ev.ms;
+    showToast("📦 택배 폭주 타임!");
+  }
+}
+
+function updateStoryHUDProgress(){
+  const el=getEl("hudStoryProgress");
+  if(!el)return;
+  if(!SV||SV.mode!=="story"){ el.style.display="none"; return; }
+  el.style.display="";
+  el.textContent=`${SV.sortedCount} / ${SV.targetCount}`;
+}
+
+function startStoryStage(stageNum){
+  const info=STAGE_INFO[stageNum-1];
+  if(!info)return;
+  const ch=getChar();
+  const extraH=ch.key==="extraHeart"?ch.val:0;
+  const maxH=3+extraH;
+  SV={mode:"story",stageNum,targetCount:info.targetCount,targetTime:info.targetTime,
+      sortedCount:0,boss:!!info.boss,
+      ch,score:0,combo:0,maxCombo:0,hearts:maxH,maxH,
+      elapsed:0,elapsedMs:0,
+      paused:false,ended:false,
+      items:[],itemId:0,lastSpawn:0,lastTick:performance.now(),
+      lastPhase:null,_pool:null,_spawnBag:null,
+      nextSpawnMs:1200,
+      newCatsIntroduced:new Set(NEW_CATS), /* 스토리는 신규 카테고리 단계적 소개 없이 전체 카테고리 풀에서 즉시 교체 */
+      _storyEvents:buildStoryEventPlan(stageNum,info),
+      _storyDoubleRushPending:false,_storyBoostUntilMs:0,
+      boxSlots:null,swapQueue:[],
+      sB:ch.key==="scoreBoost"?ch.val:1,
+      cB:ch.key==="comboScore"?ch.val:1};
+  document.getElementById("beltItems").innerHTML="";
+  clearDangerEffect();
+  initStoryBoxSlots(info.boxes);
+  initHearts(maxH);
+  const charEl=document.getElementById("gameCharacter");
+  if(charEl){
+    charEl.innerHTML=ch.img?'<img src="'+ch.img+'" alt="'+ch.name+'">':ch.emoji;
+    charEl.style.left="100px";charEl.className="game-character idle";
+  }
+  G=SV;updateSvHUD();updateStoryHUDProgress();showScreen("game");
+  _svLoopRunning=false;
+  requestAnimationFrame(()=>{
+    SV.lastTick=performance.now();
+    requestAnimationFrame(svLoop);
+  });
+  startBlinking();
+}
+
+function endStoryStage(cleared){
+  if(!SV||SV.ended)return;
+  SV.ended=true;SV.paused=true;
+  clearDangerEffect();
+  const timeBonus = cleared && SV.elapsed<=SV.targetTime;
+  if(timeBonus) SV.score=Math.floor(SV.score*1.3);
+  let newlyUnlocked=[];
+  if(cleared){
+    save.storyCleared=Math.max(save.storyCleared||0,SV.stageNum);
+    if(SV.boss){
+      newlyUnlocked=CHARS.filter(c=>c.unlock<=save.storyCleared && !save.unlocked.includes(c.id));
+      newlyUnlocked.forEach(c=>save.unlocked.push(c.id));
+    }
+    persist();
+  }
+  getEl("stEndEmoji").textContent = cleared ? "😻" : "😿";
+  getEl("stEndTitle").textContent = cleared ? "스테이지 클리어!" : "아쉬워요...";
+  getEl("stEndScore").textContent = Math.floor(SV.score).toLocaleString();
+  getEl("stEndProgress").textContent = `${SV.sortedCount} / ${SV.targetCount}`;
+  getEl("stEndCombo").textContent = "×"+SV.maxCombo;
+  getEl("stEndBonus").textContent = timeBonus ? "⏱ 시간 보너스 +30%" : "";
+  getEl("stEndUnlock").textContent = newlyUnlocked.length ? "🎉 새 캐릭터 해금: "+newlyUnlocked.map(c=>c.name).join(", ") : "";
+  const nextBtn=getEl("stEndNextBtn");
+  if(nextBtn) nextBtn.style.display = (cleared && SV.stageNum<TOTAL_STAGES) ? "" : "none";
+  showModal("story-end");
+}
+
+function restartStoryStage(){
+  const stageNum=SV?SV.stageNum:selectedStageIdx;
+  SV=null;G=null;
+  document.getElementById("beltItems").innerHTML="";
+  hideAllModals();
+  startStoryStage(stageNum);
+}
+function quitStoryStage(){
+  const vid=SV?villageOfStage(SV.stageNum):currentVillageId;
+  SV=null;G=null;
+  stopBlinking();
+  document.getElementById("beltItems").innerHTML="";
+  clearDangerEffect();hideAllModals();
+  currentVillageId=vid;
+  showScreen("stageselect");
 }
 
 function startSurvival(){
@@ -2290,7 +2592,7 @@ function startSurvival(){
     charEl.innerHTML=ch.img?'<img src="'+ch.img+'" alt="'+ch.name+'">':ch.emoji;
     charEl.style.left="100px";charEl.className="game-character idle";
   }
-  G=SV;updateSvHUD();showScreen("game");
+  G=SV;updateSvHUD();updateStoryHUDProgress();showScreen("game");
   /* showScreen 후 다음 프레임에 시작 → screen display:flex 적용 보장 */
   _svLoopRunning=false;
   requestAnimationFrame(()=>{
@@ -2307,13 +2609,15 @@ function svLoop(now){
   _svLoopRunning = true;
   const dt=Math.min(100,now-SV.lastTick);
   SV.lastTick=now;SV.elapsedMs+=dt;SV.elapsed=SV.elapsedMs/1000;
-  const phase=getSvPhase(SV.elapsed);
+  const phase=getCurrentPhase();
   updateBeltLinkScroll(dt,phase);
   if(phase!==SV.lastPhase){
     SV.lastPhase=phase;
     SV._pool=buildSvPool(phase);
     SV._spawnBag=null;
-    updateSvButtons();
+    /* 스토리 모드는 박스 개수가 2~5개로 가변이라(중앙 재배치+일부 숨김),
+       전 슬롯을 강제로 다시 보이게 하는 updateSvButtons는 서바이벌 전용으로 남김 */
+    if(SV.mode!=="story") updateSvButtons();
   }
   if(SV._rushActive){
     if(SV.elapsedMs-SV._rushLastSpawn>=SV._rushGap){
@@ -2332,13 +2636,17 @@ function svLoop(now){
       const jitter=phase.spawnBase*0.2;
       SV.nextSpawnMs=Math.max(500,phase.spawnBase+(Math.random()*2-1)*jitter);
     }
-    if(SV.elapsed>=15&&SV.elapsedMs-SV.lastRush>=SV.nextRushMs){
+    /* 서바이벌 전용 자동 러시(15초부터 20~30초 랜덤 간격) — 스토리 모드는
+       buildStoryEventPlan으로 미리 짜둔 이벤트 큐로만 러시를 켬 */
+    if(SV.mode!=="story" && SV.elapsed>=15 && SV.elapsedMs-SV.lastRush>=SV.nextRushMs){
       SV.lastRush=SV.elapsedMs;
       SV.nextRushMs=scheduleNextRush();
       startRush();
     }
   }
-  if(SV.elapsedMs>=SV.nextWaveAt){
+  if(SV.mode==="story"){
+    fireDueStoryEvents();
+  }else if(SV.elapsedMs>=SV.nextWaveAt){
     triggerBoxWave();
   }
   processBoxSwapQueue();
@@ -2405,7 +2713,7 @@ function svMissItem(it){
     if(it.rushGroup){it.rushGroup.failed=true;it.rushGroup.settled++;checkRushGroupDone(it.rushGroup,null);}
     if(SV.hearts<=0){
       if(it.node.parentNode)it.node.parentNode.removeChild(it.node);
-      endSurvival();
+      SV.mode==="story"?endStoryStage(false):endSurvival();
       return;
     }
   }else if(it.rushGroup){
@@ -2451,6 +2759,11 @@ function onSortSurvival(type){
     if(btn) flyToBox(target.node, btn);
     else if(target.node.parentNode) target.node.parentNode.removeChild(target.node);
     if(btn){btn.classList.add("ok");setTimeout(()=>btn.classList.remove("ok"),400);}
+    if(SV.mode==="story"){
+      SV.sortedCount++;
+      updateStoryHUDProgress();
+      if(SV.sortedCount>=SV.targetCount){ updateSvHUD(); endStoryStage(true); return; }
+    }
   }else{
     SV.combo=0;SV.hearts--;
     charReact("wrong-react");target.node.classList.add("wrong");
@@ -2458,7 +2771,7 @@ function onSortSurvival(type){
     popFeedback(target.itemDef?.tricky?(target.itemDef.confuses||"-오답!"):"-오답!","bad",target.node);
     if(target.rushGroup){target.rushGroup.failed=true;target.rushGroup.settled++;checkRushGroupDone(target.rushGroup,null);}
     updateDangerEffect();
-    if(SV.hearts<=0)endSurvival();
+    if(SV.hearts<=0){ updateSvHUD(); SV.mode==="story"?endStoryStage(false):endSurvival(); return; }
   }
   updateSvHUD();
 }
@@ -2561,7 +2874,15 @@ function handleAction(a, el){
       if(getStageStatus(g)==="locked"){showToast("이전 스테이지를 먼저 완료해주세요!");return;}
       selectStageCard(g);break;
     }
-    case"start-stage":showToast("스테이지 배송 게임은 준비 중이에요!");break;
+    case"start-stage":startStoryStage(selectedStageIdx);break;
+    case"restart-story-stage":restartStoryStage();break;
+    case"quit-story-stage":quitStoryStage();break;
+    case"next-story-stage":{
+      const n=(SV?SV.stageNum:selectedStageIdx)+1;
+      hideAllModals();
+      if(n<=TOTAL_STAGES) startStoryStage(n); else showScreen("stageselect");
+      break;
+    }
     case"confirm-character":{
       const selCh=CHARS[previewCharIdx];
       if(!selCh||!save.unlocked.includes(selCh.id)){showToast("먼저 해금이 필요해요!");break;}
@@ -2570,9 +2891,9 @@ function handleAction(a, el){
     case"start-survival":startSurvival();break;
     case"pause-game":    pauseGame();break;
     case"resume-game":   resumeGame();break;
-    case"restart-game":
+    case"restart-game":  G&&G.mode==="story"?restartStoryStage():restartSurvival();break;
     case"restart-survival":restartSurvival();break;
-    case"quit-game":
+    case"quit-game":     G&&G.mode==="story"?quitStoryStage():quitSurvival();break;
     case"quit-survival": quitSurvival();break;
   }
 }

@@ -1858,11 +1858,14 @@ const STORY_CHAPTER_BG=[
   "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.png",
 ];
 const SURVIVAL_BG_URL="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png";
+/* travelMs(벨트 속도)는 아이템 개수/난이도가 이미 챕터별로 올라가는 상황에서
+   속도까지 같이 올라가면 너무 가팔라진다는 피드백으로 전 챕터 동일하게 고정.
+   spawnBase(스폰 간격)/trickyRatio(트리키 비율)만 챕터가 오를수록 계속 상승. */
 const STORY_CHAPTER_DIFFICULTY=[
-  {spawnBase:[1500,1400], trickyRatio:[0.00,0.08], travelMs:[6000,5600]}, // 1챕터: 골목마을
-  {spawnBase:[1500,1300], trickyRatio:[0.10,0.18], travelMs:[5400,5000]}, // 2챕터: 해변마을
-  {spawnBase:[1250,1050], trickyRatio:[0.20,0.28], travelMs:[4800,4400]}, // 3챕터: 숲속마을
-  {spawnBase:[1000,820],  trickyRatio:[0.28,0.36], travelMs:[4200,3800]}, // 4챕터: 눈꽃마을
+  {spawnBase:[1500,1400], trickyRatio:[0.00,0.08], travelMs:[6000,6000]}, // 1챕터: 골목마을
+  {spawnBase:[1500,1300], trickyRatio:[0.10,0.18], travelMs:[6000,6000]}, // 2챕터: 해변마을
+  {spawnBase:[1250,1050], trickyRatio:[0.20,0.28], travelMs:[6000,6000]}, // 3챕터: 숲속마을
+  {spawnBase:[1000,820],  trickyRatio:[0.28,0.36], travelMs:[6000,6000]}, // 4챕터: 눈꽃마을
 ];
 function getStoryPhase(stageNum){
   const chapterIdx=Math.floor((stageNum-1)/STAGES_PER_VILLAGE); // 0~3
@@ -1877,7 +1880,7 @@ function getStoryPhase(stageNum){
   };
 }
 
-const SAVE_KEY="catDelivery.v4"; /* v3→v4: 스테이지 진행도 전체 리셋(1스테이지부터 재시작) */
+const SAVE_KEY="catDelivery.v5"; /* v4→v5: 스테이지 진행도 전체 리셋(1스테이지부터 재시작) */
 
 /* ══ 벨트 흐름 모션 ══
    ingame_conveyor_link.png(줄무늬 오버레이)를 아이템이 벨트 위를

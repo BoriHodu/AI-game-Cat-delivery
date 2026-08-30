@@ -45,6 +45,7 @@ html,body{
   width:var(--W);height:var(--H);
   background:var(--cream);overflow:hidden;
   transform-origin:top left;
+  will-change:transform;backface-visibility:hidden;
 }
 
 .paper-bg{
@@ -816,7 +817,7 @@ html,body{
   display:block;
 }
 @keyframes touchToStartBlink{0%,100%{opacity:1;}50%{opacity:0;}}
-.touch-to-start-blink{animation:touchToStartBlink 1s ease-in-out infinite;}
+.touch-to-start-blink{animation:touchToStartBlink 2s ease-in-out infinite;}
 
 
 
@@ -826,6 +827,7 @@ html,body{
   position:absolute;
   left:0;top:0;width:100%;height:100%;
   object-fit:fill;z-index:0;pointer-events:none;
+  transform:translateZ(0);backface-visibility:hidden;
 }
 .ingame-belt{
   position:absolute;
@@ -2556,8 +2558,6 @@ function runBoxSwap(slotIdx,newCat,handImg,phase){
         slot.cat=newCat;slot.everSwapped=true;
         renderBoxSlot(slotIdx); /* 같은 img 엘리먼트의 src만 바뀜(현재 translateY(260px)로 숨은 상태 유지) */
 
-        refreshSpawnPool(getCurrentPhase()); /* 스폰 풀이 바뀌었으니 셔플백도 다시 섞기(모드 무관 공용) */
-
         const hand2=createHandEl(layer,x,handImg);
         slideEl(hand2,HAND_HIDE_Y,HAND_SHOW_Y,rise,EASE_IN,"translateX(-50%) ");
         /* 손과 새 박스가 "함께" 아래에서 올라와 자리에 놓임 */
@@ -2570,6 +2570,7 @@ function runBoxSwap(slotIdx,newCat,handImg,phase){
             hand2.remove();
             if(btn)btn.classList.remove("swapping-lock");
             slot.swapping=false;
+            refreshSpawnPool(getCurrentPhase()); /* 애니메이션이 완전히 끝나 swapping이 풀린 뒤에야 새 카테고리가 스폰 풀에 포함됨 */
           },rise);
         },rise);
       },gap);

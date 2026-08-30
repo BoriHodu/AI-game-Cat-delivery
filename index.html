@@ -2680,7 +2680,9 @@ function fireStoryEvent(ev){
     SV._storyDoubleRushPending=true;
     startRush();
   }else if(ev.type==="boxbatch"){
-    const n=Math.min(ev.count,SV.boxSlots.length);
+    /* 아무리 기획상 count가 커도, 한 번에 그 스테이지 박스 전체가 바뀌어버리면
+       플레이어가 따라잡기 힘드므로 최대 (배정된 박스 개수-1)개로 제한 */
+    const n=Math.min(ev.count,SV.boxSlots.length-1);
     const idxs=SV.boxSlots.map((_,i)=>i).sort(()=>Math.random()-0.5).slice(0,n);
     startBoxSwapBatch(idxs);
   }else if(ev.type==="speedboost"){
@@ -2888,12 +2890,16 @@ function drawFromSpawnBag(){
     SV._spawnBag=[...SV._pool].sort(()=>Math.random()-0.5);
   }
   let itemDef=SV._spawnBag.pop();
-  /* 백 경계에서 직전과 같은 아이템이 연속으로 나오는 것만 추가로 방지 */
-  if(itemDef&&itemDef.label===SV._lastItemLabel&&SV._spawnBag.length>0){
-    const swapIdx=Math.floor(Math.random()*SV._spawnBag.length);
-    const alt=SV._spawnBag[swapIdx];
-    SV._spawnBag[swapIdx]=itemDef;
-    itemDef=alt;
+  /* 백 경계에서 직전과 같은 카테고리가 연속으로 나오는 것을 방지.
+     같은 타입이면 백에서 다른 타입인 첫 아이템과 자리를 바꿔치기한다
+     (남은 아이템이 전부 같은 타입이면 어쩔 수 없이 그대로 둠). */
+  if(itemDef&&itemDef.type===SV._lastItemType&&SV._spawnBag.length>0){
+    const diffIdx=SV._spawnBag.findIndex(d=>d.type!==itemDef.type);
+    if(diffIdx>=0){
+      const alt=SV._spawnBag[diffIdx];
+      SV._spawnBag[diffIdx]=itemDef;
+      itemDef=alt;
+    }
   }
   return itemDef;
 }
@@ -2901,7 +2907,7 @@ function svSpawnItem(phase,opts){
   if(!SV._pool||SV._pool.length===0)refreshSpawnPool(phase);
   const itemDef=drawFromSpawnBag();
   if(!itemDef)return;
-  SV._lastItemLabel=itemDef.label;
+  SV._lastItemType=itemDef.type;
   const cat=CATEGORIES[itemDef.type];
   const id=++SV.itemId;
   const node=document.createElement("div");

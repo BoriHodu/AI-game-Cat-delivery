@@ -1710,11 +1710,11 @@ const STAGE_INFO=[
   {title:"주방용품 밀리",      desc:"주방용품・간식・욕실용품・쓰레기 55개를 배송해요!", boxes:["kitchen","snack","bath","trash"], targetCount:55,targetTime:70,boss:false},
   {title:"도서관장 하니 — 숲속마을 도서관 정리", desc:"책・문구용품・가전・식물 58개를 배송해요! (보스)", boxes:["book","school","it","plant"], targetCount:58,targetTime:70,boss:true},
 
-  {title:"털모자가게 포포",    desc:"옷・장난감・간식・책・쓰레기 65개를 배송해요!", boxes:["cloth","toy","snack","book","trash"], targetCount:65,targetTime:75,boss:false},
-  {title:"야외온천 로이",      desc:"욕실용품・옷・주방용품・식물・간식 68개를 배송해요!", boxes:["bath","cloth","kitchen","plant","snack"], targetCount:68,targetTime:75,boss:false},
-  {title:"스케이터 루나",      desc:"옷・장난감・욕실용품・간식・쓰레기 72개를 배송해요!", boxes:["cloth","toy","bath","snack","trash"], targetCount:72,targetTime:75,boss:false},
-  {title:"기차역장 펠릭스",    desc:"옷・가전・책・문구용품・쓰레기 75개를 배송해요!", boxes:["cloth","it","book","school","trash"], targetCount:75,targetTime:75,boss:false},
-  {title:"시장님 레오 — 눈꽃마을 그랜드 오픈", desc:"전 카테고리 90개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:90,targetTime:85,boss:true},
+  {title:"털모자가게 포포",    desc:"옷・장난감・간식・책・쓰레기 75개를 배송해요!", boxes:["cloth","toy","snack","book","trash"], targetCount:75,targetTime:75,boss:false},
+  {title:"야외온천 로이",      desc:"욕실용품・옷・주방용품・식물・간식 78개를 배송해요!", boxes:["bath","cloth","kitchen","plant","snack"], targetCount:78,targetTime:75,boss:false},
+  {title:"스케이터 루나",      desc:"옷・장난감・욕실용품・간식・쓰레기 83개를 배송해요!", boxes:["cloth","toy","bath","snack","trash"], targetCount:83,targetTime:75,boss:false},
+  {title:"기차역장 펠릭스",    desc:"옷・가전・책・문구용품・쓰레기 86개를 배송해요!", boxes:["cloth","it","book","school","trash"], targetCount:86,targetTime:75,boss:false},
+  {title:"시장님 레오 — 눈꽃마을 그랜드 오픈", desc:"전 카테고리 104개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:104,targetTime:85,boss:true},
 ];
 
 function villageOfStage(g){ return Math.ceil(g/STAGES_PER_VILLAGE); }
@@ -2611,18 +2611,21 @@ function scheduleNextRush(){
   return 20000+Math.random()*10000;
 }
 
-function startRush(){
+function startRush(count){
   if(!SV||SV.paused||SV.ended)return;
-  const count=3+Math.floor(Math.random()*3); /* 3~5개 */
+  if(SV._rushActive)return; /* 이미 진행 중인 러시가 있으면 새로 겹쳐 시작하지 않음(안전장치) */
+  const n=count||(3+Math.floor(Math.random()*3)); /* count 미지정(서바이벌 등)이면 기존처럼 3~5개 랜덤 */
   SV._rushActive=true;
-  SV._rushSpawnsLeft=count;
+  SV._rushSpawnsLeft=n;
   /* 간격을 고정값이 아니라 "현재 아이템 이동 속도"에 맞춰 계산해서 겹치지
      않게 함: 아이템 폭(192px) + 여유(40px)만큼 벨트 위에서 떨어지도록. */
   const phase=getCurrentPhase();
   const speed=ITEM_TRAVEL_PX/phase.travelMs; /* px per ms */
   SV._rushGap=(192+40)/speed;
-  SV._rushLastSpawn=SV.elapsedMs-SV._rushGap; /* 다음 틱에 바로 첫 스폰 */
-  SV._rushGroup={total:count,settled:0,failed:false,done:false};
+  /* 직전 스폰(일반 스폰이든 러시든)과의 간격도 동일하게 보장해서, 러시
+     시작 첫 아이템이 바로 직전에 나온 일반 아이템과 겹쳐 보이는 것을 방지 */
+  SV._rushLastSpawn=Math.max(SV.elapsedMs-SV._rushGap, SV.lastSpawn||0);
+  SV._rushGroup={total:n,settled:0,failed:false,done:false};
   showToast("🔥 러시타임! 몰려와요!");
 }
 
@@ -2634,10 +2637,10 @@ function checkRushGroupDone(group,node){
       SV.score+=40;
       popFeedback("⚡ 러시 클리어! +40","ok",node);
     }
-    /* 보스 스테이지5/20 "더블 러시": 첫 러시 그룹이 끝나자마자 간격 없이 두번째 러시 발동 */
+    /* 보스 스테이지5 "더블 러시": 첫 러시 그룹이 끝나자마자 간격 없이 두번째 러시 발동 */
     if(SV.mode==="story" && SV._storyDoubleRushPending){
       SV._storyDoubleRushPending=false;
-      startRush();
+      startRush(SV._storyDoubleRushCount);
     }
   }
 }
@@ -2664,6 +2667,13 @@ function getCurrentPhase(){
    일반 스테이지는 문서 2번 섹션(챕터별 박스교체/러시 횟수), 보스 스테이지는
    4번 섹션 기믹을 그대로 반영. 애니메이션 자체는 기존 startRush()/박스교체
    큐/startBoxSwapBatch를 그대로 재사용하고, 여기서는 "언제"만 정한다. */
+const STORY_RUSH_FREQ_PER_CHAPTER=[1,1,2,2]; /* 챕터별 일반 스테이지 기준 플레이당 러시 발생 횟수 */
+const STORY_RUSH_ITEM_COUNT={ /* 절대 스테이지 번호 -> 러시 1회당 연속 아이템 개수 */
+  3:3, 4:3, 5:4,
+  6:3, 7:3, 8:3, 9:4, 10:4,
+  11:4, 12:4, 13:4, 14:5, 15:5,
+  16:5, 17:5, 18:5, 19:6, 20:7,
+};
 function buildStoryEventPlan(stageNum,info){
   const chapterIdx=Math.floor((stageNum-1)/STAGES_PER_VILLAGE); // 0~3
   const withinIdx=(stageNum-1)%STAGES_PER_VILLAGE;              // 0~4 (4=그 챕터의 보스)
@@ -2674,31 +2684,35 @@ function buildStoryEventPlan(stageNum,info){
     for(let i=0;i<count;i++) list.push(T*(i+1)/(count+1));
     return list;
   };
+  const rushItemCount=STORY_RUSH_ITEM_COUNT[stageNum];
   if(info.boss){
     if(stageNum===5){
-      events.push({atSec:T*0.35,type:"doublerush"});
+      events.push({atSec:T*0.35,type:"doublerush",count:rushItemCount});
     }else if(stageNum===10){
-      events.push({atSec:T*0.5,type:"boxbatch",count:3});
+      events.push({atSec:T*0.3,type:"rush",count:rushItemCount});
+      events.push({atSec:T*0.6,type:"boxbatch",count:2});
     }else if(stageNum===15){
       events.push({atSec:T*0.4,type:"speedboost",ms:10000});
+      events.push({atSec:T*0.65,type:"rush",count:rushItemCount});
     }else if(stageNum===20){
-      events.push({atSec:T*0.2,type:"doublerush"});
-      events.push({atSec:T*0.5,type:"boxbatch",count:5});
+      events.push({atSec:T*0.3,type:"rush",count:rushItemCount});
+      events.push({atSec:T*0.55,type:"boxbatch",count:3});
       events.push({atSec:T*0.75,type:"speedboost",ms:10000});
     }
   }else{
-    let swapCount=0, rushCount=0;
+    let swapCount=0;
     if(chapterIdx===1){                    /* 해변마을: 스테이지7부터 1회 */
       swapCount = withinIdx>=1 ? 1 : 0;
-    }else if(chapterIdx===2){              /* 숲속마을: 박스교체 2회, 스테이지13부터 러시 1회 */
+    }else if(chapterIdx===2){              /* 숲속마을: 박스교체 2회 */
       swapCount=2;
-      rushCount = withinIdx>=2 ? 1 : 0;
-    }else if(chapterIdx===3){              /* 눈꽃마을: 2~3회 / 1~2회, 매 플레이 랜덤 */
+    }else if(chapterIdx===3){              /* 눈꽃마을: 2~3회, 매 플레이 랜덤 */
       swapCount = 2+Math.floor(Math.random()*2);
-      rushCount = 1+Math.floor(Math.random()*2);
     }
     spread(swapCount).forEach(atSec=>events.push({atSec,type:"swap"}));
-    spread(rushCount).forEach(atSec=>events.push({atSec,type:"rush"}));
+    if(rushItemCount){
+      const rushFreq=STORY_RUSH_FREQ_PER_CHAPTER[chapterIdx];
+      spread(rushFreq).forEach(atSec=>events.push({atSec,type:"rush",count:rushItemCount}));
+    }
   }
   events.sort((a,b)=>a.atSec-b.atSec);
   return events;
@@ -2714,10 +2728,11 @@ function fireStoryEvent(ev){
   if(ev.type==="swap"){
     pickSlotsToSwap(1).forEach(idx=>{ if(!SV.swapQueue.includes(idx)) SV.swapQueue.push(idx); });
   }else if(ev.type==="rush"){
-    startRush();
+    startRush(ev.count);
   }else if(ev.type==="doublerush"){
     SV._storyDoubleRushPending=true;
-    startRush();
+    SV._storyDoubleRushCount=ev.count;
+    startRush(ev.count);
   }else if(ev.type==="boxbatch"){
     /* 아무리 기획상 count가 커도, 한 번에 그 스테이지 박스 전체가 바뀌어버리면
        플레이어가 따라잡기 힘드므로 최대 (배정된 박스 개수-1)개로 제한.

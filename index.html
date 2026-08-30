@@ -889,6 +889,28 @@ html,body{
 }
 #guideOverlay1.show{display:block;}
 
+/* 아이템 좌표 확인용 뷰어 (Ctrl+I 토글, 개발용) — 카테고리별 8개씩 정지 상태로
+   실제 벨트 위 렌더링과 동일한 크기/스타일로 보여줘서 좌표/모양을 눈으로 체크 */
+#itemViewerOverlay{
+  position:absolute;inset:0;z-index:20000;
+  display:none;background:rgba(20,14,8,.55);
+  font-family:var(--font);
+}
+#itemViewerOverlay.show{display:block;}
+.iv-toolbar{
+  position:absolute;top:24px;left:50%;transform:translateX(-50%);
+  background:#fff;border:2.5px solid var(--brown,#8B5A2B);border-radius:16px;
+  padding:10px 18px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 6px 0 rgba(0,0,0,.15);
+}
+.iv-toolbar button{
+  font-family:var(--font);font-size:15px;padding:8px 16px;border-radius:12px;
+  border:2px solid #8B5A2B;background:#FFD98A;cursor:pointer;
+}
+.iv-toolbar button:active{transform:translateY(2px);}
+.iv-toolbar .iv-label{font-size:16px;min-width:220px;text-align:center;}
+.iv-toolbar .iv-hint{font-size:11px;color:#888;margin-left:8px;}
+
 /* ══════════ 월드맵 화면 ══════════ */
 #screen-worldmap{background:#BFE3EE;}
 .wm-scroll{
@@ -1009,6 +1031,7 @@ html,body{
 <body>
 <div id="gameRoot">
 <img id="safeAreaOverlay" src="safe_area.png" alt="">
+<div id="itemViewerOverlay"></div>
 <section id="screen-main" class="screen screen-main active" data-action="goto-worldmap">
   <div class="paper-bg"></div>
 
@@ -3660,6 +3683,69 @@ document.addEventListener("visibilitychange",()=>{
     e.preventDefault();
     e.stopPropagation();
   },true);
+})();
+
+/* ══ 아이템 좌표/모양 확인용 뷰어 (Ctrl+I, 개발용) ══
+   카테고리별로 8개씩(1~8, 9~16, 17~24) 실제 벨트와 동일한 크기로 정지 렌더링해서
+   눈으로 좌표/스케일을 확인할 수 있게 함. 플레이 여부와 무관하게 아무 화면에서나 토글. */
+(function setupItemViewer(){
+  const PER_PAGE=8;
+  let open=false, catIdx=0, groupIdx=0;
+  const root=document.getElementById("itemViewerOverlay");
+
+  function totalGroups(cat){
+    const n=ALL_ITEMS.filter(it=>it.type===cat).length;
+    return Math.max(1,Math.ceil(n/PER_PAGE));
+  }
+  function step(dir){
+    const groups=totalGroups(ALL_CATS[catIdx]);
+    groupIdx+=dir;
+    if(groupIdx>=groups){ groupIdx=0; catIdx=(catIdx+1)%ALL_CATS.length; }
+    else if(groupIdx<0){ catIdx=(catIdx-1+ALL_CATS.length)%ALL_CATS.length; groupIdx=totalGroups(ALL_CATS[catIdx])-1; }
+    render();
+  }
+  function render(){
+    const cat=ALL_CATS[catIdx];
+    const items=ALL_ITEMS.filter(it=>it.type===cat).slice(groupIdx*PER_PAGE,groupIdx*PER_PAGE+PER_PAGE);
+    const start=groupIdx*PER_PAGE+1, end=groupIdx*PER_PAGE+items.length;
+    const catLabel=(CATEGORIES[cat]&&CATEGORIES[cat].label)||cat;
+
+    const itemsHtml=items.map((it,i)=>{
+      const centerX=1624*(i+0.5)/PER_PAGE;
+      const left=Math.round(centerX-96);
+      return '<div class="belt-item" style="left:'+left+'px;"><img src="'+it.img+'" alt="'+it.label+'"></div>';
+    }).join("");
+
+    root.innerHTML=
+      '<img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.png" alt="">'
+      +'<div class="game-belt">'
+        +'<img class="ingame-belt" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_conveyor_belt.png" alt="">'
+        +'<div class="belt-items-layer" style="pointer-events:none;">'+itemsHtml+'</div>'
+      +'</div>'
+      +'<div class="iv-toolbar">'
+        +'<button data-iv="prev">◀ 이전</button>'
+        +'<span class="iv-label">'+catLabel+'('+cat+') '+start+'-'+end+'</span>'
+        +'<button data-iv="next">다음 ▶</button>'
+        +'<span class="iv-hint">Ctrl+I로 닫기</span>'
+      +'</div>';
+  }
+  function toggle(){
+    open=!open;
+    root.classList.toggle("show",open);
+    if(open) render();
+  }
+  root.addEventListener("click",e=>{
+    const btn=e.target.closest("[data-iv]");
+    if(!btn)return;
+    if(btn.dataset.iv==="prev")step(-1);
+    else if(btn.dataset.iv==="next")step(1);
+  });
+  window.addEventListener("keydown",e=>{
+    if(e.ctrlKey && e.key.toLowerCase()==="i"){
+      e.preventDefault();
+      toggle();
+    }
+  });
 })();
 
 loadSave();

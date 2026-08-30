@@ -1152,8 +1152,8 @@ html,body{
         <img class="wm-village-bubble" src="village_town_box_01.png" alt="골목마을">
         <img class="wm-village-status" src="village_town_lock.png" alt="">
       </button>
-      <button class="wm-village" id="wmVillage2" data-action="goto-stageselect" data-village="2" data-editable="월드맵-해안마을" style="left:1226px;top:131px;">
-        <img class="wm-village-bubble" src="village_town_box_02.png" alt="해안마을">
+      <button class="wm-village" id="wmVillage2" data-action="goto-stageselect" data-village="2" data-editable="월드맵-해변마을" style="left:1226px;top:131px;">
+        <img class="wm-village-bubble" src="village_town_box_02.png" alt="해변마을">
         <img class="wm-village-status" src="village_town_lock.png" alt="">
       </button>
       <button class="wm-village" id="wmVillage3" data-action="goto-stageselect" data-village="3" data-editable="월드맵-숲속마을" style="left:2314px;top:152px;">
@@ -1454,6 +1454,179 @@ const ALL_ITEMS=[
   {id:"snack_seed_bag",emoji:"🍪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_06.png",label:"과자모양 씨앗봉지",type:"plant",tricky:true,condCategory:"snack",confuses:"간식처럼 보이지만 식물!"},
   {id:"seedling_tray",emoji:"🌿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_07.png",label:"모종식물판",type:"plant",tricky:true,condCategory:"bath",confuses:"욕실용품처럼 보이지만 식물!"},
   {id:"pencase_pot",emoji:"🪴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_08.png",label:"필통모양 화분",type:"plant",tricky:true,condCategory:"school",confuses:"문구용품처럼 보이지만 식물!"},
+
+  /* ══ 아이템 확장(09~24, 카테고리당 16개 신규) — cat_delivery_stage_balance_v1.md 7번 섹션 ══
+     전부 tricky:false(제작 시간 관계상 신규분은 트리키 없음). num은 스토리 모드
+     마을별 노출 스케줄(buildStoryPool)에서 파일명 접미사로 그대로 파싱해서 씀. */
+  {id:"yoyo",emoji:"🪀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_09.png",label:"요요",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"spinning_top",emoji:"🌀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_10.png",label:"팽이",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"robot_toy",emoji:"🤖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_11.png",label:"로봇 장난감",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"dino_plush",emoji:"🦕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_12.png",label:"공룡인형",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"toy_drum",emoji:"🥁",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_13.png",label:"장난감 북",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"toy_train",emoji:"🚂",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_14.png",label:"장난감 기차",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"skateboard",emoji:"🛹",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_15.png",label:"스케이트보드",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"toy_airplane",emoji:"✈️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_16.png",label:"장난감 비행기",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"slinky",emoji:"🌈",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_17.png",label:"스프링 장난감",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"toy_trumpet",emoji:"🎺",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_18.png",label:"장난감 트럼펫",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"bubble_wand",emoji:"🫧",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_19.png",label:"비눗방울",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"rocking_horse",emoji:"🐴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_20.png",label:"흔들목마",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"music_box",emoji:"🎵",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_21.png",label:"오르골",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"stacking_rings",emoji:"🟡",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_22.png",label:"링 쌓기 장난감",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"toy_phone",emoji:"☎️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_23.png",label:"장난감 전화기",type:"toy",tricky:false,condCategory:null,confuses:null},
+  {id:"bowling_set",emoji:"🎳",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_toy_24.png",label:"볼링 세트",type:"toy",tricky:false,condCategory:null,confuses:null},
+
+  {id:"ice_cream_cone",emoji:"🍦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_09.png",label:"아이스크림콘",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"churros",emoji:"🥖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_10.png",label:"추로스",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"lollipop",emoji:"🍭",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_11.png",label:"막대사탕",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"chocolate_bar",emoji:"🍫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_12.png",label:"초콜릿바",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"waffle",emoji:"🧇",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_13.png",label:"와플",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"popcorn",emoji:"🍿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_14.png",label:"팝콘",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"jelly_bag",emoji:"🍬",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_15.png",label:"젤리 봉지",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"cotton_candy",emoji:"🍭",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_16.png",label:"솜사탕",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"shrimp_snack",emoji:"🍤",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_17.png",label:"새우깡",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"potato_chips",emoji:"🥔",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_18.png",label:"감자칩",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"pudding",emoji:"🍮",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_19.png",label:"푸딩",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"choco_pie",emoji:"🥮",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_20.png",label:"초코파이",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"fish_bread",emoji:"🐟",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_21.png",label:"붕어빵",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"cream_puff",emoji:"🥐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_22.png",label:"슈크림빵",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"cupcake",emoji:"🧁",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_23.png",label:"컵케이크",type:"snack",tricky:false,condCategory:null,confuses:null},
+  {id:"cake_slice",emoji:"🍰",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_food_24.png",label:"조각케이크",type:"snack",tricky:false,condCategory:null,confuses:null},
+
+  {id:"belt",emoji:"👖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_09.png",label:"벨트",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"flower_dress",emoji:"👗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_10.png",label:"원피스",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"sunglasses",emoji:"🕶️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_11.png",label:"선글라스",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"overalls",emoji:"🧑‍🌾",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_12.png",label:"멜빵바지",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"mittens",emoji:"🧤",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_13.png",label:"벙어리장갑",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"dot_ribbon",emoji:"🎀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_14.png",label:"물방울무늬 리본",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"necktie",emoji:"👔",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_15.png",label:"넥타이",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"rain_boots",emoji:"👢",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_16.png",label:"장화",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"ear_muffs",emoji:"🎧",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_17.png",label:"귀마개",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"handkerchief",emoji:"🟦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_18.png",label:"손수건",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"raincoat",emoji:"🧥",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_19.png",label:"우비",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"star_pajama",emoji:"🌟",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_20.png",label:"별무늬 잠옷",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"fuzzy_socks",emoji:"🧦",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_21.png",label:"수면양말",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"knit_vest",emoji:"🦺",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_22.png",label:"니트 조끼",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"crossbody_bag",emoji:"👜",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_23.png",label:"크로스백",type:"cloth",tricky:false,condCategory:null,confuses:null},
+  {id:"hair_clip",emoji:"🎀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_cloth_24.png",label:"리본 머리핀",type:"cloth",tricky:false,condCategory:null,confuses:null},
+
+  {id:"map",emoji:"🗺️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_09.png",label:"지도",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"music_score_book",emoji:"🎼",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_10.png",label:"악보책",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"star_storybook",emoji:"📕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_11.png",label:"별무늬 동화책",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"photo_album",emoji:"📔",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_12.png",label:"사진앨범",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"travel_journal",emoji:"🌍",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_13.png",label:"여행 다이어리",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"sticker_book",emoji:"⭐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_14.png",label:"스티커북",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"calendar",emoji:"📅",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_15.png",label:"탁상달력",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"antique_book",emoji:"📖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_16.png",label:"고전 가죽책",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"mint_notebook",emoji:"📗",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_17.png",label:"민트 노트",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"spiral_notebook",emoji:"📓",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_18.png",label:"스프링노트",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"atlas_book",emoji:"🌏",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_19.png",label:"지구본 책",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"boardgame_book",emoji:"🎲",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_20.png",label:"보드게임북",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"letter_bundle",emoji:"✉️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_21.png",label:"편지 묶음",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"spiral_diary",emoji:"📘",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_22.png",label:"스프링 다이어리",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"diploma_scroll",emoji:"📜",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_23.png",label:"졸업장",type:"book",tricky:false,condCategory:null,confuses:null},
+  {id:"clipboard",emoji:"📋",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_book_24.png",label:"클립보드",type:"book",tricky:false,condCategory:null,confuses:null},
+
+  {id:"broken_plate",emoji:"🍽️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_09.png",label:"깨진 접시",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"broken_umbrella",emoji:"☂️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_10.png",label:"부서진 우산",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"torn_milk_carton",emoji:"🥛",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_11.png",label:"찢어진 우유팩",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"empty_detergent",emoji:"🧴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_12.png",label:"빈 세제통",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"worn_shoe",emoji:"👟",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_13.png",label:"낡은 신발",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"used_toothpaste",emoji:"🪥",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_14.png",label:"다 쓴 치약",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"empty_egg_carton",emoji:"🥚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_15.png",label:"빈 계란판",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"worn_broom",emoji:"🧹",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_16.png",label:"낡은 빗자루",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"empty_spray_can",emoji:"🧴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_17.png",label:"다 쓴 스프레이캔",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"broken_cd",emoji:"💿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_18.png",label:"깨진 CD",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"used_paint_can",emoji:"🎨",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_19.png",label:"다 쓴 페인트통",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"torn_slipper",emoji:"🥿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_20.png",label:"구멍난 슬리퍼",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"used_batteries",emoji:"🔋",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_21.png",label:"다 쓴 건전지",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"broken_comb",emoji:"💇",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_22.png",label:"낡은 빗",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"paper_tube",emoji:"🧻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_23.png",label:"휴지심",type:"trash",tricky:false,condCategory:null,confuses:null},
+  {id:"broken_glasses",emoji:"👓",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_trash_24.png",label:"깨진 안경",type:"trash",tricky:false,condCategory:null,confuses:null},
+
+  {id:"laptop",emoji:"💻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_09.png",label:"노트북",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"earbuds",emoji:"🎧",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_10.png",label:"무선이어폰",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"mini_keyboard",emoji:"⌨️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_11.png",label:"미니 키보드",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"digital_scale",emoji:"⚖️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_12.png",label:"전자저울",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"drone",emoji:"🚁",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_13.png",label:"드론",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"game_controller",emoji:"🎮",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_14.png",label:"게임패드",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"calculator",emoji:"🧮",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_15.png",label:"계산기",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"walkie_talkie",emoji:"📻",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_16.png",label:"무전기",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"home_console",emoji:"🎮",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_17.png",label:"게임콘솔",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"vr_headset",emoji:"🥽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_18.png",label:"VR고글",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"smartwatch",emoji:"⌚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_19.png",label:"스마트워치",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"photo_printer",emoji:"🖨️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_20.png",label:"포토프린터",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"handheld_fan",emoji:"🌀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_21.png",label:"휴대용 선풍기",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"computer_mouse",emoji:"🖱️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_22.png",label:"마우스",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"projector",emoji:"📽️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_23.png",label:"프로젝터",type:"it",tricky:false,condCategory:null,confuses:null},
+  {id:"bt_speaker",emoji:"🔊",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_it_24.png",label:"블루투스 스피커",type:"it",tricky:false,condCategory:null,confuses:null},
+
+  {id:"cutting_board",emoji:"🪵",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_09.png",label:"도마",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"measuring_spoons",emoji:"🥄",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_10.png",label:"계량스푼",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"grater",emoji:"🧀",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_11.png",label:"강판",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"whisk",emoji:"🥣",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_12.png",label:"거품기",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"oven_mitt",emoji:"🧤",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_13.png",label:"냄비장갑",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"dish_soap",emoji:"🧴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_14.png",label:"주방세제",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"spatula",emoji:"🍳",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_15.png",label:"뒤집개",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"coffee_pot",emoji:"☕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_16.png",label:"커피포트",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"rolling_pin",emoji:"🥖",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_17.png",label:"밀대",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"rice_bowl",emoji:"🍚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_18.png",label:"밥그릇",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"strainer",emoji:"🥄",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_19.png",label:"체망",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"rice_cooker",emoji:"🍚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_20.png",label:"전기밥솥",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"peeler",emoji:"🥕",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_21.png",label:"감자칼",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"bottle_opener",emoji:"🍾",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_22.png",label:"병따개",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"olive_oil",emoji:"🫒",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_23.png",label:"올리브오일",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+  {id:"clay_pot",emoji:"🍲",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_kitchen_24.png",label:"뚝배기",type:"kitchen",tricky:false,condCategory:null,confuses:null},
+
+  {id:"pencil_sharpener",emoji:"✏️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_09.png",label:"연필깎이",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"fountain_pen",emoji:"🖋️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_10.png",label:"만년필",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"clip_dispenser",emoji:"📎",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_11.png",label:"클립 디스펜서",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"stamp_pad",emoji:"🟥",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_12.png",label:"스탬프 잉크",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"glue_stick",emoji:"🖍️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_13.png",label:"딱풀",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"rubber_stamp",emoji:"🟣",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_14.png",label:"도장",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"compass_tool",emoji:"📐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_15.png",label:"컴퍼스",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"masking_tape",emoji:"🎨",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_16.png",label:"마스킹테이프",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"phone_stand",emoji:"📱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_17.png",label:"휴대폰 거치대",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"triangle_ruler",emoji:"📐",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_18.png",label:"삼각자",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"sticky_note",emoji:"🟨",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_19.png",label:"포스트잇",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"crayons",emoji:"🖍️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_20.png",label:"크레파스",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"a4_paper",emoji:"📄",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_21.png",label:"A4용지",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"utility_knife",emoji:"🔪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_22.png",label:"커터칼",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"binder_clip",emoji:"🖇️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_23.png",label:"더블클립",type:"school",tricky:false,condCategory:null,confuses:null},
+  {id:"glue_bottle",emoji:"🧪",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_school_24.png",label:"물풀",type:"school",tricky:false,condCategory:null,confuses:null},
+
+  {id:"hair_dryer",emoji:"💨",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_09.png",label:"헤어드라이기",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"loofah",emoji:"🧽",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_10.png",label:"샤워타올",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"nail_clipper",emoji:"💅",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_11.png",label:"손톱깎이",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"tongue_cleaner",emoji:"🪥",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_12.png",label:"혀클리너",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"shower_head",emoji:"🚿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_13.png",label:"샤워헤드",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"shower_ball",emoji:"🟣",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_14.png",label:"샤워볼",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"bath_bomb",emoji:"🎱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_15.png",label:"배쓰밤",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"pumice_stone",emoji:"🪨",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_16.png",label:"속돌",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"bath_mat",emoji:"🐾",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_17.png",label:"발매트",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"cotton_swab_jar",emoji:"🏺",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_18.png",label:"면봉통",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"body_wash",emoji:"🧴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_19.png",label:"바디워시",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"slippers",emoji:"🩴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_20.png",label:"슬리퍼",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"scalp_brush",emoji:"💆",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_21.png",label:"두피마사지빗",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"cleaning_brush",emoji:"🧹",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_22.png",label:"세척솔",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"shower_hourglass",emoji:"⏳",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_23.png",label:"샤워타이머",type:"bath",tricky:false,condCategory:null,confuses:null},
+  {id:"bath_egg",emoji:"🥚",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_bath_24.png",label:"입욕제",type:"bath",tricky:false,condCategory:null,confuses:null},
+
+  {id:"propagation_jar",emoji:"🌱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_09.png",label:"수경재배병",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"pruning_shears",emoji:"✂️",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_10.png",label:"전정가위",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"succulent_bowl",emoji:"🪴",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_11.png",label:"다육이 화분",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"garden_rake",emoji:"🧑‍🌾",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_12.png",label:"갈퀴",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"soil_bag",emoji:"🟤",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_13.png",label:"흙포대",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"pothos_pot",emoji:"🌿",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_14.png",label:"넝쿨식물 화분",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"hose_reel",emoji:"⚫",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_15.png",label:"정원 호스릴",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"garden_gnome",emoji:"🧙",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_16.png",label:"정원 노움",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"birdhouse",emoji:"🏠",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_17.png",label:"새집",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"garden_basket",emoji:"🧺",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_18.png",label:"정원 바구니",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"tomato_pot",emoji:"🍅",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_19.png",label:"방울토마토 화분",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"kokedama",emoji:"🟢",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_20.png",label:"이끼공",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"bug_hotel",emoji:"🐞",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_21.png",label:"벌레호텔",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"pesticide_spray",emoji:"🐛",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_22.png",label:"살충제",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"terrarium",emoji:"🌵",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_23.png",label:"테라리엄",type:"plant",tricky:false,condCategory:null,confuses:null},
+  {id:"lawn_mower",emoji:"🌱",img:"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/item_plant_24.png",label:"잔디깎이",type:"plant",tricky:false,condCategory:null,confuses:null},
 ];
 
 const CHARS=[
@@ -1474,7 +1647,7 @@ function getComboMultiplier(combo){
 /* ══ 월드맵 / 스테이지 선택 데이터 ══ */
 const VILLAGES=[
   {id:1,name:"골목마을",  chapterImg:"stage_chapter_01.png",bg:"village1_stageselect_bg.png"},
-  {id:2,name:"해안마을",  chapterImg:"stage_chapter_02.png",bg:"village2_stageselect_bg.png"},
+  {id:2,name:"해변마을",  chapterImg:"stage_chapter_02.png",bg:"village2_stageselect_bg.png"},
   {id:3,name:"숲속마을",  chapterImg:"stage_chapter_03.png",bg:"village3_stageselect_bg.png"},
   {id:4,name:"눈꽃마을",  chapterImg:"stage_chapter_04.png",bg:"village4_stageselect_bg.png"},
 ];
@@ -1486,29 +1659,29 @@ const TOTAL_STAGES=VILLAGES.length*STAGES_PER_VILLAGE;
    targetCount = 클리어 목표 개수, targetTime(초) = 이 시간 안에 클리어하면 점수 +30% 보너스,
    boss = 5/10/15/20 보스 스테이지 여부(기믹 트리거 + 클리어 시 캐릭터 해금 조건). */
 const STAGE_INFO=[
-  {title:"미미의 첫 주문",           desc:"장난감・간식 31개를 배송해요!",       boxes:["toy","snack"],                    targetCount:31,targetTime:60,boss:false},
-  {title:"베이커리의 모카",          desc:"간식・책 31개를 배송해요!",           boxes:["snack","book"],                   targetCount:31,targetTime:60,boss:false},
-  {title:"편집샵 루루",              desc:"장난감・옷 32개를 배송해요!",         boxes:["toy","cloth"],                    targetCount:32,targetTime:60,boss:false},
-  {title:"문구점 아저씨 사부",       desc:"책・쓰레기 33개를 배송해요!",         boxes:["book","trash"],                   targetCount:33,targetTime:60,boss:false},
-  {title:"헌옷가게 코코 — 골목마을 대청소", desc:"옷・쓰레기 34개를 배송해요! (보스)", boxes:["cloth","trash"],             targetCount:34,targetTime:60,boss:true},
+  {title:"미미의 첫 주문",     desc:"장난감・간식 31개를 배송해요!",             boxes:["toy","snack"],                       targetCount:31,targetTime:60,boss:false},
+  {title:"베이커리의 모카",    desc:"간식・주방용품 31개를 배송해요!",           boxes:["snack","kitchen"],                   targetCount:31,targetTime:60,boss:false},
+  {title:"편집샵 루루",        desc:"옷・책 32개를 배송해요!",                   boxes:["cloth","book"],                      targetCount:32,targetTime:60,boss:false},
+  {title:"공원지기 토토",      desc:"식물・쓰레기 33개를 배송해요!",             boxes:["plant","trash"],                     targetCount:33,targetTime:60,boss:false},
+  {title:"서점주인 올리버 — 골목마을 서가 정리", desc:"책・문구용품 34개를 배송해요! (보스)", boxes:["book","school"],       targetCount:34,targetTime:60,boss:true},
 
-  {title:"서프샵 나나",              desc:"장난감・옷・욕실용품 38개를 배송해요!", boxes:["toy","cloth","bath"],            targetCount:38,targetTime:65,boss:false},
-  {title:"아이스크림가게 보리",       desc:"간식・장난감・쓰레기 39개를 배송해요!", boxes:["snack","toy","trash"],           targetCount:39,targetTime:65,boss:false},
-  {title:"등대지기 하루",            desc:"책・가전・욕실용품 40개를 배송해요!",   boxes:["book","it","bath"],              targetCount:40,targetTime:65,boss:false},
-  {title:"조개공방 유자",            desc:"옷・문구용품・쓰레기 42개를 배송해요!", boxes:["cloth","school","trash"],        targetCount:42,targetTime:65,boss:false},
-  {title:"요트클럽 대장 모카투 — 해안마을 큰 파티", desc:"장난감・간식・가전 43개를 배송해요! (보스)", boxes:["toy","snack","it"], targetCount:43,targetTime:65,boss:true},
+  {title:"해변주민 코기",      desc:"옷・욕실용품・장난감 38개를 배송해요!",     boxes:["cloth","bath","toy"],                targetCount:38,targetTime:65,boss:false},
+  {title:"베이커 찰리",        desc:"간식・주방용품・쓰레기 39개를 배송해요!",   boxes:["snack","kitchen","trash"],           targetCount:39,targetTime:65,boss:false},
+  {title:"서퍼 맥스",          desc:"장난감・옷・욕실용품 40개를 배송해요!",     boxes:["toy","cloth","bath"],                targetCount:40,targetTime:65,boss:false},
+  {title:"선장 브루노",        desc:"옷・가전・쓰레기 42개를 배송해요!",         boxes:["cloth","it","trash"],                targetCount:42,targetTime:65,boss:false},
+  {title:"등대지기 벤 — 해변마을 등대 대청소", desc:"책・가전・욕실용품 43개를 배송해요! (보스)", boxes:["book","it","bath"], targetCount:43,targetTime:65,boss:true},
 
-  {title:"원예상점 로즈",            desc:"장난감・책・식물・간식 49개를 배송해요!", boxes:["toy","book","plant","snack"],  targetCount:49,targetTime:70,boss:false},
-  {title:"오두막 셰프 두부",         desc:"간식・주방용품・옷・쓰레기 51개를 배송해요!", boxes:["snack","kitchen","cloth","trash"], targetCount:51,targetTime:70,boss:false},
-  {title:"캠핑샵 조이",              desc:"장난감・옷・식물・가전 53개를 배송해요!", boxes:["toy","cloth","plant","it"],    targetCount:53,targetTime:70,boss:false},
-  {title:"버섯마을 약초상",          desc:"책・식물・주방용품・욕실용품 55개를 배송해요!", boxes:["book","plant","kitchen","bath"], targetCount:55,targetTime:70,boss:false},
-  {title:"숲의 수호자 — 숲속마을 축제", desc:"장난감・간식・옷・책 58개를 배송해요! (보스)", boxes:["toy","snack","cloth","book"], targetCount:58,targetTime:70,boss:true},
+  {title:"정원사 라라",        desc:"식물・장난감・책・간식 49개를 배송해요!",   boxes:["plant","toy","book","snack"],        targetCount:49,targetTime:70,boss:false},
+  {title:"당근가게 피코",      desc:"간식・식물・주방용품・쓰레기 51개를 배송해요!", boxes:["snack","plant","kitchen","trash"], targetCount:51,targetTime:70,boss:false},
+  {title:"우체부 루비",        desc:"책・문구용품・옷・쓰레기 53개를 배송해요!", boxes:["book","school","cloth","trash"],    targetCount:53,targetTime:70,boss:false},
+  {title:"주방용품 밀리",      desc:"주방용품・간식・욕실용품・쓰레기 55개를 배송해요!", boxes:["kitchen","snack","bath","trash"], targetCount:55,targetTime:70,boss:false},
+  {title:"도서관장 하니 — 숲속마을 도서관 정리", desc:"책・문구용품・가전・식물 58개를 배송해요! (보스)", boxes:["book","school","it","plant"], targetCount:58,targetTime:70,boss:true},
 
-  {title:"눈사람공방 하양이",        desc:"장난감・간식・옷・책・쓰레기 65개를 배송해요!", boxes:["toy","snack","cloth","book","trash"], targetCount:65,targetTime:75,boss:false},
-  {title:"온천여관 유키",            desc:"욕실용품・주방용품・옷・간식・식물 68개를 배송해요!", boxes:["bath","kitchen","cloth","snack","plant"], targetCount:68,targetTime:75,boss:false},
-  {title:"스케이트샵 은비",          desc:"장난감・가전・문구용품・옷・쓰레기 72개를 배송해요!", boxes:["toy","it","school","cloth","trash"], targetCount:72,targetTime:75,boss:false},
-  {title:"크리스마스마켓 코코넛",     desc:"간식・식물・책・가전・주방용품 75개를 배송해요!", boxes:["snack","plant","book","it","kitchen"], targetCount:75,targetTime:75,boss:false},
-  {title:"대표 미미 — 눈꽃마을 그랜드 오픈", desc:"전 카테고리 90개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:90,targetTime:85,boss:true},
+  {title:"털모자가게 포포",    desc:"옷・장난감・간식・책・쓰레기 65개를 배송해요!", boxes:["cloth","toy","snack","book","trash"], targetCount:65,targetTime:75,boss:false},
+  {title:"야외온천 로이",      desc:"욕실용품・옷・주방용품・식물・간식 68개를 배송해요!", boxes:["bath","cloth","kitchen","plant","snack"], targetCount:68,targetTime:75,boss:false},
+  {title:"스케이터 루나",      desc:"옷・장난감・욕실용품・간식・쓰레기 72개를 배송해요!", boxes:["cloth","toy","bath","snack","trash"], targetCount:72,targetTime:75,boss:false},
+  {title:"기차역장 펠릭스",    desc:"옷・가전・책・문구용품・쓰레기 75개를 배송해요!", boxes:["cloth","it","book","school","trash"], targetCount:75,targetTime:75,boss:false},
+  {title:"시장님 레오 — 눈꽃마을 그랜드 오픈", desc:"전 카테고리 90개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:90,targetTime:85,boss:true},
 ];
 
 function villageOfStage(g){ return Math.ceil(g/STAGES_PER_VILLAGE); }
@@ -1672,7 +1845,7 @@ const SV_PHASES=[
    기준으로 챕터 내에서 시작값→끝값을 선형보간한다. */
 const STORY_CHAPTER_DIFFICULTY=[
   {spawnBase:[1700,1550], trickyRatio:[0.00,0.08], travelMs:[6000,5600]}, // 1챕터: 골목마을
-  {spawnBase:[1500,1300], trickyRatio:[0.10,0.18], travelMs:[5400,5000]}, // 2챕터: 해안마을
+  {spawnBase:[1500,1300], trickyRatio:[0.10,0.18], travelMs:[5400,5000]}, // 2챕터: 해변마을
   {spawnBase:[1250,1050], trickyRatio:[0.20,0.28], travelMs:[4800,4400]}, // 3챕터: 숲속마을
   {spawnBase:[1000,820],  trickyRatio:[0.28,0.36], travelMs:[4200,3800]}, // 4챕터: 눈꽃마을
 ];
@@ -2097,6 +2270,49 @@ function buildSvPool(phase){
   return pool;
 }
 
+/* ══ 스토리 모드 전용 확장 아이템 풀(09~24) — 마을별 노출 스케줄 ══
+   cat_delivery_stage_balance_v1.md 7번 섹션: 24개를 4마을에 6개씩 순차 공개하고,
+   "이번 마을 신규 공개분"과 "이전까지 누적분"을 그룹 단위 50:50(1마을은 신규100%)
+   비율로 섞는다. 트리키 아이템(06/07/08)은 기존 buildSvPool과 동일한 방식 그대로 사용. */
+function itemNum(it){
+  const m=it.img.match(/_(\d\d)\.png$/);
+  return m?parseInt(m[1],10):99;
+}
+const STORY_ITEM_RELEASE=[6,12,18,24];           // 마을 인덱스(0~3)까지 누적 공개된 최대 번호
+const STORY_RELEASE_REPEATS=[                     // {기존그룹 1개당 반복수, 신규그룹 1개당 반복수}
+  {old:0,new:12}, {old:6,new:6}, {old:3,new:6}, {old:2,new:6},
+];
+function buildStoryPool(stageNum,phase){
+  const active=getActiveCats();
+  const villageIdx=Math.min(3,Math.floor((stageNum-1)/STAGES_PER_VILLAGE)); // 0~3
+  const maxNum=STORY_ITEM_RELEASE[villageIdx];
+  const prevMax=villageIdx>0?STORY_ITEM_RELEASE[villageIdx-1]:0;
+  const rep=STORY_RELEASE_REPEATS[villageIdx];
+  const pool=[];
+  ALL_ITEMS.forEach(it=>{
+    if(!active.includes(it.type)||it.tricky)return;
+    const n=itemNum(it);
+    if(n<=prevMax){ for(let i=0;i<rep.old;i++)pool.push(it); }
+    else if(n<=maxNum){ for(let i=0;i<rep.new;i++)pool.push(it); }
+    /* maxNum을 넘는(아직 이 마을에서 공개 안 된) 아이템은 풀에서 제외 */
+  });
+  /* 트리키 아이템: 기존 로직과 동일 — 조건부 등장 + trickyRatio 비율만큼 추가.
+     pool.length(가중치 반영된 기본 풀 크기)를 기준으로 삼아야 trickyRatio의
+     의미(전체 드로우 중 비율)가 가중치 유무와 무관하게 그대로 유지됨. */
+  const tricky=ALL_ITEMS.filter(it=>active.includes(it.type)&&it.tricky&&active.includes(it.condCategory));
+  if(tricky.length>0&&phase.trickyRatio>0&&pool.length>0){
+    const cnt=Math.max(1,Math.round(pool.length*(phase.trickyRatio/(1-phase.trickyRatio))));
+    const shuffledTricky=[...tricky].sort(()=>Math.random()-0.5);
+    for(let i=0;i<cnt;i++)pool.push(shuffledTricky[i%shuffledTricky.length]);
+  }
+  return pool;
+}
+/* 서바이벌/스토리 공용 진입점 — 모드에 맞는 풀 생성기로 분기 */
+function refreshSpawnPool(phase){
+  SV._pool = SV.mode==="story" ? buildStoryPool(SV.stageNum,phase) : buildSvPool(phase);
+  SV._spawnBag=null;
+}
+
 /* ── 수정: 서바이벌 버튼 항상 5개 표시 ── */
 function updateSvButtons(){
   document.querySelectorAll(".sort-btn").forEach(btn=>btn.style.display="");
@@ -2328,8 +2544,7 @@ function runBoxSwap(slotIdx,newCat,handImg,phase){
         slot.cat=newCat;slot.everSwapped=true;
         renderBoxSlot(slotIdx); /* 같은 img 엘리먼트의 src만 바뀜(현재 translateY(260px)로 숨은 상태 유지) */
 
-        SV._pool=buildSvPool(getSvPhase(SV.elapsed));
-        SV._spawnBag=null; /* 스폰 풀이 바뀌었으니 셔플백도 다시 섞기 */
+        refreshSpawnPool(getCurrentPhase()); /* 스폰 풀이 바뀌었으니 셔플백도 다시 섞기(모드 무관 공용) */
 
         const hand2=createHandEl(layer,x,handImg);
         slideEl(hand2,HAND_HIDE_Y,HAND_SHOW_Y,rise,EASE_IN,"translateX(-50%) ");
@@ -2437,7 +2652,7 @@ function buildStoryEventPlan(stageNum,info){
     }
   }else{
     let swapCount=0, rushCount=0;
-    if(chapterIdx===1){                    /* 해안마을: 스테이지7부터 1회 */
+    if(chapterIdx===1){                    /* 해변마을: 스테이지7부터 1회 */
       swapCount = withinIdx>=1 ? 1 : 0;
     }else if(chapterIdx===2){              /* 숲속마을: 박스교체 2회, 스테이지13부터 러시 1회 */
       swapCount=2;
@@ -2613,8 +2828,7 @@ function svLoop(now){
   updateBeltLinkScroll(dt,phase);
   if(phase!==SV.lastPhase){
     SV.lastPhase=phase;
-    SV._pool=buildSvPool(phase);
-    SV._spawnBag=null;
+    refreshSpawnPool(phase);
     /* 스토리 모드는 박스 개수가 2~5개로 가변이라(중앙 재배치+일부 숨김),
        전 슬롯을 강제로 다시 보이게 하는 updateSvButtons는 서바이벌 전용으로 남김 */
     if(SV.mode!=="story") updateSvButtons();
@@ -2682,7 +2896,7 @@ function drawFromSpawnBag(){
   return itemDef;
 }
 function svSpawnItem(phase,opts){
-  if(!SV._pool||SV._pool.length===0)SV._pool=buildSvPool(phase);
+  if(!SV._pool||SV._pool.length===0)refreshSpawnPool(phase);
   const itemDef=drawFromSpawnBag();
   if(!itemDef)return;
   SV._lastItemLabel=itemDef.label;

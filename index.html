@@ -815,6 +815,8 @@ html,body{
   border-radius:22px;
   display:block;
 }
+@keyframes touchToStartBlink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
+.touch-to-start-blink{animation:touchToStartBlink 1s step-start infinite;}
 
 
 
@@ -1022,7 +1024,7 @@ html,body{
     </div>
     <div class="main-mode-cards" data-editable="메인-시작버튼">
       <button class="mode-card mode-card--survival-img" data-action="goto-worldmap" style="background:none;border:none;box-shadow:none;padding:0;overflow:visible;">
-        <img src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_start_btn.png" style="display:block;" alt="게임 시작">
+        <img class="touch-to-start-blink" src="https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/touch_to_start.png" style="display:block;" alt="게임 시작">
       </button>
     </div><!-- /main-mode-cards -->
     </div><!-- /main-cat-btn-wrap -->
@@ -1081,7 +1083,7 @@ html,body{
 
 <section id="screen-game" class="screen">
   <div class="danger-vignette" id="dangerVignette"></div>
-  <img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png" alt="">
+  <img id="ingameBg" class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png" alt="">
   <header class="game-hud">
     <!-- 좌측: 콤보 + 하트 -->
     <div class="hud-left">
@@ -1369,6 +1371,12 @@ const CATEGORIES={
     "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_03.png",
     "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_04.png",
     "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_05.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_conveyor_link.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_02.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_03.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.png",
+    "https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/touch_to_start.png",
   ];
   urls.forEach(u=>{ const im=new Image(); im.src=u; });
 })();
@@ -1843,8 +1851,15 @@ const SV_PHASES=[
 /* ══ 스토리 모드 난이도 곡선 (cat_delivery_stage_balance_v1.md 2번 섹션) ══
    서바이벌의 SV_PHASES(경과시간 기준 구간)와 달리, 스토리는 "스테이지 번호"
    기준으로 챕터 내에서 시작값→끝값을 선형보간한다. */
+const STORY_CHAPTER_BG=[
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_02.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_03.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.png",
+];
+const SURVIVAL_BG_URL="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png";
 const STORY_CHAPTER_DIFFICULTY=[
-  {spawnBase:[1700,1550], trickyRatio:[0.00,0.08], travelMs:[6000,5600]}, // 1챕터: 골목마을
+  {spawnBase:[1500,1400], trickyRatio:[0.00,0.08], travelMs:[6000,5600]}, // 1챕터: 골목마을
   {spawnBase:[1500,1300], trickyRatio:[0.10,0.18], travelMs:[5400,5000]}, // 2챕터: 해변마을
   {spawnBase:[1250,1050], trickyRatio:[0.20,0.28], travelMs:[4800,4400]}, // 3챕터: 숲속마을
   {spawnBase:[1000,820],  trickyRatio:[0.28,0.36], travelMs:[4200,3800]}, // 4챕터: 눈꽃마을
@@ -1862,7 +1877,7 @@ function getStoryPhase(stageNum){
   };
 }
 
-const SAVE_KEY="catDelivery.v3";
+const SAVE_KEY="catDelivery.v4"; /* v3→v4: 스테이지 진행도 전체 리셋(1스테이지부터 재시작) */
 
 /* ══ 벨트 흐름 모션 ══
    ingame_conveyor_link.png(줄무늬 오버레이)를 아이템이 벨트 위를
@@ -2270,31 +2285,13 @@ function buildSvPool(phase){
   return pool;
 }
 
-/* ══ 스토리 모드 전용 확장 아이템 풀(09~24) — 마을별 노출 스케줄 ══
-   cat_delivery_stage_balance_v1.md 7번 섹션: 24개를 4마을에 6개씩 순차 공개하고,
-   "이번 마을 신규 공개분"과 "이전까지 누적분"을 그룹 단위 50:50(1마을은 신규100%)
-   비율로 섞는다. 트리키 아이템(06/07/08)은 기존 buildSvPool과 동일한 방식 그대로 사용. */
-function itemNum(it){
-  const m=it.img.match(/_(\d\d)\.png$/);
-  return m?parseInt(m[1],10):99;
-}
-const STORY_ITEM_RELEASE=[6,12,18,24];           // 마을 인덱스(0~3)까지 누적 공개된 최대 번호
-const STORY_RELEASE_REPEATS=[                     // {기존그룹 1개당 반복수, 신규그룹 1개당 반복수}
-  {old:0,new:12}, {old:6,new:6}, {old:3,new:6}, {old:2,new:6},
-];
+/* ══ 스토리 모드 전용 아이템 풀 ══ 카테고리당 24개 전부를 스테이지1부터 동일 가중치로 공개 */
 function buildStoryPool(stageNum,phase){
   const active=getActiveCats();
-  const villageIdx=Math.min(3,Math.floor((stageNum-1)/STAGES_PER_VILLAGE)); // 0~3
-  const maxNum=STORY_ITEM_RELEASE[villageIdx];
-  const prevMax=villageIdx>0?STORY_ITEM_RELEASE[villageIdx-1]:0;
-  const rep=STORY_RELEASE_REPEATS[villageIdx];
   const pool=[];
   ALL_ITEMS.forEach(it=>{
     if(!active.includes(it.type)||it.tricky)return;
-    const n=itemNum(it);
-    if(n<=prevMax){ for(let i=0;i<rep.old;i++)pool.push(it); }
-    else if(n<=maxNum){ for(let i=0;i<rep.new;i++)pool.push(it); }
-    /* maxNum을 넘는(아직 이 마을에서 공개 안 된) 아이템은 풀에서 제외 */
+    pool.push(it);
   });
   /* 트리키 아이템: 기존 로직과 동일 — 조건부 등장 + trickyRatio 비율만큼 추가.
      pool.length(가중치 반영된 기본 풀 크기)를 기준으로 삼아야 trickyRatio의
@@ -2722,6 +2719,9 @@ function startStoryStage(stageNum){
       cB:ch.key==="comboScore"?ch.val:1};
   document.getElementById("beltItems").innerHTML="";
   clearDangerEffect();
+  const chapterIdx=Math.floor((stageNum-1)/STAGES_PER_VILLAGE);
+  const bgElStory=document.getElementById("ingameBg");
+  if(bgElStory)bgElStory.src=STORY_CHAPTER_BG[chapterIdx]||STORY_CHAPTER_BG[STORY_CHAPTER_BG.length-1];
   initStoryBoxSlots(info.boxes);
   initHearts(maxH);
   const charEl=document.getElementById("gameCharacter");
@@ -2799,6 +2799,8 @@ function startSurvival(){
       cB:ch.key==="comboScore"?ch.val:1};
   document.getElementById("beltItems").innerHTML="";
   clearDangerEffect();
+  const bgElSv=document.getElementById("ingameBg");
+  if(bgElSv)bgElSv.src=SURVIVAL_BG_URL;
   updateSvButtons();
   initBoxSlots();
   initHearts(maxH);
@@ -2847,7 +2849,7 @@ function svLoop(now){
     if(SV.elapsedMs-SV.lastSpawn>=SV.nextSpawnMs){
       svSpawnItem(phase);
       SV.lastSpawn=SV.elapsedMs;
-      const jitter=phase.spawnBase*0.2;
+      const jitter=phase.spawnBase*0.5;
       SV.nextSpawnMs=Math.max(500,phase.spawnBase+(Math.random()*2-1)*jitter);
     }
     /* 서바이벌 전용 자동 러시(15초부터 20~30초 랜덤 간격) — 스토리 모드는
@@ -2939,15 +2941,27 @@ function svMissItem(it){
   setTimeout(()=>{if(it.node.parentNode)it.node.parentNode.removeChild(it.node);},250);
 }
 
+/* 아이템이 실제로 화면(가로 0~BASE_W) 안에 들어와 있는지 판정.
+   moveItems가 매 프레임 계산해 넣은 style.left(진입여유 포함 좌표)를 그대로 재사용해
+   좌표 계산식이 두 곳에서 따로 관리되며 어긋나는 일을 방지한다. */
+function isItemOnScreen(it){
+  const wrap=getEl("beltItems");
+  const W=wrap?wrap.clientWidth:1624;
+  const left=parseFloat(it.node.style.left);
+  if(isNaN(left))return false;
+  return (left+192>0)&&(left<W);
+}
 function onSortSurvival(type){
   if(!SV||SV.paused||SV.ended)return;
   /* 순서 무관 정답 인정: 클릭한 타입과 일치하는 살아있는 아이템이 있으면
      그중 가장 급한(벨트를 가장 많이 지나간, prog가 큰) 아이템을 정답 처리.
+     단, 아직 화면 밖 진입 여유 구간에 있는(화면에 보이지 않는) 아이템은
+     제외한다 — 보이지도 않는 아이템이 정답 처리되는 것을 막기 위함.
      일치하는 게 하나도 없으면 오답 — 이땐 화면에서 가장 중앙에 가까운
      아이템을 시각적 기준(흔들림 표시용)으로만 사용. */
   let target=null,bestProg=-1;
   for(const it of SV.items){
-    if(it.alive&&it.type===type&&it.prog>bestProg){bestProg=it.prog;target=it;}
+    if(it.alive&&it.type===type&&it.prog>bestProg&&isItemOnScreen(it)){bestProg=it.prog;target=it;}
   }
   const isMatch=!!target;
   if(!target){

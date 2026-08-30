@@ -137,7 +137,7 @@ html,body{
 }
 .main-char-box::before{display:none;}
 /* 버튼 래퍼: 고양이보다 앞 */
-.main-mode-cards{position:absolute;left:813px;top:479px;transform:translate(-50%,-50%);z-index:2;display:flex;}
+.main-mode-cards{position:absolute;left:813px;top:627px;transform:translate(-50%,-50%);z-index:2;display:flex;}
 
 .main-title-block{text-align:center;margin-bottom:4px;}
 .subtitle{
@@ -815,8 +815,8 @@ html,body{
   border-radius:22px;
   display:block;
 }
-@keyframes touchToStartBlink{0%,49%{opacity:1;}50%,100%{opacity:0;}}
-.touch-to-start-blink{animation:touchToStartBlink 1s step-start infinite;}
+@keyframes touchToStartBlink{0%,100%{opacity:1;}50%{opacity:0;}}
+.touch-to-start-blink{animation:touchToStartBlink 1s ease-in-out infinite;}
 
 
 
@@ -1007,7 +1007,7 @@ html,body{
 <body>
 <div id="gameRoot">
 <img id="safeAreaOverlay" src="safe_area.png" alt="">
-<section id="screen-main" class="screen screen-main active">
+<section id="screen-main" class="screen screen-main active" data-action="goto-worldmap">
   <div class="paper-bg"></div>
 
   <div class="main-card">

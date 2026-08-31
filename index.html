@@ -463,7 +463,6 @@ html,body{
   bottom:0;
   line-height:1;
   filter:drop-shadow(0 8px 16px rgba(0,0,0,.25));
-  transition:left .25s cubic-bezier(.34,1.3,.64,1);
   transform-origin:bottom center;
   display:flex;align-items:flex-end;justify-content:center;
 }
@@ -2133,6 +2132,28 @@ const CAT_IMG={
   fail  :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_fail.png",
   blink :"https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_blink.png",
 };
+/* 스테이지 진입 시 1회 재생되는 인사 스프라이트 애니메이션(40프레임) */
+const CAT_GREETING_FRAMES=Array.from({length:40},(_,i)=>
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_greeting_"+String(i+1).padStart(2,"0")+".png"
+);
+const CAT_GREETING_FRAME_MS=50; /* 40프레임 * 50ms = 총 2초 */
+CAT_GREETING_FRAMES.forEach(u=>{ const im=new Image(); im.src=u; }); /* 재생 중 로딩 지연/깜빡임 방지 */
+function playCatGreeting(onDone){
+  const charEl=document.getElementById("gameCharacter");
+  const img=charEl&&charEl.querySelector("img");
+  if(!img){ if(onDone)onDone(); return; } /* 이모지 캐릭터는 스킵(기존 charReact와 동일한 가드) */
+  let frame=0;
+  (function step(){
+    if(frame>=CAT_GREETING_FRAMES.length){
+      img.src=CAT_IMG.normal;
+      if(onDone)onDone();
+      return;
+    }
+    img.src=CAT_GREETING_FRAMES[frame];
+    frame++;
+    setTimeout(step,CAT_GREETING_FRAME_MS);
+  })();
+}
 let _blinkTimer=null;
 function startBlinking(){
   if(_blinkTimer)clearTimeout(_blinkTimer);
@@ -2802,7 +2823,7 @@ function startStoryStage(stageNum){
   const charEl=document.getElementById("gameCharacter");
   if(charEl){
     charEl.innerHTML=ch.img?'<img src="'+ch.img+'" alt="'+ch.name+'">':ch.emoji;
-    charEl.style.left="100px";charEl.className="game-character idle";
+    charEl.className="game-character idle";
   }
   G=SV;updateSvHUD();updateStoryHUDProgress();showScreen("game");
   updateCharPosition(); /* 매 프레임 대신 시작 시 1회(+리사이즈 시)만 계산 */
@@ -2811,7 +2832,7 @@ function startStoryStage(stageNum){
     SV.lastTick=performance.now();
     requestAnimationFrame(svLoop);
   });
-  startBlinking();
+  playCatGreeting(startBlinking); /* 인사 애니메이션 1회 재생 후 눈깜빡임 시작(겹치지 않게) */
 }
 
 function endStoryStage(cleared){
@@ -2889,7 +2910,7 @@ function startSurvival(){
   const charEl=document.getElementById("gameCharacter");
   if(charEl){
     charEl.innerHTML=ch.img?'<img src="'+ch.img+'" alt="'+ch.name+'">':ch.emoji;
-    charEl.style.left="100px";charEl.className="game-character idle";
+    charEl.className="game-character idle";
   }
   G=SV;updateSvHUD();updateStoryHUDProgress();showScreen("game");
   updateCharPosition(); /* 매 프레임 대신 시작 시 1회(+리사이즈 시)만 계산 */
@@ -2899,7 +2920,7 @@ function startSurvival(){
     SV.lastTick=performance.now();
     requestAnimationFrame(svLoop);
   });
-  startBlinking();
+  playCatGreeting(startBlinking); /* 인사 애니메이션 1회 재생 후 눈깜빡임 시작(겹치지 않게) */
 }
 
 /* ── 수정: svLoop — jitter 적용, nextSpawnMs 갱신 ── */

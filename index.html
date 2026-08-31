@@ -1002,6 +1002,14 @@ html,body{
 .wm-corner-btn img{width:100%;display:block;}
 
 /* 우하단: 현재 진행중인 마을 진행도 패널 */
+.wm-dev-btn{
+  position:absolute;left:24px;top:24px;z-index:31;
+  width:56px;height:56px;border-radius:50%;
+  background:#FFD98A;border:2.5px solid #8B5A2B;
+  font-size:26px;cursor:pointer;
+  box-shadow:0 4px 0 rgba(0,0,0,.2);
+}
+.wm-dev-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2);}
 .wm-progress-panel{
   position:absolute;right:24px;bottom:24px;z-index:30;
   width:457px;height:149px;cursor:pointer;
@@ -1252,6 +1260,7 @@ html,body{
     </div>
     <span class="wm-progress-count" id="wmProgCount">3/5</span>
   </button>
+  <button class="wm-dev-btn" data-action="open-stage-jump" title="스테이지 바로가기(테스트용)">🧪</button>
 </section>
 
 
@@ -2761,7 +2770,8 @@ function getCurrentPhase(){
    큐/startBoxSwapBatch를 그대로 재사용하고, 여기서는 "언제"만 정한다. */
 const STORY_RUSH_FREQ_PER_CHAPTER=[1,2,2,3]; /* 챕터별 일반 스테이지 기준 플레이당 러시 발생 횟수 */
 const STORY_RUSH_ITEM_COUNT={ /* 절대 스테이지 번호 -> 러시 1회당 연속 아이템 개수 */
-  3:5, 4:5, 5:5,
+  1:3, 2:3,
+  3:4, 4:4, 5:5,
   6:5, 7:5, 8:5, 9:5, 10:5,
   11:5, 12:5, 13:5, 14:5, 15:5,
   16:6, 17:6, 18:6, 19:6, 20:7,
@@ -3259,6 +3269,7 @@ function handleAction(a, el){
       showScreen("stageselect");break;
     }
     case"back-to-worldmap":showScreen("worldmap");break;
+    case"open-stage-jump":if(window.toggleStageJump)window.toggleStageJump();break;
     case"select-stage":{
       const g=Number(el&&el.dataset.stage);
       if(getStageStatus(g)==="locked"){showToast("이전 스테이지를 먼저 완료해주세요!");return;}
@@ -3887,6 +3898,7 @@ document.addEventListener("visibilitychange",()=>{
     root.classList.toggle("show",open);
     if(open) render();
   }
+  window.toggleStageJump=toggle; /* 월드맵 아이콘 버튼(모바일 등 키보드 없는 환경) 등에서 호출 */
   root.addEventListener("click",e=>{
     const btn=e.target.closest("[data-sj]");
     if(!btn)return;

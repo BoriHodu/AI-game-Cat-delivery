@@ -1951,7 +1951,7 @@ function getStoryPhase(stageNum){
   };
 }
 
-const SAVE_KEY="catDelivery.v5"; /* v4→v5: 스테이지 진행도 전체 리셋(1스테이지부터 재시작) */
+const SAVE_KEY="catDelivery.v6"; /* v5→v6: 테스트용 — 전 스테이지 잠금 해제(storyCleared 기본값 변경) */
 
 /* ══ 벨트 흐름 모션 ══
    ingame_conveyor_link.png(줄무늬 오버레이)를 아이템이 벨트 위를
@@ -1969,7 +1969,7 @@ function updateBeltLinkScroll(dt,phase){
   el.style.backgroundPositionX=SV._beltLinkX+"px";
 }
 
-let save={cleared:{},unlocked:["cat"],selected:"cat",storyCleared:0,coins:12500,gems:153,heartsCurrency:20};
+let save={cleared:{},unlocked:["cat"],selected:"cat",storyCleared:TOTAL_STAGES,coins:12500,gems:153,heartsCurrency:20};
 function loadSave(){
   try{const r=localStorage.getItem(SAVE_KEY);if(r)Object.assign(save,JSON.parse(r));}catch(e){}
   if(!Array.isArray(save.unlocked)||!save.unlocked.length)save.unlocked=["cat"];

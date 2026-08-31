@@ -1965,8 +1965,8 @@ const SURVIVAL_BG_URL="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main
 const STORY_CHAPTER_DIFFICULTY=[
   {spawnBase:[1350,1250], trickyRatio:[0.00,0.08], travelMs:[6667,6667]}, // 1챕터: 골목마을
   {spawnBase:[1350,1150], trickyRatio:[0.10,0.18], travelMs:[6667,6667]}, // 2챕터: 해변마을
-  {spawnBase:[1100,950],  trickyRatio:[0.20,0.28], travelMs:[6667,6667]}, // 3챕터: 숲속마을
-  {spawnBase:[900,750],   trickyRatio:[0.28,0.36], travelMs:[6667,6667]}, // 4챕터: 눈꽃마을
+  {spawnBase:[1200,1050], trickyRatio:[0.20,0.28], travelMs:[6667,6667]}, // 3챕터: 숲속마을
+  {spawnBase:[1000,850],  trickyRatio:[0.28,0.36], travelMs:[6667,6667]}, // 4챕터: 눈꽃마을
 ];
 function getStoryPhase(stageNum){
   const chapterIdx=Math.floor((stageNum-1)/STAGES_PER_VILLAGE); // 0~3
@@ -1974,8 +1974,10 @@ function getStoryPhase(stageNum){
   const t=withinIdx/(STAGES_PER_VILLAGE-1);                     // 0~1
   const d=STORY_CHAPTER_DIFFICULTY[chapterIdx];
   const lerp=(a,b)=>a+(b-a)*t;
+  let spawnBase=lerp(d.spawnBase[0],d.spawnBase[1]);
+  if(stageNum===19||stageNum===20) spawnBase=825; /* 곡선상 값이 너무 빡빡해서 고정값으로 완화 */
   return{
-    spawnBase:lerp(d.spawnBase[0],d.spawnBase[1]),
+    spawnBase,
     trickyRatio:lerp(d.trickyRatio[0],d.trickyRatio[1]),
     travelMs:lerp(d.travelMs[0],d.travelMs[1]),
   };
@@ -2802,7 +2804,7 @@ function updateStoryHUDProgress(){
   el.textContent=`${SV.sortedCount} / ${SV.targetCount}`;
 }
 
-function startStoryStage(stageNum){
+function startStoryStage(stageNum,skipGreeting){
   const info=STAGE_INFO[stageNum-1];
   if(!info)return;
   const ch=getChar();
@@ -2841,7 +2843,14 @@ function startStoryStage(stageNum){
     SV.lastTick=performance.now();
     requestAnimationFrame(svLoop);
   });
-  playCatGreeting(startBlinking); /* 인사 애니메이션 1회 재생 후 눈깜빡임 시작(겹치지 않게) */
+  /* 인사 애니메이션은 스테이지 첫 진입시에만: 재도전/다시하기에서는 바로 cat_normal */
+  if(skipGreeting){
+    const greetImg=charEl&&charEl.querySelector("img");
+    if(greetImg)greetImg.src=CAT_IMG.normal;
+    startBlinking();
+  }else{
+    playCatGreeting(startBlinking);
+  }
 }
 
 function endStoryStage(cleared){
@@ -2882,7 +2891,7 @@ function restartStoryStage(){
   SV=null;G=null;
   document.getElementById("beltItems").innerHTML="";
   hideAllModals();
-  startStoryStage(stageNum);
+  startStoryStage(stageNum,true);
 }
 function quitStoryStage(){
   const vid=SV?villageOfStage(SV.stageNum):currentVillageId;
@@ -2894,7 +2903,7 @@ function quitStoryStage(){
   showScreen("stageselect");
 }
 
-function startSurvival(){
+function startSurvival(skipGreeting){
   const ch=getChar();
   const extraH=ch.key==="extraHeart"?ch.val:0;
   const maxH=3+extraH;
@@ -2929,7 +2938,14 @@ function startSurvival(){
     SV.lastTick=performance.now();
     requestAnimationFrame(svLoop);
   });
-  playCatGreeting(startBlinking); /* 인사 애니메이션 1회 재생 후 눈깜빡임 시작(겹치지 않게) */
+  /* 인사 애니메이션은 스테이지 첫 진입시에만: 재도전/다시하기에서는 바로 cat_normal */
+  if(skipGreeting){
+    const greetImg=charEl&&charEl.querySelector("img");
+    if(greetImg)greetImg.src=CAT_IMG.normal;
+    startBlinking();
+  }else{
+    playCatGreeting(startBlinking);
+  }
 }
 
 /* ── 수정: svLoop — jitter 적용, nextSpawnMs 갱신 ── */
@@ -3193,7 +3209,7 @@ function quitSurvival(){
 function restartSurvival(){
   SV=null;G=null;
   document.getElementById("beltItems").innerHTML="";
-  hideAllModals();startSurvival();
+  hideAllModals();startSurvival(true);
 }
 
 let toastT=null;

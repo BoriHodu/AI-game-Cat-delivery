@@ -99,7 +99,7 @@ html,body{
   align-items:center;
   justify-content:flex-end;
   isolation:isolate;
-  background-image:url('https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_bg.png');
+  background-image:url('https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/home_bg.jpg');
   background-size:cover;
   background-position:center;
 }
@@ -549,15 +549,6 @@ html,body{
 .belt-item:hover img{transform:scale(1.06) translateY(-8px);}
 .belt-item:active img{transform:scale(.95) translateY(4px);}
 .belt-item::after{display:none;}
-.belt-item.correct{
-  pointer-events:none;
-  animation:itemCorrect .5s ease-out forwards;
-}
-@keyframes itemCorrect{
-  0%{transform:translateY(-50%) scale(1);opacity:1}
-  30%{transform:translateY(-90%) scale(1.25) rotate(10deg);opacity:1}
-  100%{transform:translateY(-200%) scale(.1) rotate(360deg);opacity:0}
-}
 .belt-item.wrong img{
   animation:itemWrong .45s ease-in-out;
 }
@@ -566,7 +557,6 @@ html,body{
   20%{transform:translateX(-14px) rotate(-5deg)}
   60%{transform:translateX(14px) rotate(5deg)}
 }
-.item-sparkle{display:none;}
 
 .sort-buttons{
   position:absolute;
@@ -1076,7 +1066,7 @@ html,body{
 
 <section id="screen-game" class="screen">
   <div class="danger-vignette" id="dangerVignette"></div>
-  <img id="ingameBg" class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png" alt="">
+  <img id="ingameBg" class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.jpg" alt="">
   <header class="game-hud">
     <!-- 좌측: 콤보 + 하트 -->
     <div class="hud-left">
@@ -1141,7 +1131,7 @@ html,body{
 <section id="screen-worldmap" class="screen">
   <div class="wm-scroll" id="wmScroll">
     <div class="wm-track">
-      <img class="wm-bg" src="worldmap_bg.png" alt="">
+      <img class="wm-bg" src="worldmap_bg.jpg" alt="">
 
       <button class="wm-village" id="wmVillage1" data-action="goto-stageselect" data-village="1" data-editable="월드맵-골목마을" style="left:537px;">
         <img class="wm-village-bubble" src="village_town_box_01.png" alt="골목마을">
@@ -1199,7 +1189,7 @@ html,body{
 
 
 <section id="screen-stageselect" class="screen">
-  <img class="ss-bg" id="ssBg" src="village1_stageselect_bg.png" alt="">
+  <img class="ss-bg" id="ssBg" src="village1_stageselect_bg.jpg" alt="">
   <img id="guideOverlay1" src="guide_01.png" alt="" data-noedit>
 
   <header class="ss-header">
@@ -1365,10 +1355,10 @@ const CATEGORIES={
     "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_04.png",
     "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/cat_hand_05.png",
     "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_conveyor_link.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_02.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_03.png",
-    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.png",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.jpg",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_02.jpg",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_03.jpg",
+    "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.jpg",
     "https://raw.githubusercontent.com/BoriHodu/AI-game-Cat-delivery/main/touch_to_start.png",
   ];
   urls.forEach(u=>{ const im=new Image(); im.src=u; });
@@ -1693,10 +1683,10 @@ function getComboMultiplier(combo){
 
 /* ══ 월드맵 / 스테이지 선택 데이터 ══ */
 const VILLAGES=[
-  {id:1,name:"골목마을",  chapterImg:"stage_chapter_01.png",bg:"village1_stageselect_bg.png"},
-  {id:2,name:"해변마을",  chapterImg:"stage_chapter_02.png",bg:"village2_stageselect_bg.png"},
-  {id:3,name:"숲속마을",  chapterImg:"stage_chapter_03.png",bg:"village3_stageselect_bg.png"},
-  {id:4,name:"눈꽃마을",  chapterImg:"stage_chapter_04.png",bg:"village4_stageselect_bg.png"},
+  {id:1,name:"골목마을",  chapterImg:"stage_chapter_01.png",bg:"village1_stageselect_bg.jpg"},
+  {id:2,name:"해변마을",  chapterImg:"stage_chapter_02.png",bg:"village2_stageselect_bg.jpg"},
+  {id:3,name:"숲속마을",  chapterImg:"stage_chapter_03.png",bg:"village3_stageselect_bg.jpg"},
+  {id:4,name:"눈꽃마을",  chapterImg:"stage_chapter_04.png",bg:"village4_stageselect_bg.jpg"},
 ];
 const STAGES_PER_VILLAGE=5;
 const TOTAL_STAGES=VILLAGES.length*STAGES_PER_VILLAGE;
@@ -1918,12 +1908,12 @@ const SV_PHASES=[
    서바이벌의 SV_PHASES(경과시간 기준 구간)와 달리, 스토리는 "스테이지 번호"
    기준으로 챕터 내에서 시작값→끝값을 선형보간한다. */
 const STORY_CHAPTER_BG=[
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_02.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_03.png",
-  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.png",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.jpg",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_02.jpg",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_03.jpg",
+  "https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_04.jpg",
 ];
-const SURVIVAL_BG_URL="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.png";
+const SURVIVAL_BG_URL="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg.jpg";
 /* travelMs(벨트 속도)는 아이템 개수/난이도가 이미 챕터별로 올라가는 상황에서
    속도까지 같이 올라가면 너무 가팔라진다는 피드백으로 전 챕터 동일하게 고정.
    spawnBase(스폰 간격)/trickyRatio(트리키 비율)만 챕터가 오를수록 계속 상승. */
@@ -3042,7 +3032,6 @@ function svSpawnItem(phase,opts){
     :itemDef.emoji;
   if(!itemDef.img){node.style.background=cat.bg;node.style.borderColor=cat.color;}
   if(itemDef.tricky&&!itemDef.img)node.style.boxShadow="0 6px 0 "+cat.color+", 0 0 0 3px rgba(255,200,50,.5), 0 8px 20px rgba(0,0,0,.2)";
-  const sp=document.createElement("div");sp.className="item-sparkle";node.appendChild(sp);
   const rushGroup=(opts&&opts.rush)?SV._rushGroup:null;
   if(rushGroup)node.classList.add("rush-item");
   document.getElementById("beltItems").appendChild(node);
@@ -3813,7 +3802,7 @@ document.addEventListener("visibilitychange",()=>{
     }).join("");
 
     root.innerHTML=
-      '<img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.png" alt="">'
+      '<img class="ingame-bg" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_bg_01.jpg" alt="">'
       +'<img class="ingame-belt" src="https://github.com/BoriHodu/AI-game-Cat-delivery/raw/main/ingame_conveyor_belt.png" alt="">'
       +'<div class="ingame-belt-link"></div>'
       +'<div class="game-belt">'

@@ -880,30 +880,6 @@ html,body{
 .iv-toolbar .iv-label{font-size:16px;min-width:220px;text-align:center;}
 .iv-toolbar .iv-hint{font-size:11px;color:#888;margin-left:8px;}
 
-/* 스테이지 1~20 즉시 점프용 개발자 메뉴 (Ctrl+G 토글) — 월드맵/스테이지선택 진행도와
-   무관하게 원하는 스테이지를 바로 시작해서 테스트할 수 있게 함 */
-#stageJumpOverlay{
-  position:absolute;inset:0;z-index:20000;
-  display:none;background:rgba(20,14,8,.7);
-  font-family:var(--font);
-  align-items:center;justify-content:center;
-}
-#stageJumpOverlay.show{display:flex;}
-.sj-panel{
-  background:#fff;border:3px solid #8B5A2B;border-radius:20px;
-  padding:24px 28px;box-shadow:0 8px 0 rgba(0,0,0,.2);
-  display:flex;flex-direction:column;align-items:center;gap:14px;
-}
-.sj-title{font-size:20px;color:#6B4A28;}
-.sj-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;}
-.sj-grid button{
-  font-family:var(--font);font-size:18px;height:56px;border-radius:12px;
-  border:2px solid #8B5A2B;background:#FFD98A;cursor:pointer;
-}
-.sj-grid button:active{transform:translateY(2px);}
-.sj-grid button.boss{background:#FF9E7A;}
-.sj-hint{font-size:12px;color:#888;}
-
 /* ══════════ 월드맵 화면 ══════════ */
 #screen-worldmap{background:#BFE3EE;}
 .wm-scroll{
@@ -971,14 +947,6 @@ html,body{
 .wm-corner-btn img{width:100%;display:block;}
 
 /* 우하단: 현재 진행중인 마을 진행도 패널 */
-.wm-dev-btn{
-  position:absolute;left:24px;top:24px;z-index:31;
-  width:56px;height:56px;border-radius:50%;
-  background:#FFD98A;border:2.5px solid #8B5A2B;
-  font-size:26px;cursor:pointer;
-  box-shadow:0 4px 0 rgba(0,0,0,.2);
-}
-.wm-dev-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.2);}
 .wm-progress-panel{
   position:absolute;right:24px;bottom:24px;z-index:30;
   width:457px;height:149px;cursor:pointer;
@@ -1032,9 +1000,7 @@ html,body{
 <body>
 <div id="gameRoot">
 <img id="safeAreaOverlay" src="safe_area.png" alt="">
-<div id="itemViewerOverlay"></div>
-<div id="stageJumpOverlay"></div>
-<section id="screen-main" class="screen screen-main active" data-action="goto-worldmap">
+<div id="itemViewerOverlay"></div><section id="screen-main" class="screen screen-main active" data-action="goto-worldmap">
   <div class="paper-bg"></div>
 
   <div class="main-card">
@@ -1229,7 +1195,6 @@ html,body{
     </div>
     <span class="wm-progress-count" id="wmProgCount">3/5</span>
   </button>
-  <button class="wm-dev-btn" data-action="open-stage-jump" title="스테이지 바로가기(테스트용)">🧪</button>
 </section>
 
 
@@ -1983,7 +1948,7 @@ function getStoryPhase(stageNum){
   };
 }
 
-const SAVE_KEY="catDelivery.v7"; /* v6→v7: 테스트용 전체 해금 원복, 스테이지 진행도 1스테이지부터 재시작 */
+const SAVE_KEY="catDelivery.v8"; /* v7→v8: 공모전 제출 전 최종 리셋, 1스테이지부터 시작 */
 
 /* ══ 벨트 흐름 모션 ══
    ingame_conveyor_link.png(줄무늬 오버레이)를 아이템이 벨트 위를
@@ -3233,7 +3198,6 @@ function handleAction(a, el){
       showScreen("stageselect");break;
     }
     case"back-to-worldmap":showScreen("worldmap");break;
-    case"open-stage-jump":if(window.toggleStageJump)window.toggleStageJump();break;
     case"select-stage":{
       const g=Number(el&&el.dataset.stage);
       const gStatus=getStageStatus(g);
@@ -3842,47 +3806,6 @@ document.addEventListener("visibilitychange",()=>{
   });
   window.addEventListener("keydown",e=>{
     if(e.ctrlKey && e.key.toLowerCase()==="i"){
-      e.preventDefault();
-      toggle();
-    }
-  });
-})();
-
-/* ══ 스테이지 1~20 즉시 점프 (Ctrl+G, 개발용) ══
-   월드맵/스테이지선택의 잠금 상태와 무관하게 원하는 스테이지를 바로 시작. */
-(function setupStageJump(){
-  let open=false;
-  const root=document.getElementById("stageJumpOverlay");
-  function render(){
-    const btns=STAGE_INFO.map((info,i)=>{
-      const n=i+1;
-      return '<button data-sj="'+n+'" class="'+(info.boss?"boss":"")+'">'+n+'</button>';
-    }).join("");
-    root.innerHTML=
-      '<div class="sj-panel">'
-        +'<div class="sj-title">스테이지 바로가기 (테스트용)</div>'
-        +'<div class="sj-grid">'+btns+'</div>'
-        +'<div class="sj-hint">주황=일반, 빨강=보스 · Ctrl+G로 닫기</div>'
-      +'</div>';
-  }
-  function toggle(){
-    open=!open;
-    root.classList.toggle("show",open);
-    if(open) render();
-  }
-  window.toggleStageJump=toggle; /* 월드맵 아이콘 버튼(모바일 등 키보드 없는 환경) 등에서 호출 */
-  root.addEventListener("click",e=>{
-    const btn=e.target.closest("[data-sj]");
-    if(!btn)return;
-    const n=Number(btn.dataset.sj);
-    open=false;
-    root.classList.remove("show");
-    SV=null;G=null;
-    document.getElementById("beltItems").innerHTML="";
-    startStoryStage(n);
-  });
-  window.addEventListener("keydown",e=>{
-    if(e.ctrlKey && e.key.toLowerCase()==="g"){
       e.preventDefault();
       toggle();
     }

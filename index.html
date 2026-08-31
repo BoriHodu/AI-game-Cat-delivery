@@ -1836,6 +1836,19 @@ function renderWorldMap(){
     tile.style.left=(i*SLOT_W)+"px";
     fillEl.appendChild(tile);
   }
+  scrollWorldMapToVillage(activeVillage.id);
+}
+/* 월드맵은 3600px 폭인데 화면엔 한번에 일부만 보이는 가로 스크롤 구조라,
+   챕터3/4처럼 뒤쪽 마을은 스크롤을 해야만 말풍선이 화면에 나타나 클릭할 수 있음.
+   월드맵에 진입할 때마다 관련 마을(진행중이거나 마지막으로 보던 곳)이 자동으로
+   화면 중앙에 오도록 스크롤해서, 스크롤을 몰라도 해당 마을 말풍선을 바로 누를 수 있게 함. */
+function scrollWorldMapToVillage(vid){
+  const btn=document.getElementById("wmVillage"+vid);
+  const scrollEl=document.getElementById("wmScroll");
+  if(!btn||!scrollEl)return;
+  const centerX=btn.offsetLeft+btn.offsetWidth/2;
+  const target=Math.max(0,Math.min(scrollEl.scrollWidth-scrollEl.clientWidth, centerX-scrollEl.clientWidth/2));
+  scrollEl.scrollLeft=target;
 }
 
 function renderStageSelect(villageId){

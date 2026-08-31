@@ -2793,6 +2793,7 @@ function updateStoryHUDProgress(){
 function startStoryStage(stageNum,skipGreeting){
   const info=STAGE_INFO[stageNum-1];
   if(!info)return;
+  stopBlinking(); /* 이전 스테이지의 눈깜빡임 타이머가 남아있으면 인사 애니메이션 재생 중 프레임을 덮어써서 튐 */
   const ch=getChar();
   const extraH=ch.key==="extraHeart"?ch.val:0;
   const maxH=3+extraH;
@@ -2892,6 +2893,7 @@ function quitStoryStage(){
 }
 
 function startSurvival(skipGreeting){
+  stopBlinking();
   const ch=getChar();
   const extraH=ch.key==="extraHeart"?ch.val:0;
   const maxH=3+extraH;

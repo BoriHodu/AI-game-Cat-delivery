@@ -1018,8 +1018,8 @@ html,body{
 .ss-panel-bg{position:absolute;left:40px;top:8px;width:100%;height:100%;display:block;}
 .ss-panel-number{position:absolute;left:57px;top:24px;width:104px;height:104px;display:block;}
 .ss-panel-number-val{position:absolute;left:56px;top:62px;width:104px;text-align:center;font-size:55px;font-weight:normal;color:rgb(105,60,9);}
-.ss-panel-title{position:absolute;left:172px;top:43px;font-size:33px;font-weight:normal;color:rgb(117,82,41);}
-.ss-panel-desc{position:absolute;left:172px;top:82px;font-size:22px;color:rgb(171,122,65);}
+.ss-panel-title{position:absolute;left:172px;top:43px;width:265px;font-size:33px;font-weight:normal;color:rgb(117,82,41);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ss-panel-desc{position:absolute;left:172px;top:82px;width:265px;font-size:20px;line-height:1.3;color:rgb(171,122,65);}
 .ss-panel-icons{position:absolute;left:450px;top:39px;display:flex;gap:8px;}
 .ss-panel-icons img{width:75px;height:75px;display:block;}
 .ss-start-btn{position:absolute;left:1011px;top:14px;width:453px;height:138px;background:none;border:none;padding:0;cursor:pointer;}
@@ -1738,29 +1738,29 @@ const TOTAL_STAGES=VILLAGES.length*STAGES_PER_VILLAGE;
    targetCount = 클리어 목표 개수, targetTime(초) = 이 시간 안에 클리어하면 점수 +30% 보너스,
    boss = 5/10/15/20 보스 스테이지 여부(기믹 트리거 + 클리어 시 캐릭터 해금 조건). */
 const STAGE_INFO=[
-  {title:"미미의 첫 주문",     desc:"장난감・간식 31개를 배송해요!",             boxes:["toy","snack"],                       targetCount:31,targetTime:60,boss:false},
-  {title:"베이커리의 모카",    desc:"간식・주방용품 31개를 배송해요!",           boxes:["snack","kitchen"],                   targetCount:31,targetTime:60,boss:false},
-  {title:"편집샵 루루",        desc:"옷・책 32개를 배송해요!",                   boxes:["cloth","book"],                      targetCount:32,targetTime:60,boss:false},
-  {title:"공원지기 토토",      desc:"식물・쓰레기 33개를 배송해요!",             boxes:["plant","trash"],                     targetCount:33,targetTime:60,boss:false},
-  {title:"서점주인 올리버 — 골목마을 서가 정리", desc:"책・문구용품 34개를 배송해요! (보스)", boxes:["book","school"],       targetCount:34,targetTime:60,boss:true},
+  {title:"미미의 첫 주문",     desc:"미미의 첫 주문에서 물건 31개를 배송해요!",             boxes:["toy","snack"],                       targetCount:31,targetTime:60,boss:false},
+  {title:"베이커리의 모카",    desc:"베이커리의 모카에서 물건 31개를 배송해요!",           boxes:["snack","kitchen"],                   targetCount:31,targetTime:60,boss:false},
+  {title:"편집샵 루루",        desc:"편집샵 루루에서 물건 32개를 배송해요!",                   boxes:["cloth","book"],                      targetCount:32,targetTime:60,boss:false},
+  {title:"공원지기 토토",      desc:"공원지기 토토에서 물건 33개를 배송해요!",             boxes:["plant","trash"],                     targetCount:33,targetTime:60,boss:false},
+  {title:"서점주인 올리버 — 골목마을 서가 정리", desc:"서점주인 올리버에서 물건 34개를 배송해요! (보스)", boxes:["book","school"],       targetCount:34,targetTime:60,boss:true},
 
-  {title:"해변주민 코기",      desc:"옷・욕실용품・장난감 38개를 배송해요!",     boxes:["cloth","bath","toy"],                targetCount:38,targetTime:65,boss:false},
-  {title:"베이커 찰리",        desc:"간식・주방용품・쓰레기 39개를 배송해요!",   boxes:["snack","kitchen","trash"],           targetCount:39,targetTime:65,boss:false},
-  {title:"서퍼 맥스",          desc:"장난감・옷・욕실용품 40개를 배송해요!",     boxes:["toy","cloth","bath"],                targetCount:40,targetTime:65,boss:false},
-  {title:"선장 브루노",        desc:"옷・가전・쓰레기 42개를 배송해요!",         boxes:["cloth","it","trash"],                targetCount:42,targetTime:65,boss:false},
-  {title:"등대지기 벤 — 해변마을 등대 대청소", desc:"책・가전・욕실용품 43개를 배송해요! (보스)", boxes:["book","it","bath"], targetCount:43,targetTime:65,boss:true},
+  {title:"해변주민 코기",      desc:"해변주민 코기에서 물건 38개를 배송해요!",     boxes:["cloth","bath","toy"],                targetCount:38,targetTime:65,boss:false},
+  {title:"베이커 찰리",        desc:"베이커 찰리에서 물건 39개를 배송해요!",   boxes:["snack","kitchen","trash"],           targetCount:39,targetTime:65,boss:false},
+  {title:"서퍼 맥스",          desc:"서퍼 맥스에서 물건 40개를 배송해요!",     boxes:["toy","cloth","bath"],                targetCount:40,targetTime:65,boss:false},
+  {title:"선장 브루노",        desc:"선장 브루노에서 물건 42개를 배송해요!",         boxes:["cloth","it","trash"],                targetCount:42,targetTime:65,boss:false},
+  {title:"등대지기 벤 — 해변마을 등대 대청소", desc:"등대지기 벤에서 물건 43개를 배송해요! (보스)", boxes:["book","it","bath"], targetCount:43,targetTime:65,boss:true},
 
-  {title:"정원사 라라",        desc:"식물・장난감・책・간식 49개를 배송해요!",   boxes:["plant","toy","book","snack"],        targetCount:49,targetTime:70,boss:false},
-  {title:"당근가게 피코",      desc:"간식・식물・주방용품・쓰레기 51개를 배송해요!", boxes:["snack","plant","kitchen","trash"], targetCount:51,targetTime:70,boss:false},
-  {title:"우체부 루비",        desc:"책・문구용품・옷・쓰레기 53개를 배송해요!", boxes:["book","school","cloth","trash"],    targetCount:53,targetTime:70,boss:false},
-  {title:"주방용품 밀리",      desc:"주방용품・간식・욕실용품・쓰레기 55개를 배송해요!", boxes:["kitchen","snack","bath","trash"], targetCount:55,targetTime:70,boss:false},
-  {title:"도서관장 하니 — 숲속마을 도서관 정리", desc:"책・문구용품・가전・식물 58개를 배송해요! (보스)", boxes:["book","school","it","plant"], targetCount:58,targetTime:70,boss:true},
+  {title:"정원사 라라",        desc:"정원사 라라에서 물건 49개를 배송해요!",   boxes:["plant","toy","book","snack"],        targetCount:49,targetTime:70,boss:false},
+  {title:"당근가게 피코",      desc:"당근가게 피코에서 물건 51개를 배송해요!", boxes:["snack","plant","kitchen","trash"], targetCount:51,targetTime:70,boss:false},
+  {title:"우체부 루비",        desc:"우체부 루비에서 물건 53개를 배송해요!", boxes:["book","school","cloth","trash"],    targetCount:53,targetTime:70,boss:false},
+  {title:"주방용품 밀리",      desc:"주방용품 밀리에서 물건 55개를 배송해요!", boxes:["kitchen","snack","bath","trash"], targetCount:55,targetTime:70,boss:false},
+  {title:"도서관장 하니 — 숲속마을 도서관 정리", desc:"도서관장 하니에서 물건 58개를 배송해요! (보스)", boxes:["book","school","it","plant"], targetCount:58,targetTime:70,boss:true},
 
-  {title:"털모자가게 포포",    desc:"옷・장난감・간식・책・쓰레기 75개를 배송해요!", boxes:["cloth","toy","snack","book","trash"], targetCount:75,targetTime:75,boss:false},
-  {title:"야외온천 로이",      desc:"욕실용품・옷・주방용품・식물・간식 78개를 배송해요!", boxes:["bath","cloth","kitchen","plant","snack"], targetCount:78,targetTime:75,boss:false},
-  {title:"스케이터 루나",      desc:"옷・장난감・욕실용품・간식・쓰레기 83개를 배송해요!", boxes:["cloth","toy","bath","snack","trash"], targetCount:83,targetTime:75,boss:false},
-  {title:"기차역장 펠릭스",    desc:"옷・가전・책・문구용품・쓰레기 86개를 배송해요!", boxes:["cloth","it","book","school","trash"], targetCount:86,targetTime:75,boss:false},
-  {title:"시장님 레오 — 눈꽃마을 그랜드 오픈", desc:"전 카테고리 104개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:104,targetTime:85,boss:true},
+  {title:"털모자가게 포포",    desc:"털모자가게 포포에서 물건 75개를 배송해요!", boxes:["cloth","toy","snack","book","trash"], targetCount:75,targetTime:75,boss:false},
+  {title:"야외온천 로이",      desc:"야외온천 로이에서 물건 78개를 배송해요!", boxes:["bath","cloth","kitchen","plant","snack"], targetCount:78,targetTime:75,boss:false},
+  {title:"스케이터 루나",      desc:"스케이터 루나에서 물건 83개를 배송해요!", boxes:["cloth","toy","bath","snack","trash"], targetCount:83,targetTime:75,boss:false},
+  {title:"기차역장 펠릭스",    desc:"기차역장 펠릭스에서 물건 86개를 배송해요!", boxes:["cloth","it","book","school","trash"], targetCount:86,targetTime:75,boss:false},
+  {title:"시장님 레오 — 눈꽃마을 그랜드 오픈", desc:"시장님 레오에서 물건 104개를 배송해요! (최종보스)", boxes:["toy","snack","cloth","book","trash"], targetCount:104,targetTime:85,boss:true},
 ];
 
 function villageOfStage(g){ return Math.ceil(g/STAGES_PER_VILLAGE); }
@@ -1808,7 +1808,12 @@ function renderWorldMap(){
     }
   });
 
-  const activeVillage = VILLAGES.find(v=>getVillageStatus(v.id)==="in_progress") || VILLAGES[VILLAGES.length-1];
+  /* 진행 중인 마을이 없을 때(전부 완료된 경우 등) 항상 마지막 마을로 고정되면
+     그 앞 마을들의 스테이지 선택으로 못 들어가므로, 현재 보고 있던 마을을
+     우선 사용하고 그마저도 없으면 첫 마을로 대체 */
+  const activeVillage = VILLAGES.find(v=>getVillageStatus(v.id)==="in_progress")
+    || VILLAGES.find(v=>v.id===currentVillageId)
+    || VILLAGES[0];
   const cleared=save.storyCleared||0;
   const startIdx=(activeVillage.id-1)*STAGES_PER_VILLAGE;
   const doneInVillage=Math.max(0,Math.min(STAGES_PER_VILLAGE,cleared-startIdx));

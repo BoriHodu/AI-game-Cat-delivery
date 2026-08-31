@@ -1416,7 +1416,6 @@ const SOUND_URLS={
   ingame:SOUND_BASE+"ingame_sound.mp3",
   btn:SOUND_BASE+"btn_sound.mp3",
   box:SOUND_BASE+"box_sound.mp3",
-  correct:SOUND_BASE+"correct_sound.mp3",
   incorrect:SOUND_BASE+"Incorrect_sound.mp3",
   clear:SOUND_BASE+"clear_sound.mp3",
   fail:SOUND_BASE+"fail_sound.mp3",
@@ -3091,7 +3090,6 @@ function onSortSurvival(type){
   if(!target)return;
   const btn=document.querySelector('.sort-btn[data-type="'+type+'"]');
   if(isMatch){
-    playSfx("correct");
     target.alive=false;
     target._flying=true;   /* moveItems에서 건드리지 않도록 */
     SV.combo++;SV.maxCombo=Math.max(SV.maxCombo,SV.combo);

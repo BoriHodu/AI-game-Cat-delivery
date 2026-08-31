@@ -619,38 +619,6 @@ html,body{
 }
 /* 상자 흡수 시 상자 통통 튀기 */
 .sort-btn.box-absorb{animation:boxAbsorb .35s ease-out;}
-.box-particle{
-  position:fixed;
-  pointer-events:none;
-  z-index:9998;
-  will-change:transform,opacity;
-  animation:boxParticlePop 1.05s cubic-bezier(.15,.6,.4,1) forwards;
-}
-.box-particle.shape-rect{border-radius:2px;}
-.box-particle.shape-ribbon{border-radius:2px;}
-.box-particle.shape-dot{border-radius:50%;}
-@keyframes boxParticlePop{
-  0%  {transform:translate(0,0) rotate(var(--rot0,0deg)) scale(1);opacity:1;}
-  32% {transform:translate(var(--midx),var(--midy)) rotate(var(--rotmid)) scale(1);opacity:1;}
-  75% {opacity:1;}
-  100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(.55);opacity:0;}
-}
-/* 터지는 순간의 플래시 링 - 색종이와 별개로 한번만 재생 */
-.box-flash{
-  position:fixed;
-  width:150px;height:150px;
-  border-radius:50%;
-  pointer-events:none;
-  z-index:9997;
-  background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,214,102,.6) 42%,rgba(255,214,102,0) 74%);
-  transform:translate(-50%,-50%) scale(0);
-  animation:boxFlashPop .4s ease-out forwards;
-}
-@keyframes boxFlashPop{
-  0%  {transform:translate(-50%,-50%) scale(0);opacity:1;}
-  55% {opacity:.9;}
-  100%{transform:translate(-50%,-50%) scale(1);opacity:0;}
-}
 @keyframes boxAbsorb{
   0%  {transform:translateX(-50%) scale(1)}
   40% {transform:translateX(-50%) scale(1.12) translateY(-6px)}
@@ -2225,66 +2193,6 @@ function moveItems(dt){
 
 
 /* ── 포물선 날아가기: scale 보정된 clone을 정확한 화면좌표에 ── */
-function spawnBoxParticles(btnEl){
-  const r = btnEl.getBoundingClientRect();
-  const cx = r.left + r.width/2;
-  const cy = r.top  + r.height*0.28;
-  const colors = ["#ffd166","#ff8fab","#7ec4ff","#b18cff","#8de08a","#ffb562","#ff6b6b","#5ee6d0"];
-  const shapes = ["shape-rect","shape-ribbon","shape-dot"];
-
-  /* 터지는 순간 플래시 링 (한번만) */
-  const flash = document.createElement("div");
-  flash.className = "box-flash";
-  flash.style.left = cx+"px";
-  flash.style.top  = cy+"px";
-  document.body.appendChild(flash);
-  setTimeout(()=>{ if(flash.parentNode) flash.parentNode.removeChild(flash); }, 420);
-
-  const n = 30;
-  for(let i=0;i<n;i++){
-    const p = document.createElement("div");
-    const shape = shapes[Math.floor(Math.random()*shapes.length)];
-    p.className = "box-particle "+shape;
-
-    /* 1단계: 위로 솟구침(넓은 부채꼴, 위쪽 편향) */
-    const angle = -Math.PI/2 + (Math.random()*2-1)*(Math.PI*0.75);
-    const burstDist = 110 + Math.random()*150; /* 기존 40~86 → 훨씬 넓게 */
-    const midx = Math.cos(angle)*burstDist;
-    const midy = Math.sin(angle)*burstDist;
-
-    /* 2단계: 중력 받아 아래로 낙하 + 좌우 드리프트 */
-    const fallExtra = 150 + Math.random()*180;
-    const drift = (Math.random()*100-50);
-    const dx = midx + drift;
-    const dy = midy + fallExtra;
-
-    const rot0 = Math.floor(Math.random()*360);
-    const rotmid = rot0 + (Math.random()<0.5?-1:1)*(150+Math.random()*150);
-    const rot = rotmid + (Math.random()<0.5?-1:1)*(150+Math.random()*250);
-
-    let w,h;
-    if(shape==="shape-ribbon"){ w=3+Math.random()*3; h=12+Math.random()*10; }
-    else if(shape==="shape-dot"){ w=h=5+Math.random()*6; }
-    else{ w=6+Math.random()*6; h=8+Math.random()*8; }
-
-    p.style.left = cx+"px";
-    p.style.top  = cy+"px";
-    p.style.width  = w+"px";
-    p.style.height = h+"px";
-    p.style.marginLeft = (-w/2)+"px";
-    p.style.marginTop  = (-h/2)+"px";
-    p.style.background = colors[i % colors.length];
-    p.style.setProperty("--midx", midx+"px");
-    p.style.setProperty("--midy", midy+"px");
-    p.style.setProperty("--dx", dx+"px");
-    p.style.setProperty("--dy", dy+"px");
-    p.style.setProperty("--rot0", rot0+"deg");
-    p.style.setProperty("--rotmid", rotmid+"deg");
-    p.style.setProperty("--rot", rot+"deg");
-    document.body.appendChild(p);
-    setTimeout(()=>{ if(p.parentNode) p.parentNode.removeChild(p); }, 1080);
-  }
-}
 function flyToBox(itemNode, btnEl){
   /* getBoundingClientRect = scale 적용 후 실제 화면 좌표/크기 */
   const itemR = itemNode.getBoundingClientRect();
@@ -2297,7 +2205,9 @@ function flyToBox(itemNode, btnEl){
   const ex = btnR.left  + btnR.width   / 2;
   const ey = btnR.top   + btnR.height  * 0.2;
 
-  /* clone을 실제 렌더 크기(scale 반영)로 생성 */
+  /* clone을 실제 렌더 크기(scale 반영)로 생성. left/top은 시작 위치에 고정해두고
+     매 프레임 이동은 transform(translate)만으로 처리해서(레이아웃 재계산 없이
+     GPU 합성만으로 처리됨) 모바일에서 프레임이 끊기지 않게 함. */
   const clone = itemNode.cloneNode(true);
   clone.style.cssText = `
     position:fixed;
@@ -2306,7 +2216,7 @@ function flyToBox(itemNode, btnEl){
     width:${itemR.width}px;
     height:${itemR.height}px;
     margin:0;padding:0;
-    transform:none;
+    transform:translate(0,0);
     transform-origin:center center;
     pointer-events:none;
     z-index:9999;
@@ -2343,9 +2253,8 @@ function flyToBox(itemNode, btnEl){
     const ly = sy + (ey - sy) * ease + PEAK * Math.sin(Math.PI * t);
     const op = t > 0.8 ? 1 - (t - 0.8) / 0.2 : 1;
 
-    /* left/top 기준이 itemR.left/top이므로 sx-itemR.left/sy-itemR.top 오프셋 없음 */
-    clone.style.left    = `${itemR.left + (lx - sx)}px`;
-    clone.style.top     = `${itemR.top  + (ly - sy)}px`;
+    /* 시작점(sx,sy) 대비 이동량만큼만 translate — left/top은 처음 값 그대로 유지 */
+    clone.style.transform = `translate(${lx - sx}px, ${ly - sy}px)`;
     clone.style.opacity   = `${op}`;
 
     if(t < 1){
@@ -2357,7 +2266,6 @@ function flyToBox(itemNode, btnEl){
       void btnEl.offsetWidth;
       btnEl.classList.add("box-absorb");
       playSfx("box");
-      spawnBoxParticles(btnEl);
       setTimeout(()=>btnEl.classList.remove("box-absorb"), 350);
     }
   }

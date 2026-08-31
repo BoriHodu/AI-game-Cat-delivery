@@ -529,13 +529,16 @@ html,body{
 }
 .belt-item{
   position:absolute;
-  top:-35px;transform:translateY(-50%);
+  top:-35px;
   background:none;border:none;border-radius:0;box-shadow:none;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;pointer-events:all;
-  transition:transform .12s;
 }
-.belt-item img{width:192px;height:192px;object-fit:contain;pointer-events:none;}
+/* 위치(translateX/Y)는 moveItems()가 매 프레임 이 요소(부모)의 transform에
+   직접 씀. 호버/러시/오답 등 시각효과는 전부 자식(img)의 transform으로
+   분리해서 위치 갱신과 서로 덮어쓰지 않게 함. transition도 자식에만 걸어서
+   위치 갱신에는 보간 지연이 안 생기게 함(부모 transform은 매 프레임 즉시 반영). */
+.belt-item img{width:192px;height:192px;object-fit:contain;pointer-events:none;transition:transform .12s;}
 .belt-item.rush-item img{
   filter:drop-shadow(0 0 10px rgba(255,90,60,.95)) drop-shadow(0 0 18px rgba(255,150,60,.65));
   animation:rushPulse .45s ease-in-out infinite;
@@ -544,8 +547,8 @@ html,body{
   0%,100%{transform:scale(1);}
   50%{transform:scale(1.1);}
 }
-.belt-item:hover{transform:translateY(-58%) scale(1.06);}
-.belt-item:active{transform:translateY(-46%) scale(.95);}
+.belt-item:hover img{transform:scale(1.06) translateY(-8px);}
+.belt-item:active img{transform:scale(.95) translateY(4px);}
 .belt-item::after{display:none;}
 .belt-item.correct{
   pointer-events:none;
@@ -556,13 +559,13 @@ html,body{
   30%{transform:translateY(-90%) scale(1.25) rotate(10deg);opacity:1}
   100%{transform:translateY(-200%) scale(.1) rotate(360deg);opacity:0}
 }
-.belt-item.wrong{
+.belt-item.wrong img{
   animation:itemWrong .45s ease-in-out;
 }
 @keyframes itemWrong{
-  0%,100%{transform:translateY(-50%)}
-  20%{transform:translateY(-50%) translateX(-14px) rotate(-5deg)}
-  60%{transform:translateY(-50%) translateX(14px) rotate(5deg)}
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-14px) rotate(-5deg)}
+  60%{transform:translateX(14px) rotate(5deg)}
 }
 .item-sparkle{display:none;}
 
@@ -1019,7 +1022,7 @@ html,body{
 .ss-panel-number-val{position:absolute;left:56px;top:62px;width:104px;text-align:center;font-size:55px;font-weight:normal;color:rgb(105,60,9);}
 .ss-panel-title{position:absolute;left:172px;top:43px;width:265px;font-size:33px;font-weight:normal;color:rgb(117,82,41);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ss-panel-desc{position:absolute;left:172px;top:82px;width:265px;font-size:20px;line-height:1.3;color:rgb(171,122,65);}
-.ss-panel-icons{position:absolute;left:701px;top:39px;display:flex;gap:8px;}
+.ss-panel-icons{position:absolute;right:40px;top:39px;display:flex;gap:8px;}
 .ss-panel-icons img{width:75px;height:75px;display:block;}
 .ss-start-btn{position:absolute;left:1011px;top:14px;width:453px;height:138px;background:none;border:none;padding:0;cursor:pointer;}
 #ssHeartVal{left:31px;top:-9px;font-size:25px;color:rgb(106,73,29);}
@@ -2185,7 +2188,12 @@ function moveItems(dt){
     const it = items[i];
     if(!it.alive || it._flying) continue;
     it.prog += dt / it.travelMs;
-    it.node.style.left = (-192-ENTRY_BUFFER + (W + 384 + ENTRY_BUFFER) * it.prog) + "px";
+    /* left(레이아웃 트리거) 대신 transform(GPU 합성만)으로 이동시켜서, 터치 시
+       getBoundingClientRect() 등이 강제 리플로우를 유발하지 않게 함. x는
+       화면 안/밖 판정(isItemOnScreen)에서 DOM을 다시 읽지 않도록 같이 저장. */
+    const x = -192-ENTRY_BUFFER + (W + 384 + ENTRY_BUFFER) * it.prog;
+    it.x = x;
+    it.node.style.transform = `translateY(-50%) translateX(${x}px)`;
     if(it.prog >= 1) svMissItem(it);
   }
 }
@@ -2797,6 +2805,7 @@ function startStoryStage(stageNum){
     charEl.style.left="100px";charEl.className="game-character idle";
   }
   G=SV;updateSvHUD();updateStoryHUDProgress();showScreen("game");
+  updateCharPosition(); /* 매 프레임 대신 시작 시 1회(+리사이즈 시)만 계산 */
   _svLoopRunning=false;
   requestAnimationFrame(()=>{
     SV.lastTick=performance.now();
@@ -2883,6 +2892,7 @@ function startSurvival(){
     charEl.style.left="100px";charEl.className="game-character idle";
   }
   G=SV;updateSvHUD();updateStoryHUDProgress();showScreen("game");
+  updateCharPosition(); /* 매 프레임 대신 시작 시 1회(+리사이즈 시)만 계산 */
   /* showScreen 후 다음 프레임에 시작 → screen display:flex 적용 보장 */
   _svLoopRunning=false;
   requestAnimationFrame(()=>{
@@ -2939,7 +2949,7 @@ function svLoop(now){
     triggerBoxWave();
   }
   processBoxSwapQueue();
-  moveItems(dt);updateCharPosition();updateSvHUD();checkComboBonus();
+  moveItems(dt);updateSvHUD();checkComboBonus();
   requestAnimationFrame(svLoop);
 }
 /* svLoop가 죽었을 때 안전하게 재시작 */
@@ -3019,13 +3029,14 @@ function svMissItem(it){
 }
 
 /* 아이템이 실제로 화면(가로 0~BASE_W) 안에 들어와 있는지 판정.
-   moveItems가 매 프레임 계산해 넣은 style.left(진입여유 포함 좌표)를 그대로 재사용해
-   좌표 계산식이 두 곳에서 따로 관리되며 어긋나는 일을 방지한다. */
+   moveItems가 매 프레임 계산해 it.x에 저장해둔 좌표(진입여유 포함)를 그대로
+   재사용해 좌표 계산식이 두 곳에서 따로 관리되며 어긋나는 일을 방지하고,
+   DOM 스타일을 다시 읽는(강제 리플로우) 비용도 피한다. */
 function isItemOnScreen(it){
   const wrap=getEl("beltItems");
   const W=wrap?wrap.clientWidth:1624;
-  const left=parseFloat(it.node.style.left);
-  if(isNaN(left))return false;
+  const left=it.x;
+  if(left===undefined||isNaN(left))return false;
   return (left+192>0)&&(left<W);
 }
 function onSortSurvival(type){
